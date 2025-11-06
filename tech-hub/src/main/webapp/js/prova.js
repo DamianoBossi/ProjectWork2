@@ -70,7 +70,7 @@ if (document.getElementById('registerForm')) {
     document.getElementById('registerForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        const firstName = document.getElementById('registerFirstName').value.trim();
+        const firstName = document.getElementById('registerFirstName').value.trim();  //prendo tutti i valori dal form
         const lastName = document.getElementById('registerLastName').value.trim();
         const dob = document.getElementById('registerDob').value;
         const birthCity = document.getElementById('registerBirthCity').value.trim();
@@ -83,7 +83,7 @@ if (document.getElementById('registerForm')) {
             ...Array.from(document.querySelectorAll('#hardSkillsList li')).map(li => li.childNodes[0].textContent.trim())
         ];
 
-        const formData = new FormData();
+        const formData = new FormData(); //li riassegno come oggetto
         formData.append('firstName', firstName);
         formData.append('lastName', lastName);
         formData.append('dob', dob);
@@ -221,7 +221,7 @@ async function fetchJobsCount() {
     const countText = `${jobs.length} `;
 
     // Aggiorna entrambi se esistono
-    const pill = document.getElementById('homeJobsCountPill');
+    const pill = document.getElementById('homeJobsCountPill'); //da fare per ogni elemento nell'html in cui lo vogliamo inserire
     const card = document.getElementById('homeJobsCountCard');
     
     if (pill) pill.textContent = countText;
@@ -278,21 +278,6 @@ function filterJobs() {
 }
 
 
-
-
-
-
-
-// ==============================
-// SEZIONE DA MODIFICARE
-// ==============================
-
-
-
-
-
-
-
 // ==============================
 // APERTURA MODALE CANDIDATURA  DA MODIFICARE!
 // ==============================
@@ -311,7 +296,7 @@ function openApplyModal(role) {
 
 
 // ==============================
-// FORM DI LOGIN (MODALE)          DA MODIFICARE CON POST!
+// FORM DI LOGIN 
 // ==============================
 
 
@@ -326,7 +311,7 @@ async function handleLogin(event) {
     const utenti = await res.json();
 
     // Trova utente corrispondente
-    const utente = utenti.find(u => u.email === email && u.password === password);
+    const utente = utenti.find(u => u.email === email && u.password === password); //processo non sicuro ma lo utilizziamo per la simulazione
 
     if (utente) {
       alert(`Benvenuto, ${utente.name}!`);
