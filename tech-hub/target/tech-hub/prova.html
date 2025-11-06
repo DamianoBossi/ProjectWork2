@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>TechHub Italia - Careers</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="css/prova.css">
+
+</head>
+
+<body>
+
+  <div id="homeContent">
+    <div class="container text-center">
+      
+      <div class="bg-primary text-white rounded-pill d-inline-block px-3 py-1 mb-5 fs-6"> <!-- QUI SERVE LO SPAN SENNò QUELLA MERDA DI SCRIPT SOVRASCRIVE TUTTO IL DIV! --> 
+        <span id="homeJobsCountPill"></span> posizioni aperte 
+      </div>
+
+      <h1 class="fw-bold"> TechHub Italia</h1>
+    </div>
+
+    <div class="container mt-4" style="max-width: 500px;">
+      <p class="fs-5 text-center lh-lg mx-auto fs-4">
+        Innoviamo il futuro dei pagamenti digitali. Unisciti al nostro team di talenti e costruisci soluzioni
+        tecnologiche
+        all'avanguardia che trasformano il modo in cui le aziende italiane gestiscono le transazioni.
+      </p>
+    </div>
+
+    <div class="container d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 mb-4">
+      <button class="btn btn-primary btn-lg d-flex align-items-center" onclick="showJobsPage()">
+        <i class="bi bi-luggage-fill me-2"></i> Esplora Posizioni Aperte
+      </button>
+      <button class="btn btn-primary btn-lg d-flex align-items-center">
+        <i class="bi bi-person-vcard-fill me-2"></i> Candidatura Spontanea
+      </button>
+    </div>
+
+    <div class="container text-center mb-5">
+      <p class="text-center lh-lg mx-auto fs-6">Hai già un account?</p>
+      <button type="button" class="btn btn-primary btn-lg me-1 px-3 py-1 fs-6" data-bs-toggle="modal"
+        data-bs-target="#loginModal">
+        <i class="bi bi-person-fill"></i> Accedi
+      </button>
+      <button type="button" class="btn btn-primary btn-lg me-1 px-2 py-1 fs-6" data-bs-toggle="modal"
+        data-bs-target="#registerModal">
+        <i class="bi bi-person-fill"></i> Registrati
+      </button>
+    </div>
+
+    <div class="container mt-5 ">
+      <div class="row text-center">
+        <div class="col-md-3 mb-4 g-0">
+          <div class="card p-4 shadow-sm">
+            <i class="bi bi-people fs-2 mb-2 text-primary"></i>
+            <h5 class="text-primary">200+</h5>
+            <p>Professionisti</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-4 g-0">
+          <div class="card p-4 shadow-sm">
+            <i class="bi bi-briefcase fs-2 mb-2 text-primary"></i>
+            <h5 class="text-primary" id="homeJobsCountCard"></h5>
+            <p>Posizioni aperte</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-4 g-0">
+          <div class="card p-4 shadow-sm">
+            <i class="bi bi-graph-up-arrow fs-2 mb-2 text-primary"></i>
+            <h5 class="text-primary">150%</h5>
+            <p>Crescita annua</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-4 g-0">
+          <div class="card p-4 shadow-sm">
+            <i class="bi bi-award fs-2 mb-2 text-danger"></i>
+            <h5 class="text-danger">Best place</h5>
+            <p>To Work 2024</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-5">
+      <div class="bg-primary text-white rounded-pill d-inline-block px-3 py-2 mb-3 fs-6">
+        Chi Siamo
+      </div>
+
+      <div class="row align-items-center">
+        <div class="col-md-6 mb-4 mb-md-0">
+          <div class="card-body py-4 text-start">
+            <h2 class="fs-2 mb-3">L'Azienda Leader nel Fintech Italiano</h2>
+            <p class="fs-6">
+              TechHub Italia è una tech company innovativa fondata nel 2015 con la missione di rivoluzionare il settore
+              dei
+              pagamenti digitali in Italia. Con sede principale a Milano e uffici a Roma e Torino, siamo diventati il
+              partner
+              di riferimento per oltre 5.000 aziende italiane. Sviluppiamo soluzioni POS di ultima generazione,
+              piattaforme di
+              pagamento online e servizi finanziari innovativi che rendono le transazioni sicure, veloci e accessibili a
+              tutti.
+            </p>
+
+            <div class="mt-4" style="max-width:420px;">
+              <div class="d-flex align-items-start mb-3">
+                <div
+                  class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width:40px; height:40px;">
+                  <i class="bi bi-geo-alt-fill fs-5"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold">Sedi in Italia</h6>
+                  <p class="mb-0 text-muted">Milano (HQ), Roma, Torino</p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start mb-3">
+                <div
+                  class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width:40px; height:40px;">
+                  <i class="bi bi-calendar-event-fill fs-5"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold">Fondata nel</h6>
+                  <p class="mb-0 text-muted">2015 – 10 anni di innovazione</p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start">
+                <div
+                  class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width:40px; height:40px;">
+                  <i class="bi bi-globe2 fs-5"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold">Mercato</h6>
+                  <p class="mb-0 text-muted">Italia e espansione europea</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 text-center">
+          <img src="images/POS.jpg" class="img-fluid rounded" style="max-width:550px;" alt="ImmaginePOS">
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card p-5 shadow-sm h-100">
+            <i class="bi bi-graph-up-arrow fs-2 mb-2 text-primary"></i>
+            <h5>Retail & POS</h5>
+            <p>Forniamo terminali POS di ultima generazione a negozi, ristoranti e attività commerciali in tutta Italia.
+            </p>
+            <div class="fs-6 mt-4">
+              <p><i class="bi bi-check-circle-fill fs-6 text-success"></i> 5.000+ clienti attivi</p>
+              <p><i class="bi bi-check-circle-fill fs-6 text-success"></i> Installazione in 48h</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <div class="card p-5 shadow-sm h-100">
+            <i class="bi bi-graph-up-arrow fs-2 mb-2 text-primary"></i>
+            <h5>E-commerce Solutions</h5>
+            <p>Piattaforme di pagamento online integrate per e-commerce di ogni dimensione, con API semplici e sicure.
+            </p>
+
+            <div class="fs-6 mt-4">
+              <p><i class="bi bi-check-circle-fill fs-6 text-success"></i> Integrazione in 1 giorno</p>
+              <p><i class="bi bi-check-circle-fill fs-6 text-success"></i> Sicurezza PCI-DSS</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <div class="card p-5 shadow-sm h-100">
+            <i class="bi bi-graph-up-arrow fs-2 mb-2 text-primary"></i>
+            <h5>Business Services</h5>
+            <p>Soluzioni enterprise per grandi aziende con esigenze complesse di pagamento e reporting avanzato.</p>
+
+            <div class="fs-6 mt-4">
+              <p><i class="bi bi-check-circle-fill fs-6 text-success"></i> Dashboard real-time</p>
+              <p><i class="bi bi-check-circle-fill fs-6 text-success"></i> Account manager dedicato</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="why-section">
+      <div class="container text-center">
+        <div class="why-heading-small">Lavora Con Noi</div>
+        <h2 class="why-title">Perché Scegliere TechHub Italia</h2>
+        <p class="why-subtitle mx-auto">
+          Offriamo un ambiente di lavoro stimolante dove puoi crescere professionalmente e fare davvero la differenza.
+          Tecnologie moderne, cultura inclusiva, percorsi di crescita e benefit competitivi pensati per te.
+        </p>
+      </div>
+
+      <div class="container">
+        <div class="row g-4 align-items-center justify-content-center">
+          <div class="col-lg-6">
+            <div class="hero-photo">
+              <img src="images/Team.jpg" alt="Team TechHub" class="img-fluid">
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="why-card">
+              <div class="why-icon icon-tech"><i class="bi bi-lightning-fill"></i></div>
+              <div>
+                <h6 class="mb-1 fw-semibold">Tecnologie All'Avanguardia</h6>
+                <p class="mb-0 text-muted small">Lavora con React, Node.js, AWS, Kubernetes e le tecnologie più moderne.
+                  Budget
+                  annuale per formazione e conferenze tech.</p>
+              </div>
+            </div>
+
+            <div class="why-card">
+              <div class="why-icon icon-culture"><i class="bi bi-people-fill"></i></div>
+              <div>
+                <h6 class="mb-1 fw-semibold">Cultura Aziendale Inclusiva</h6>
+                <p class="mb-0 text-muted small">Team multiculturale e collaborativo. Eventi di team building, hackathon
+                  interni e un ambiente dove ogni voce conta.</p>
+              </div>
+            </div>
+
+            <div class="why-card">
+              <div class="why-icon icon-growth"><i class="bi bi-bar-chart-fill"></i></div>
+              <div>
+                <h6 class="mb-1 fw-semibold">Crescita Professionale</h6>
+                <p class="mb-0 text-muted small">Percorsi di carriera chiari, mentoring, certificazioni pagate e
+                  possibilità
+                  di lavorare su progetti internazionali.</p>
+              </div>
+            </div>
+
+            <div class="why-card">
+              <div class="why-icon icon-benefits"><i class="bi bi-gift-fill"></i></div>
+              <div>
+                <h6 class="mb-1 fw-semibold">Benefit Competitivi</h6>
+                <p class="mb-0 text-muted small">Smart working flessibile, assicurazione sanitaria, buoni pasto, bonus
+                  performance e stock options per senior.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- JOB SECTION (inizialmente nascosta) -->
+  <section id="jobSection" class="container my-5" style="display:none;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-link text-decoration-none p-0 d-flex align-items-center" onclick="showHomePage()">
+          <i class="bi bi-arrow-left-circle fs-4 me-2"></i> Torna alla Home
+        </button>
+        <h4 class="mb-0 text-primary">Posizioni Aperte</h4>
+      </div>
+      <div class="text-muted" id="jobsCount"></div>
+    </div>
+
+    <div class="row mb-4 g-2">
+      <div class="col-md-5">
+        <input type="text" id="jobSearch" class="form-control" placeholder="Cerca titolo o keyword..."
+          onkeyup="filterJobs()">
+      </div>
+      <div class="col-md-2">
+        <select id="filterCategory" class="form-select" onchange="filterJobs()">
+          <option value="">Categoria (Tutte)</option>
+          <option value="Sviluppo Software">Sviluppo Software</option>
+          <option value="Consulenza e Analisi">Consulenza e Analisi</option>
+          <option value="Data & BI">Data & BI</option>
+          <option value="Logistica e Operazioni">Logistica e Operazioni</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="filterCity" class="form-select" onchange="filterJobs()">
+          <option value="">Sede (Tutte)</option>
+          <option value="Milano, Italia">Milano</option>
+          <option value="Roma, Italia">Roma</option>
+          <option value="Torino, Italia">Torino</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select id="filterContract" class="form-select" onchange="filterJobs()">
+          <option value="">Contratto (Tutti)</option>
+          <option value="Tempo indeterminato">Indeterminato</option>
+          <option value="consulenza">Consulenza</option>
+        </select>
+      </div>
+    </div>
+
+
+    <div id="jobsGrid" class="row g-4"></div>
+
+    <footer class="mt-5 mb-5 text-center text-muted">
+      © 2024 TechHub Italia
+    </footer>
+
+  </section>
+
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Accedi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Accedi</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerModalLabel">Registrati</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm" enctype="multipart/form-data">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="registerFirstName" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="registerFirstName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="registerLastName" class="form-label">Cognome</label>
+                <input type="text" class="form-control" id="registerLastName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="registerDob" class="form-label">Data di nascita</label>
+                <input type="date" class="form-control" id="registerDob" required>
+              </div>
+              <div class="col-md-6">
+                <label for="registerBirthCity" class="form-label">Città di nascita</label>
+                <input type="text" class="form-control" id="registerBirthCity" required>
+              </div>
+              <div class="col-12">
+                <label for="registerEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="registerEmail" required>
+              </div>
+              <div class="col-md-6">
+                <label for="registerPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="registerPassword" required>
+              </div>
+              <div class="col-md-6">
+                <label for="registerCv" class="form-label">Carica CV (PDF/DOC/DOCX)</label>
+                <input type="file" class="form-control" id="registerCv" accept=".pdf,.doc,.docx">
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Soft Skills</label>
+                <div class="input-group mb-2">
+                  <input type="text" id="softSkillInput" class="form-control" placeholder="Esempio: comunicazione"
+                    aria-label="Soft skill">
+                  <button class="btn btn-outline-secondary" type="button" id="addSoftSkillBtn">Aggiungi</button>
+                </div>
+                <ul id="softSkillsList" class="list-group"></ul>
+                <small class="text-muted">Clicca su un elemento per rimuoverlo.</small>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">Hard Skills</label>
+                <div class="input-group mb-2">
+                  <input type="text" id="hardSkillInput" class="form-control" placeholder="Esempio: React, Node.js"
+                    aria-label="Hard skill">
+                  <button class="btn btn-outline-secondary" type="button" id="addHardSkillBtn">Aggiungi</button>
+                </div>
+                <ul id="hardSkillsList" class="list-group"></ul>
+                <small class="text-muted">Clicca su un elemento per rimuoverlo.</small>
+              </div>
+            </div>
+
+            <div class="mt-4 d-grid">
+              <button type="submit" class="btn btn-primary w-100">Registrati</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  <script src="js/prova.js"></script>
+
+
+</body>
+
+</html>

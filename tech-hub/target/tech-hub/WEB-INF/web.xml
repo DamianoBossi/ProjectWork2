@@ -4,4 +4,12 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+    <servlet-name>ExampleServlet</servlet-name>
+    <servlet-class>it.zucchetti.packages.servlets.ExampleServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ExampleServlet</servlet-name>
+    <url-pattern>/servlet/ExampleServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
