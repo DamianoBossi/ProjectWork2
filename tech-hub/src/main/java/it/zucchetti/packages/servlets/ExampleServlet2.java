@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import it.zucchetti.packages.jdbc.JDBCConnection;
+//import it.zucchetti.packages.jdbc.JDBCConnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,8 +14,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
+//@WebServlet("/servlets/ExampleServlet2")
 public class ExampleServlet2 extends HttpServlet {
+    
+    public static final String JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    public static final String CONNECTION_STRING = "jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks;encrypted=false;trustServerCertificate=true;integratedSecurity=true;"; 
+    public static final String USER = "";
+    public static final String PASSWORD = "";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -25,29 +30,42 @@ public class ExampleServlet2 extends HttpServlet {
         Statement statement = null;
         ResultSet resultSet = null;
 
+        PrintWriter out = response.getWriter();
+        
         try {
-            Class.forName(JDBCConnection.JDBC_DRIVER);
+            Class.forName(JDBC_DRIVER);
     
-            connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING , JDBCConnection.USER, JDBCConnection.PASSWORD);
+            connection = DriverManager.getConnection(CONNECTION_STRING , USER, PASSWORD);
     
             statement = connection.createStatement();
     
-            resultSet = statement.executeQuery("SELECT Nome, Prezzo FROM PRODOTTO");
+            resultSet = statement.executeQuery("SELECT PersonID, PersonName FROM Person");
 
-            PrintWriter out = response.getWriter();
             while (resultSet.next()) {
-                String name = resultSet.getString("Nome");
-                double price = resultSet.getDouble("Prezzo");
-                out.println("Name: " + name + ", Price: " + price);
+                int pid = resultSet.getInt("PersonID");
+                String pname = resultSet.getString("PersonName");
+                out.println("PersonID: " + pid + ", PersonName: " + pname);
             }
-        } catch (ClassNotFoundException | SQLException e) {}
+        } catch (ClassNotFoundException e) {
+            out.println("Errore: driver JDBC non trovato.");
+            e.printStackTrace(out);
+        } catch (SQLException e) {
+            out.println("Errore SQL:");
+            e.printStackTrace(out);
+        } catch (Exception e) {
+            out.println("Errore inaspettato:");
+            e.printStackTrace(out);
+        }
         finally {
             try {
                 if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
                 if (connection != null) connection.close();
-            } catch (SQLException ignored) {}
+            } catch (SQLException e) {
+                out.println("Errore durante la chiusura delle risorse:");
+                e.printStackTrace(out);
+            }
         }
     }
-
+    
 }
