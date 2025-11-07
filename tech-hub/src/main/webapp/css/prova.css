@@ -1,261 +1,211 @@
-/* ------------------------------------------------------------------- */
-/* THEME VARIABLES + FOUNDATION                                        */
-/* ------------------------------------------------------------------- */
-:root{
-  --color-primary-start: #4f46e5; /* Indigo 600 */
-  --color-primary-mid:   #7c3aed;
-  --color-primary-end:   #06b6d4; /* Cyan 500 */
-  --color-accent:        #ff6bcb;
-  --color-success:       #10b981;
-  --color-danger:        #ef4444;
+    /* ------------------------------------------------------------------- */
+    /* 1. VARIABILI E FONDAMENTALI: Rende il tema facile da cambiare */
+    /* ------------------------------------------------------------------- */
+    :root {
+      /* Colori primari (usati nei gradienti) */
+      --color-primary-start: #4f46e5; /* Indigo 600 */
+      --color-primary-end: #06b6d4;   /* Cyan 500 */
+      /* Colori di testo e sfondo */
+      --color-text-dark: #0b1020;
+      --color-text-body: #1e293b;
+      --color-background: #f8f9fa;
+      --color-card-bg: #ffffff;
+      /* Ombre pulite e moderne (più soft) */
+      --shadow-base: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.1);
+      /* Transizioni */
+      --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-  --color-text-dark:  #0b1020;
-  --color-text-body:  #1e293b;
-  --color-muted:      #64748b;
-  --color-background: #f8fafc;
-  --color-card-bg:    #fff;
+    /* --- Global Styles --- */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-background);
+      margin: 0;
+      padding: 0;
+      color: var(--color-text-body);
+      scroll-behavior: smooth;
+    }
 
-  --shadow-1:  0 6px 18px rgba(16,24,40,0.06);
-  --shadow-2:  0 12px 40px rgba(16,24,40,0.09);
-  --shadow-pop: 0 18px 50px rgba(13,110,253,0.12);
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--color-text-dark);
+    }
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+    /* ------------------------------------------------------------------- */
+    /* 2. COMPONENTI MODIFICATI: Miglioramenti a Pulsanti e Card */
+    /* ------------------------------------------------------------------- */
 
-  --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
-  --transition-base: all 300ms cubic-bezier(.4,0,.2,1);
+    /* Hero / Buttons */
+    .btn-primary {
+      /* Usa le variabili per il gradiente e aggiungi una transizione */
+      background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
+      border: none;
+      transition: var(--transition-base); 
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); /* Ombra basata sul colore primario */
+    }
 
-  --glass-bg: rgba(255,255,255,0.7);
-}
+    .btn-primary:hover {
+      /* Inverte o modifica leggermente il gradiente e solleva il pulsante */
+      background: linear-gradient(90deg, var(--color-primary-end), var(--color-primary-start));
+      transform: translateY(-2px); /* Effetto sollevamento */
+      box-shadow: 0 8px 15px rgba(6, 182, 212, 0.4);
+    }
+    
+    .btn-link {
+        transition: var(--transition-base);
+    }
+    
+    .btn-link:hover {
+        opacity: 0.8;
+    }
 
-/* ------------------------------------------------------------------- */
-/* GLOBALS                                                              */
-/* ------------------------------------------------------------------- */
-*{box-sizing:border-box}
-html,body{height:100%}
-body {
-  font-family: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
-  background: var(--color-background); 
-  margin: 0;
-  color: var(--color-text-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.55;
-  scroll-behavior: smooth;
-}
+    /* Card standard (statistiche e servizi) */
+    .card {
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      border-radius: 12px;
+      transition: var(--transition-base);
+      box-shadow: var(--shadow-base); /* Ombra pulita */
+      background-color: var(--color-card-bg);
+    }
 
+    /* Aggiunge un effetto hover sottile alle card */
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-hover);
+    }
+    
+    /* Correzione per card affiancate (statistiche) */
+    .row > [class*="col-"] > .card {
+        margin: 0 -0.5px; 
+        height: calc(100% + 1px); 
+    }
 
-/* Headings */
-h1,h2,h3,h4,h5,h6{color:var(--color-text-dark); margin:0 0 .5rem 0; font-weight:700; letter-spacing:-0.01em}
-h1{font-size:2.25rem}
-h2{font-size:1.75rem}
-h3{font-size:1.25rem}
+    /* ------------------------------------------------------------------- */
+    /* 3. SEZIONE "PERCHÉ SCEGLIERE TECHHUB ITALIA" (Why Section) */
+    /* ------------------------------------------------------------------- */
 
-/* Paragraphs & small */
-p{margin:.5rem 0 1rem}
-.small, small{font-size:.875rem; color:var(--color-muted)}
+    .why-section {
+      padding: 60px 0;
+    }
 
-/* Links */
-a{color:var(--color-primary-mid); text-decoration:none; transition:var(--transition-fast)}
-a:hover{filter:brightness(.95); text-decoration:underline}
+    .why-heading-small {
+      color: var(--color-primary-start);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
 
-/* ------------------------------------------------------------------- */
-/* BUTTONS                                                               */
-/* ------------------------------------------------------------------- */
-.btn{
-  border-radius: calc(var(--radius-sm) - 2px);
-  transition:var(--transition-base);
-  font-weight:600;
-  letter-spacing:0.01em;
-}
+    .why-title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
 
-/* Primary gradient button */
-.btn-primary{
-  background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
-  color:#fff;
-  border: none;
-  box-shadow: var(--shadow-1);
-  padding:.6rem 1rem;
-}
-.btn-primary:hover{ transform: translateY(-3px); box-shadow: var(--shadow-2) }
-.btn-primary:active{ transform: translateY(-1px) }
+    .why-subtitle {
+      max-width: 700px;
+      font-size: 1.15rem;
+      color: #64748b;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
 
-/* Outline variant */
-.btn-outline-primary{
-  background: transparent;
-  color:var(--color-primary-mid);
-  border: 1px solid rgba(124,58,237,0.12);
-  backdrop-filter: blur(4px);
-}
-.btn-outline-primary:hover{
-  background: linear-gradient(90deg, rgba(124,58,237,0.06), rgba(6,182,212,0.04));
-  box-shadow: 0 8px 30px rgba(99,102,241,0.06);
-}
+    /* Why Card: Effetto di apparizione */
+    .why-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px;
+      background-color: var(--color-card-bg);
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      margin-bottom: 16px;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.6s ease;
+      opacity: 0; /* Nascondi per l'animazione */
+      transform: translateY(20px); /* Sposta in basso per l'animazione */
+      box-shadow: var(--shadow-base);
+    }
 
-/* Small buttons */
-.btn-sm{ padding:.35rem .6rem; font-size:.875rem }
+    /* Animazione: aggiunta della classe "visible" tramite JavaScript */
+    .why-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-/* Link-styled buttons */
-.btn-link{ color:var(--color-muted); background:transparent; border:none; padding:0 }
-.btn-link:hover{ color:var(--color-primary-mid) }
+    /* Icone */
+    .why-icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
 
-/* ------------------------------------------------------------------- */
-/* CARDS                                                                 */
-/* ------------------------------------------------------------------- */
-.card{
-  background: linear-gradient(180deg, var(--color-card-bg), var(--glass-bg));
-  border-radius:var(--radius-md);
-  border:1px solid rgba(15,23,42,0.04);
-  box-shadow: var(--shadow-1);
-  transition: transform 280ms cubic-bezier(.2,.9,.2,1), box-shadow 280ms;
-}
+    /* Icon gradients (Colori unici per ogni icona) */
+    .icon-tech { 
+        background: linear-gradient(135deg, #4f46e5, #06b6d4); 
+    }
+    .icon-culture { 
+        background: linear-gradient(135deg, #7c3aed, #ff6bcb); 
+    }
+    .icon-growth { 
+        background: linear-gradient(135deg, #ef4444, #f97316); 
+    }
+    .icon-benefits { 
+        background: linear-gradient(135deg, #22c55e, #10b981); /* Tonalità di verde per i benefici */
+    }
 
-/* Hover elevazione */
-.card:hover{
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-2);
-}
+    /* Hero Image */
+    .hero-photo {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 45px rgba(16, 24, 40, 0.15); 
+      border: 1px solid rgba(15, 23, 42, 0.05);
+    }
 
-/* Card inner padding util */
-.card-body{ padding:1.25rem }
+    .hero-photo img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
-/* Small stat card tweaks */
-.stat-number{ font-weight:800; font-size:1.25rem; color:var(--color-primary-mid) }
-.stat-sub{ color:var(--color-muted); margin-top:.25rem }
+    /* ------------------------------------------------------------------- */
+    /* 4. SEZIONE POSIZIONI APERTE (jobSection) */
+    /* ------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------- */
-/* WHY SECTION                                                           */
-/* ------------------------------------------------------------------- */
-.why-section{ padding:72px 0 }
-.why-heading-small{
-  color:var(--color-primary-start);
-  font-size:.825rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  margin-bottom:.5rem;
-  display:inline-block;
-  background: linear-gradient(90deg, rgba(79,70,229,0.06), rgba(6,182,212,0.04));
-  padding:.35rem .75rem;
-  border-radius:999px;
-}
-.why-title{ font-size:2.75rem; line-height:1.05; margin-bottom:.5rem }
-.why-subtitle{ max-width:760px; margin:0 auto 32px; color:var(--color-muted); font-size:1.05rem }
+    #jobSection .card {
+        padding: 1.5rem;
+        height: 100%;
+        box-shadow: var(--shadow-base);
+    }
+    
+    #jobSection .card:hover {
+        border-color: var(--color-primary-start); 
+    }
 
-/* why-card: refined look */
-.why-card{
-  display:flex; gap:18px; align-items:flex-start;
-  padding:20px; background:linear-gradient(180deg, #fff, #fbfdff);
-  border-radius:12px; border:1px solid rgba(15,23,42,0.04);
-  transition: transform 380ms cubic-bezier(.2,.8,.2,1), box-shadow 380ms, opacity 300ms;
-  box-shadow: 0 8px 30px rgba(16,24,40,0.04);
-}
-.why-card.visible{ transform: translateY(0); opacity:1 }
-.why-card .why-icon{
-  width:54px; height:54px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:1.25rem; flex-shrink:0; box-shadow: 0 6px 20px rgba(12,22,50,0.08);
-}
+    .small.text-muted i {
+        margin-right: 4px;
+        color: #94a3b8; 
+    }
 
-/* Icon gradients preserved & slightly softened */
-.icon-tech{ background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)) }
-.icon-culture{ background: linear-gradient(135deg, #7c3aed, #ff7ab6) }
-.icon-growth{ background: linear-gradient(135deg, #f97316, #ef4444) }
-.icon-benefits{ background: linear-gradient(135deg, #22c55e, #10b981) }
+    /* ------------------------------------------------------------------- */
+    /* 5. RESPONSIVE MEDIA QUERIES */
+    /* ------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------- */
-/* HERO IMAGE                                                             */
-/* ------------------------------------------------------------------- */
-.hero-photo{
-  border-radius:16px; overflow:hidden; box-shadow: var(--shadow-pop); border:1px solid rgba(15,23,42,0.04);
-}
-.hero-photo img{ display:block; width:100%; height:auto; }
+    @media (max-width: 991px) {
+      .why-title { font-size: 2.5rem; }
+    }
 
-/* ------------------------------------------------------------------- */
-/* JOB SECTION                                                            */
-/* ------------------------------------------------------------------- */
-#jobSection .card{ padding:1.5rem; border-radius:12px }
-#jobSection .card:hover{ border-color: rgba(79,70,229,0.18); transform:translateY(-6px) }
-.job-badge{
-  display:inline-flex; align-items:center; gap:.4rem; padding:.28rem .6rem; font-weight:700;
-  border-radius:999px; font-size:.85rem; color:#fff;
-  background: linear-gradient(90deg, var(--color-primary-mid), var(--color-primary-end));
-  box-shadow: 0 6px 18px rgba(6,182,212,0.12);
-}
-
-/* small text icons */
-.small.text-muted i{ margin-right:6px; color:#94a3b8 }
-
-/* grid card internals */
-.job-meta{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
-.job-meta .muted{ color:var(--color-muted); font-size:.95rem }
-
-/* ------------------------------------------------------------------- */
-/* FORMS / INPUTS                                                         */
-/* ------------------------------------------------------------------- */
-.form-control{
-  border-radius:10px; border:1px solid rgba(15,23,42,0.06);
-  padding:.6rem .75rem; transition: box-shadow 180ms, border-color 180ms;
-}
-.form-control:focus{
-  outline:none;
-  box-shadow: 0 6px 20px rgba(99,102,241,0.08);
-  border-color: rgba(99,102,241,0.28);
-}
-
-/* select */
-.form-select{ border-radius:10px }
-
-/* file input small tweak */
-input[type="file"]{
-  border-radius:8px;
-  padding:.35rem;
-}
-
-/* ------------------------------------------------------------------- */
-/* BADGES & LABELS                                                        */
-/* ------------------------------------------------------------------- */
-.badge-soft{
-  display:inline-block; padding:.25rem .55rem; border-radius:999px; font-weight:700;
-  background: linear-gradient(90deg, rgba(79,70,229,0.08), rgba(6,182,212,0.04));
-  color:var(--color-primary-mid);
-  border:1px solid rgba(79,70,229,0.06);
-}
-
-/* ------------------------------------------------------------------- */
-/* UTILITIES                                                              */
-/* ------------------------------------------------------------------- */
-.muted{ color:var(--color-muted) }
-.centered-overlay{
-  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-  background: linear-gradient(180deg, rgba(13,110,253,0.96), rgba(79,70,229,0.92));
-  color:#fff; padding:1rem 1.4rem; border-radius:14px; z-index:1200;
-  box-shadow: 0 20px 50px rgba(10,15,30,0.3); display:none;
-}
-
-/* visible helper */
-.show-inline{ display:inline-flex !important }
-
-/* ------------------------------------------------------------------- */
-/* RESPONSIVE                                                              */
-/* ------------------------------------------------------------------- */
-@media (max-width:991px){
-  h1{ font-size:2rem } .why-title{ font-size:2rem }
-}
-@media (max-width:767px){
-  .why-title{ font-size:1.6rem }
-  .btn-lg{ width:100%; justify-content:center }
-  .why-card{ flex-direction:column; gap:10px }
-  .hero-photo{ border-radius:12px }
-  .why-heading-small{ margin-bottom:.25rem }
-}
-
-/* ------------------------------------------------------------------- */
-/* ACCESSIBILITY: Respect user motion preferences                         */
-/* ------------------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce){
-  :root{ --transition-base: none; --transition-fast: none }
-  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition:none !important }
-}
-
-
+    @media (max-width: 767px) {
+      .why-title { font-size: 2.2rem; }
+      .why-subtitle { padding: 0 15px; font-size: 1rem; }
+      .btn-lg { width: 100%; justify-content: center; margin-bottom: 10px; }
+      .why-card { flex-direction: column; gap: 8px; padding: 20px; }
+      .why-icon { margin-bottom: 8px; }
+    }
