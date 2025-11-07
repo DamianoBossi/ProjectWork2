@@ -272,12 +272,28 @@
         </button>
         <h4 class="mb-0 text-primary">Posizioni Aperte</h4>
       </div>
-      <div class="text-muted" id="jobsCount"></div>
+
+      <!-- BLOCCO SOSTITUITO: mostra il conteggio e aggiunge i due bottoni vicino al testo -->
+      <div class="d-flex align-items-center gap-2">
+        <!-- l'ID jobsCount viene mantenuto così il tuo script può aggiornare il testo -->
+        <div class="text-muted" id="jobsCount">50 opportunità trovate</div>
+
+        <!-- Pulsanti che aprono i modal già presenti -->
+        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center"
+                data-bs-toggle="modal" data-bs-target="#loginModal" aria-label="Accedi">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Accedi
+        </button>
+
+        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center"
+                data-bs-toggle="modal" data-bs-target="#registerModal" aria-label="Registrati">
+          <i class="bi bi-person-plus me-1"></i> Registrati
+        </button>
+      </div>
     </div>
 
     <div class="row mb-4 g-2">
       <div class="col-md-5">
-        <input type="text" id="jobSearch" class="form-control" placeholder="Cerca titolo o keyword..."
+        <input type="text" id="jobSearch" class="form-control" placeholder="Cerca una candidatura aperta in TechHub Italia "
           onkeyup="filterJobs()">
       </div>
       <div class="col-md-2">
@@ -297,13 +313,15 @@
           <option value="Torino, Italia">Torino</option>
         </select>
       </div>
-      <div class="col-md-2">
-        <select id="filterContract" class="form-select" onchange="filterJobs()">
-          <option value="">Contratto (Tutti)</option>
-          <option value="Tempo indeterminato">Indeterminato</option>
-          <option value="consulenza">Consulenza</option>
-        </select>
-      </div>
+     <div class="col-md-2">
+      <select id="filterContract" class="form-select" onchange="filterJobs()">
+        <option value="">Contratto (Tutti)</option>
+        <option value="Determinato">Determinato</option>
+        <option value="Indeterminato">Indeterminato</option>
+        <option value="Part-time">Part-time</option>
+     </select>
+    </div>
+
     </div>
 
 
