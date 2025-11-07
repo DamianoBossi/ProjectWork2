@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-//import it.zucchetti.packages.jdbc.JDBCConnection;
+import it.zucchetti.packages.jdbc.JDBCConnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,11 +16,6 @@ import java.sql.Statement;
 
 //@WebServlet("/servlets/ExampleServlet2")
 public class ExampleServlet2 extends HttpServlet {
-    
-    public static final String JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String CONNECTION_STRING = "jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks;encrypted=false;trustServerCertificate=true;integratedSecurity=true;"; 
-    public static final String USER = "";
-    public static final String PASSWORD = "";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -31,11 +26,11 @@ public class ExampleServlet2 extends HttpServlet {
         ResultSet resultSet = null;
 
         PrintWriter out = response.getWriter();
-        
+
         try {
-            Class.forName(JDBC_DRIVER);
+            Class.forName(JDBCConnection.JDBC_DRIVER);
     
-            connection = DriverManager.getConnection(CONNECTION_STRING , USER, PASSWORD);
+            connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING , JDBCConnection.USER, JDBCConnection.PASSWORD);
     
             statement = connection.createStatement();
     
