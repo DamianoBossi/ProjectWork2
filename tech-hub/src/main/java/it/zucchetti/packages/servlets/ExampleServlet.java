@@ -7,11 +7,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class ExampleServlet extends HttpServlet {
-    private int attributo;
+    //private int attributo;
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/plain");
+        response.setContentType("text/plain"); //JSON
         PrintWriter out = response.getWriter();
         out.println("Hello, World!");
     }
