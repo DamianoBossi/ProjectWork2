@@ -17,9 +17,10 @@
 
   <div id="homeContent">
     <div class="container text-center">
-      
-      <div class="bg-primary text-white rounded-pill d-inline-block px-4 py-1 mb-5 fs-6 mt-5"> <!-- QUI SERVE LO SPAN SENNò QUELLA MERDA DI SCRIPT SOVRASCRIVE TUTTO IL DIV! --> 
-        <span id="homeJobsCountPill"></span> posizioni aperte 
+
+      <div class="bg-primary text-white rounded-pill d-inline-block px-4 py-1 mb-5 fs-6 mt-5">
+        <!-- QUI SERVE LO SPAN SENNò QUELLA MERDA DI SCRIPT SOVRASCRIVE TUTTO IL DIV! -->
+        <span id="homeJobsCountPill"></span> posizioni aperte
       </div>
 
     </div>
@@ -33,7 +34,8 @@
       <button class="btn btn-primary btn-lg d-flex align-items-center mt-5" onclick="showJobsPage()">
         <i class="bi bi-luggage-fill me-2"></i> Esplora Posizioni Aperte
       </button>
-      <button class="btn btn-primary btn-lg d-flex align-items-center mt-5">
+      <button class="btn btn-primary btn-lg d-flex align-items-center mt-5" data-bs-toggle="modal"
+        data-bs-target="#candidaturaModal">
         <i class="bi bi-person-vcard-fill me-2"></i> Candidatura Spontanea
       </button>
     </div>
@@ -275,13 +277,13 @@
         <div class="text-muted" id="jobsCount">50 opportunità trovate</div>
 
         <!-- Pulsanti che aprono i modal già presenti -->
-        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center"
-                data-bs-toggle="modal" data-bs-target="#loginModal" aria-label="Accedi">
+        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center" data-bs-toggle="modal"
+          data-bs-target="#loginModal" aria-label="Accedi">
           <i class="bi bi-box-arrow-in-right me-1"></i> Accedi
         </button>
 
-        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center"
-                data-bs-toggle="modal" data-bs-target="#registerModal" aria-label="Registrati">
+        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center" data-bs-toggle="modal"
+          data-bs-target="#registerModal" aria-label="Registrati">
           <i class="bi bi-person-plus me-1"></i> Registrati
         </button>
       </div>
@@ -289,8 +291,8 @@
 
     <div class="row mb-4 g-2">
       <div class="col-md-5">
-        <input type="text" id="jobSearch" class="form-control" placeholder="Cerca una candidatura aperta in TechHub Italia "
-          onkeyup="filterJobs()">
+        <input type="text" id="jobSearch" class="form-control"
+          placeholder="Cerca una candidatura aperta in TechHub Italia " onkeyup="filterJobs()">
       </div>
       <div class="col-md-2">
         <select id="filterCategory" class="form-select" onchange="filterJobs()">
@@ -309,14 +311,14 @@
           <option value="Torino, Italia">Torino</option>
         </select>
       </div>
-     <div class="col-md-2">
-      <select id="filterContract" class="form-select" onchange="filterJobs()">
-        <option value="">Contratto (Tutti)</option>
-        <option value="Determinato">Determinato</option>
-        <option value="Indeterminato">Indeterminato</option>
-        <option value="Part-time">Part-time</option>
-     </select>
-    </div>
+      <div class="col-md-2">
+        <select id="filterContract" class="form-select" onchange="filterJobs()">
+          <option value="">Contratto (Tutti)</option>
+          <option value="Determinato">Determinato</option>
+          <option value="Indeterminato">Indeterminato</option>
+          <option value="Part-time">Part-time</option>
+        </select>
+      </div>
 
     </div>
 
@@ -422,6 +424,80 @@
             <div class="mt-4 d-grid">
               <button type="submit" class="btn btn-primary w-100">Registrati</button>
             </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- 🔹 MODALE CANDIDATURA -->
+  <div class="modal fade" id="candidaturaModal" tabindex="-1" aria-labelledby="candidaturaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+
+        <!-- Header -->
+        <div class="modal-header text-white">
+          <h5 class="modal-title fw-semibold" id="candidaturaModalLabel">Invia candidatura</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body p-4" style="background: var(--color-card-bg);">
+          <form id="candidaturaForm">
+
+            <!-- Nome e Cognome -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nome" class="form-label fw-semibold">Nome</label>
+                <input type="text" class="form-control" id="nome" placeholder="Mario" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="cognome" class="form-label fw-semibold">Cognome</label>
+                <input type="text" class="form-control" id="cognome" placeholder="Rossi" required>
+              </div>
+            </div>
+
+            <!-- Email e Telefono -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label fw-semibold">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="nome@email.com" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="telefono" class="form-label fw-semibold">Telefono</label>
+                <input type="tel" class="form-control" id="telefono" placeholder="+39 333 1234567">
+              </div>
+            </div>
+
+            <!-- Titolo di studio -->
+            <div class="mb-3">
+              <label for="titoloStudio" class="form-label fw-semibold">Titolo di studio</label>
+              <input type="text" class="form-control" id="titoloStudio"
+                placeholder="Laurea in Ingegneria Informatica, Diploma, ecc.">
+            </div>
+
+            <!-- Lettera di presentazione -->
+            <div class="mb-3">
+              <label for="lettera" class="form-label fw-semibold">Lettera di presentazione</label>
+              <textarea class="form-control" id="lettera" rows="6" placeholder="Scrivi una breve presentazione..."
+                required></textarea>
+            </div>
+
+            <!-- Caricamento CV -->
+            <div class="mb-4">
+              <label for="cvFile" class="form-label fw-semibold">Carica il tuo CV (PDF o DOC)</label>
+              <input type="file" class="form-control" id="cvFile" accept=".pdf,.doc,.docx" required>
+            </div>
+
+            <!-- Bottone di invio -->
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+              Invia candidatura
+            </button>
+
           </form>
         </div>
       </div>
