@@ -1,3 +1,6 @@
+# PARAMETRI CONNESSIONE AL DB
+JDBCConnection.java
+
 # Compilati Java
 *.class
 
