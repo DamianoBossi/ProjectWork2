@@ -3,11 +3,13 @@ ALTER LOGIN [sa] ENABLE;
 GO
 ALTER LOGIN [sa] WITH PASSWORD = 'Admin!123';
 */ 
---setta nelle propriet� della connessione encrypt=true;trustServerCertificate=true
+--setta nelle proprietà della connessione encrypt=true;trustServerCertificate=true
 
-USE master;/*
+--entra con sa
+/*USE master; --USE AdventureWorks
 DROP USER TechHub
 DROP LOGIN TechHub;*/
+USE master;
 CREATE LOGIN TechHub WITH PASSWORD = 'Segretone123',
 CHECK_POLICY = ON;
 USE AdventureWorks;

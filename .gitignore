@@ -37,11 +37,6 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
-# Gradle
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.jar
-
 # Distribuzioni
 *.jar
 *.war

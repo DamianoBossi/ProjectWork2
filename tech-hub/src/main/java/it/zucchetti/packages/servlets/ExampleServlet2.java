@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//@WebServlet("/servlets/ExampleServlet2")
+//@WebServlet("/servlets/ExampleServlet2") //ti permette di non dover dichiarare e mappare in web.xml la servlet
 public class ExampleServlet2 extends HttpServlet {
 
     @Override
