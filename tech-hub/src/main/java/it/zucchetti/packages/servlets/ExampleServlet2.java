@@ -34,11 +34,12 @@ public class ExampleServlet2 extends HttpServlet {
     
             statement = connection.createStatement();
     
-            resultSet = statement.executeQuery("SELECT NomeProdotto FROM Prodotto");
+            resultSet = statement.executeQuery("SELECT PersonID, PersonName FROM Person");
 
             while (resultSet.next()) {
-                String pname = resultSet.getString("NomeProdotto");
-                out.println("NomeProdotto:" + pname);
+                int pid = resultSet.getInt("PersonID");
+                String pname = resultSet.getString("PersonName");
+                out.println("PersonID: " + pid + ", PersonName: " + pname);
             }
         } catch (ClassNotFoundException e) {
             out.println("Errore: driver JDBC non trovato.");
