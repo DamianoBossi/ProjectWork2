@@ -1,5 +1,7 @@
-package it.zucchetti.packages.servlets;
+package it.zucchetti.packages.servlet.users;
+
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +16,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//@WebServlet("/servlets/ExampleServlet2") //ti permette di non dover dichiarare e mappare in web.xml la servlet
-public class ExampleServlet2 extends HttpServlet {
+@WebServlet("/servlet/users") // ti permette di non dover dichiarare e mappare in web.xml la servlet
+public class UserIndex extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("text/plain");
 
         Connection connection = null;
@@ -29,17 +32,18 @@ public class ExampleServlet2 extends HttpServlet {
 
         try {
             Class.forName(JDBCConnection.JDBC_DRIVER);
-    
-            connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING , JDBCConnection.USER, JDBCConnection.PASSWORD);
-    
+
+            connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING, JDBCConnection.USER,
+                    JDBCConnection.PASSWORD);
+
             statement = connection.createStatement();
-    
-            resultSet = statement.executeQuery("SELECT PersonID, PersonName FROM Person");
+
+            resultSet = statement.executeQuery("SELECT * FROM Users");
 
             while (resultSet.next()) {
-                int pid = resultSet.getInt("PersonID");
-                String pname = resultSet.getString("PersonName");
-                out.println("PersonID: " + pid + ", PersonName: " + pname);
+                int userId = resultSet.getInt("userid");
+                String firstName = resultSet.getString("firstName");
+                out.println("userId: " + userId + ", firstName: " + firstName);
             }
         } catch (ClassNotFoundException e) {
             out.println("Errore: driver JDBC non trovato.");
@@ -50,17 +54,19 @@ public class ExampleServlet2 extends HttpServlet {
         } catch (Exception e) {
             out.println("Errore inaspettato:");
             e.printStackTrace(out);
-        }
-        finally {
+        } finally {
             try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
+                if (resultSet != null)
+                    resultSet.close();
+                if (statement != null)
+                    statement.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 out.println("Errore durante la chiusura delle risorse:");
                 e.printStackTrace(out);
             }
         }
     }
-    
+
 }
