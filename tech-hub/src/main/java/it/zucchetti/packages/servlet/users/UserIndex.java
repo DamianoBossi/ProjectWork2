@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-@WebServlet("/servlet/users") // ti permette di non dover dichiarare e mappare in web.xml la servlet
+@WebServlet("/servlet/users") 
 public class UserIndex extends HttpServlet {
 
     @Override
