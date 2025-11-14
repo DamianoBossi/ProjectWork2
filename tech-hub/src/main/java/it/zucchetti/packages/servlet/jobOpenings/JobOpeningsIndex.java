@@ -1,16 +1,17 @@
-package it.zucchetti.packages.servlet.users;
+package it.zucchetti.packages.servlet.jobOpenings;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import it.zucchetti.packages.jdbc.JDBCConnection;
 
@@ -20,17 +21,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-@WebServlet("/servlet/users/*")
-public class UserShow extends HttpServlet {
+@WebServlet("/servlet/jobopenings")
+public class JobOpeningsIndex extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
-        String pathInfo = request.getPathInfo(); // es. "/1"
-        String id = (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
 
         Connection connection = null;
         Statement statement = null;
@@ -47,9 +45,7 @@ public class UserShow extends HttpServlet {
 
             statement = connection.createStatement();
 
-            resultSet = statement.executeQuery("SELECT * FROM jobopenings WHERE jobopeningid = " + id);
-
-            response.setStatus(HttpServletResponse.SC_OK);
+            resultSet = statement.executeQuery("SELECT * FROM jobopenings");
 
             // Costruisco il JSON con Gson
             JsonObject jsonResponse = new JsonObject();
@@ -59,19 +55,18 @@ public class UserShow extends HttpServlet {
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
                 JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("userId", resultSet.getInt("userId"));
-                skillObj.addProperty("roleId", resultSet.getString("roleId"));
-                skillObj.addProperty("email", resultSet.getString("email"));
-                skillObj.addProperty("firstName", resultSet.getString("firstName"));
-                skillObj.addProperty("lastName", resultSet.getString("lastName"));
-                skillObj.addProperty("birthDate", resultSet.getString("birthDate"));
-                skillObj.addProperty("address", resultSet.getString("address"));
+                skillObj.addProperty("jobOpeningId", resultSet.getInt("jobOpeningId"));
+                skillObj.addProperty("title", resultSet.getString("title"));
+                skillObj.addProperty("description", resultSet.getString("description"));
+                skillObj.addProperty("ralFrom", resultSet.getString("ralFrom"));
+                skillObj.addProperty("ralTo", resultSet.getString("ralTo"));
+                skillObj.addProperty("isOpen", resultSet.getString("isOpen"));
+                skillObj.addProperty("emptypeId", resultSet.getString("emptypeId"));
+                skillObj.addProperty("workSchedId", resultSet.getString("workSchedId"));
                 skillObj.addProperty("cityId", resultSet.getString("cityId"));
-                skillObj.addProperty("regionId", resultSet.getString("regionId"));
-                skillObj.addProperty("countryId", resultSet.getString("countryId"));
                 skillObj.addProperty("latitude", resultSet.getString("latitude"));
                 skillObj.addProperty("longitude", resultSet.getString("longitude"));
-                skillObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
+                skillObj.addProperty("closingDate", resultSet.getString("closingDate"));
                 dataArray.add(skillObj);
             }
 
