@@ -209,3 +209,66 @@
       .why-card { flex-direction: column; gap: 8px; padding: 20px; }
       .why-icon { margin-bottom: 8px; }
     }
+
+/*50 posizioni aperte*/
+
+.blu-chiaro {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;   
+  font-size: 1.2rem;        
+  font-weight: bold;
+  color: white;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #6ec1ff, #4da6ff); 
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  margin-top: 1.5rem;      
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge-blu:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
+}
+
+/*lavora con noi*/
+
+.why-heading-small {
+  display: inline-block;           
+  padding: 0.5rem 1.5rem;         
+  font-size: 1.5rem;               
+  font-weight: 600;                
+  color: #ffffff;                
+  background: linear-gradient(135deg, #6ec1ff, #4da6ff); 
+  border-radius: 50px;          
+  margin-top: 2rem;              
+  text-align: center;             
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.why-heading-small:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+}
+
+
+/* chi siamo*/
+
+.scrittaChiSiamo {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;              
+  font-size: 1rem;                     
+  font-weight: 600;                   
+  color: #ffffff;                     
+  background: linear-gradient(135deg, #6ec1ff, #4da6ff); 
+  border-radius: 50px;                 
+  margin-bottom: 1rem;                 
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge-custom:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+}
