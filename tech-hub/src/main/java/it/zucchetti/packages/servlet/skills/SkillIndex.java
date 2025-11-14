@@ -1,4 +1,9 @@
+
 package it.zucchetti.packages.servlet.skills;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,41 +30,48 @@ public class SkillIndex extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
 
-        PrintWriter out = response.getWriter();
-
         try {
             Class.forName(JDBCConnection.JDBC_DRIVER);
-
             connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING, JDBCConnection.USER,
                     JDBCConnection.PASSWORD);
 
             statement = connection.createStatement();
-
             resultSet = statement.executeQuery("SELECT * FROM Skills");
-            
-            response.setStatus(HttpServletResponse.SC_OK);
-            String jsonResponse = "{\"success\": true, \"message\": \"Servlet correttamente eseguita\", \"data\": {";
+
+            // Costruisco il JSON con Gson
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.addProperty("success", true);
+            jsonResponse.addProperty("message", "Servlet correttamente eseguita");
+
+            JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                int skillId = resultSet.getInt("skillId");
-                String name = resultSet.getString("name");
-                jsonResponse += "{\"skillId\": " + skillId + ", \"name\": \"" + name + "\"},";
+                JsonObject skillObj = new JsonObject();
+                skillObj.addProperty("skillId", resultSet.getInt("skillId"));
+                skillObj.addProperty("name", resultSet.getString("name"));
+                dataArray.add(skillObj);
             }
-            jsonResponse = jsonResponse.substring(0, jsonResponse.length() - 1); //rimuovo ultima virgola
-            jsonResponse += "}}";
-            out.write(jsonResponse);
+
+            jsonResponse.add("data", dataArray);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write(gson.toJson(jsonResponse));
+
         } catch (ClassNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: driver JDBC non trovato.\"}");
+            out.write(gson.toJson(errorResponse("Errore: driver JDBC non trovato.")));
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL.\"}");
+            out.write(gson.toJson(errorResponse("Errore: errore SQL.")));
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato.\"}");
+            out.write(gson.toJson(errorResponse("Errore: errore inaspettato.")));
         } finally {
             try {
                 if (resultSet != null)
@@ -70,9 +82,15 @@ public class SkillIndex extends HttpServlet {
                     connection.close();
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse.\"}");
+                out.write(gson.toJson(errorResponse("Errore: errore durante la chiusura delle risorse.")));
             }
         }
     }
 
+    private JsonObject errorResponse(String message) {
+        JsonObject errorJson = new JsonObject();
+        errorJson.addProperty("success", false);
+        errorJson.addProperty("message", message);
+        return errorJson;
+    }
 }
