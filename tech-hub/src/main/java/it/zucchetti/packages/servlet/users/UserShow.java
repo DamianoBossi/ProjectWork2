@@ -22,7 +22,8 @@ public class UserShow extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/plain");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
         String pathInfo = request.getPathInfo(); // es. "/1"
         String id = (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
@@ -43,20 +44,25 @@ public class UserShow extends HttpServlet {
 
             resultSet = statement.executeQuery("SELECT * FROM Users WHERE userid = " + id);
 
+            response.setStatus(HttpServletResponse.SC_OK);
+            String jsonResponse = "{\"success\": true, \"message\": \"Servlet correttamente eseguita\", \"data\": {";
             while (resultSet.next()) {
                 int userId = resultSet.getInt("userid");
                 String firstName = resultSet.getString("firstName");
-                out.println("userId: " + userId + ", firstName: " + firstName);
+                jsonResponse += "{\"userId\": " + userId + ", \"firstName\": \"" + firstName + "\"},";
             }
+            jsonResponse = jsonResponse.substring(0, jsonResponse.length() - 1); //rimuovo ultima virgola
+            jsonResponse += "}}";
+            out.write(jsonResponse);
         } catch (ClassNotFoundException e) {
-            out.println("Errore: driver JDBC non trovato.");
-            e.printStackTrace(out);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write("{\"success\": false, \"message\": \"Errore: driver JDBC non trovato.\"}");
         } catch (SQLException e) {
-            out.println("Errore SQL:");
-            e.printStackTrace(out);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write("{\"success\": false, \"message\": \"Errore: errore SQL.\"}");
         } catch (Exception e) {
-            out.println("Errore inaspettato:");
-            e.printStackTrace(out);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato.\"}");
         } finally {
             try {
                 if (resultSet != null)
@@ -66,8 +72,8 @@ public class UserShow extends HttpServlet {
                 if (connection != null)
                     connection.close();
             } catch (SQLException e) {
-                out.println("Errore durante la chiusura delle risorse:");
-                e.printStackTrace(out);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write("{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse.\"}");
             }
         }
     }
