@@ -47,7 +47,7 @@ public class UserShow extends HttpServlet {
 
             statement = connection.createStatement();
 
-            resultSet = statement.executeQuery("SELECT * FROM jobopenings WHERE jobopeningid = " + id);
+            resultSet = statement.executeQuery("SELECT * FROM users WHERE userid = " + id);
 
             response.setStatus(HttpServletResponse.SC_OK);
 
