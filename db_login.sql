@@ -4,24 +4,10 @@ GO
 ALTER LOGIN [sa] WITH PASSWORD = 'Admin!123';
 */
 
---setta encrypt=true;trustServerCertificate=true
-
-/*potrebbe essere necessario rimaneggiare i percorsi file
-RESTORE HEADERONLY FROM DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup\pw2.bak';
-RESTORE FILELISTONLY FROM DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup\pw2.bak';
-RESTORE DATABASE pw2
-FROM DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup\pw2.bak'
-WITH FILE = 1, 
-  MOVE N'pw2' TO N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\pw2.mdf',
-  MOVE N'pw2_log'  TO N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\pw2_log.ldf',
-  RECOVERY;
-*/
-
 --entra con sa
 /*USE master; --USE AdventureWorks oppure pw2
 DROP LOGIN TechHub;
 DROP USER TechHub;*/
-
 USE master;
 CREATE LOGIN TechHub WITH PASSWORD = 'Segretone123',
 CHECK_POLICY = ON;
@@ -32,9 +18,8 @@ ALTER ROLE db_datawriter ADD MEMBER TechHub;
 -- opzionale:
 ALTER USER TechHub WITH DEFAULT_SCHEMA = dbo; --per chiamare le tabelle senza dover scrivere dbo.
 
-/*remapping dell'user TechHub in pw2 dopo il backup
-USE pw2;
+--remapping dell'user TechHub in pw2 dopo il backup
+/*USE pw2;
 GO
 ALTER USER TechHub WITH LOGIN = TechHub;
-GO
-*/
+GO*/
