@@ -157,10 +157,11 @@ window.showHomePage = function () {
 // ===================================
 async function loadJobs() {
     try {
-        const response = await fetch('https://690b618f6ad3beba00f4b07b.mockapi.io/pj/Jobs');
+        const response = await fetch('servlet/jobopenings');
         if (!response.ok) throw new Error('Errore nel caricamento dei job');
 
-        const jobs = await response.json();
+        const json = await response.json();
+        const jobs = json.data || [];
         const grid = document.getElementById("jobsGrid");
         if (!grid) return;
 
@@ -198,7 +199,7 @@ function cardJob(job) {
             <div class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> ${job.location_city}</div>
             <p class="mb-3 text-muted small">${job.description}</p>
             <div class="d-flex justify-content-between align-items-center mt-auto">
-              <div class="small text-muted"><i class="bi bi-wallet2"></i> ${job.ral_from} - ${job.ral_to}</div>
+              <div class="small text-muted"><i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}</div>
               <button class="btn btn-sm btn-primary" onclick="openApplyModal('${job.title}')">Candidati</button>
             </div>
           </div>
@@ -214,10 +215,12 @@ function cardJob(job) {
 
 async function fetchJobsCount() {
   try {
-    const response = await fetch('https://690b618f6ad3beba00f4b07b.mockapi.io/pj/Jobs');
+    const response = await fetch('servlet/jobopenings');
     if (!response.ok) throw new Error('Errore nel caricamento dei job');
     
-    const jobs = await response.json();
+    const json = await response.json();
+    const jobs = json.data || [];
+    
     const countText = `${jobs.length} `;
 
     // Aggiorna entrambi se esistono
