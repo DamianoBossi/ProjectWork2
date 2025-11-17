@@ -28,11 +28,7 @@ public class Logout extends HttpServlet {
             session.invalidate();
         }
 
-        String path = request.getContextPath();
-        if (path == null || path.isEmpty()) {
-            path = "/";
-        }
-        String jsessionidCookie = "JSESSIONID=; Path=" + path + "; HttpOnly; Max-Age=0"; //Da fixare se lo modifico nella Servlet di Login
+        String jsessionidCookie = "JSESSIONID=; Path=/tech-hub" + "; HttpOnly; Max-Age=0"; //Da fixare se lo modifico nella Servlet di Login
 
         response.setHeader("Set-Cookie", jsessionidCookie);
         response.setStatus(HttpServletResponse.SC_OK);

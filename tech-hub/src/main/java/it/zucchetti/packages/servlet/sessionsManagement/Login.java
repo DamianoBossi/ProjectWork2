@@ -82,13 +82,9 @@ public class Login extends HttpServlet {
                 /*String csrfToken = UUID.randomUUID().toString(); //da usare nelle form POST come campo nascosto o nell'header X-CSRF-Token 
                 session.setAttribute("csrfToken", csrfToken);*/
 
-                String path = request.getContextPath();
-                if (path == null || path.isEmpty()) {
-                    path = "/";
-                }
                 /*String sameSite = "SameSite=Lax"; //o "SameSite=Strict"
                 String secureFlag = request.isSecure() ? "; Secure" : "";*/
-                String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=" + path + "; HttpOnly;" /*+ secureFlag + "; " + sameSite*/;
+                String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub" + "; HttpOnly;" /*+ secureFlag + "; " + sameSite*/;
                 
                 response.setHeader("Set-Cookie", jsessionidCookie);
                 response.setStatus(HttpServletResponse.SC_OK);
