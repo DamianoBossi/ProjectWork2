@@ -99,10 +99,10 @@ public class Login extends HttpServlet {
             out.write("{\"success\": false, \"message\": \"Errore: driver JDBC non trovato.\"}");
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL.\"}");
+            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB.\"}");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato.\"}");
+            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB.\"}");
         } finally {
             try {
                 if (resultSet != null)
