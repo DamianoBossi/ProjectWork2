@@ -84,7 +84,7 @@ public class Login extends HttpServlet {
 
                 /*String sameSite = "SameSite=Lax"; //o "SameSite=Strict"
                 String secureFlag = request.isSecure() ? "; Secure" : "";*/
-                String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub" + "; HttpOnly;" /*+ secureFlag + "; " + sameSite*/;
+                String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub; HttpOnly;" /*+ secureFlag + "; " + sameSite*/;
                 
                 response.setHeader("Set-Cookie", jsessionidCookie);
                 response.setStatus(HttpServletResponse.SC_OK);
