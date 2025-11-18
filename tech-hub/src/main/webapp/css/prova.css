@@ -272,3 +272,64 @@
   transform: scale(1.05);
   box-shadow: 0 5px 12px rgba(0,0,0,0.25);
 }
+
+
+/* PARTE ADMIN*/
+
+    body {
+      background-color: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1, h4 {
+      font-weight: 600;
+    }
+
+    .card {
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .accordion-button:not(.collapsed) {
+      background-color: #0d6efd;
+      color: white;
+    }
+
+    .accordion-button {
+      font-weight: 500;
+      color: #0d6efd;
+    }
+
+    .badge-status {
+      font-size: 0.85rem;
+      padding: 0.35em 0.65em;
+      border-radius: 12px;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .modal-header {
+      background-color: #0d6efd;
+      color: white;
+      border-bottom: none;
+    }
+
+    .candidate-list li {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .candidate-list li:hover {
+      background-color: #e9ecef;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding: 1.5rem 0;
+      text-align: center;
+      color: #6c757d;
+    }

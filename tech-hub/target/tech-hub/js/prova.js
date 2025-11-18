@@ -215,7 +215,6 @@ function cardJob(job) {
 
 async function fetchJobsCount() {
   try {
-    // const response = await fetch('https://690b618f6ad3beba00f4b07b.mockapi.io/pj/Jobs');
     const response = await fetch('servlet/jobopenings');
     if (!response.ok) throw new Error('Errore nel caricamento dei job');
     
