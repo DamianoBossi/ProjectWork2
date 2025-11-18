@@ -465,7 +465,7 @@ public class Registration extends HttpServlet {
             userSkills = new int[0];
         }
 
-        String updateDat = (new Date(System.currentTimeMillis())).toString();
+        String updatedAt = (new Date(System.currentTimeMillis())).toString();
 
         //se c'è una vecchia sessione la invalido
         HttpSession oldSession = request.getSession(false);
@@ -478,7 +478,7 @@ public class Registration extends HttpServlet {
             String insertion = "INSERT INTO USERS (ROLEID, EMAIL, PASSWORD, FIRSTNAME, LASTNAME, BIRTHDATE, ADDRESS, CITYID, REGIONID, COUNTRYID, LATITUDE," +
                     " LONGITUDE, CVFILEPATH, UPDATEDAT) VALUES ('" + roleId + "', '" + email + "', '" + password + "', '" + firstName + "', '" + 
                     lastName + "', '" + birthdate + "', '" + address + "', '" + cityId + "', '" + regionId + "', '" + countryId + "', '" + latitude + "', '" + 
-                    longitude + "', '" + cvFilePath + "', '" + updateDat + "')"; 
+                    longitude + "', '" + cvFilePath + "', '" + updatedAt + "')"; 
             
             int rowsInserted = statement.executeUpdate(insertion);
 
@@ -641,7 +641,7 @@ public class Registration extends HttpServlet {
         session.setAttribute("role", "user");
         session.setMaxInactiveInterval(30*60); //30 minuti
 
-        String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub" + "; HttpOnly;"; //da sistemare se lo modifico nella Servlet di Login
+        String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub; HttpOnly;"; //da sistemare se lo modifico nella Servlet di Login
         
         response.setHeader("Set-Cookie", jsessionidCookie);
 
