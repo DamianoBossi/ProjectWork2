@@ -12,20 +12,58 @@
 
   <!-- Il tuo CSS unificato (sovrascrive i bottoni Bootstrap) -->
   <link rel="stylesheet" href="css/prova.css">
+  <style>
+    /* Piccoli adattamenti per demo */
+    .filter-bar .form-control, .filter-bar .form-select { min-width: 180px; }
+    .badge-status { font-size: 0.8rem; margin-left: 8px; }
+    footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #666; }
+  </style>
 </head>
 
 <!-- aggiunta classe admin-area per stili specifici -->
 <body class="admin-area">
   <div class="container my-5">
+
     <h1 class="text-center text-primary mb-4"><i class="bi bi-shield-lock me-2"></i>Admin - Gestione Posizioni</h1>
 
     <div class="text-end mb-4">
-      <a href="prova.html" class="btn btn-outline-primary btn-icon">
+      <a href="prova.html" class="btn btn-primary btn-lg btn-icon">
         <i class="bi bi-arrow-left-circle"></i> Torna al sito
       </a>
     </div>
 
-   <!-- ======================================================
+    <!-- BARRA FILTRI: richiesta -->
+    <div class="card p-3 mb-4 filter-bar">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-6">
+          <label for="filterText" class="form-label mb-1">Cerca (titolo / descrizione)</label>
+          <input id="filterText" class="form-control" type="text" placeholder="Inserisci testo da cercare...">
+        </div>
+        <div class="col-md-3">
+          <label for="filterCity" class="form-label mb-1">Sede</label>
+          <select id="filterCity" class="form-select">
+            <option value="">Tutte le sedi</option>
+            <option value="Milano, Italia">Milano</option>
+            <option value="Roma, Italia">Roma</option>
+            <option value="Torino, Italia">Torino</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="filterContract" class="form-label mb-1">Contratto</label>
+          <select id="filterContract" class="form-select">
+            <option value="">Tutti i contratti</option>
+            <option value="Indeterminato">Indeterminato</option>
+            <option value="Determinato">Determinato</option>
+            <option value="Part-time">Part-time</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-3 text-end">
+        <button id="resetFilters" class="btn btn-primary btn-lg btn-icon">Reset filtri</button>
+      </div>
+    </div>
+
+    <!-- ======================================================
          SEZIONE CREAZIONE NUOVO ANNUNCIO
          ====================================================== -->
 
@@ -79,7 +117,7 @@
       </form>
     </div>
 
-      <!-- ======================================================
+    <!-- ======================================================
          SEZIONE LISTA ANNUNCI
          ====================================================== -->
 
@@ -89,7 +127,7 @@
     </div>
   </div>
 
-   <!-- ======================================================
+  <!-- ======================================================
        MODALE PER VISUALIZZARE I CANDIDATI
        ====================================================== -->
 
@@ -118,6 +156,15 @@
   <script>
     let jobs = [];
 
+    // --- Helper: recupera filtri correnti ---
+    function getActiveFilters() {
+      return {
+        text: document.getElementById('filterText').value.trim().toLowerCase(),
+        city: document.getElementById('filterCity').value,
+        contract: document.getElementById('filterContract').value
+      };
+    }
+
     // CREAZIONE NUOVO ANNUNCIO
     document.getElementById('createJobForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -136,11 +183,46 @@
       this.reset();
     });
 
-    // RENDER ANNUNCI
+    // EVENTI FILTRI
+    document.getElementById('filterText').addEventListener('input', renderJobs);
+    document.getElementById('filterCity').addEventListener('change', renderJobs);
+    document.getElementById('filterContract').addEventListener('change', renderJobs);
+    document.getElementById('resetFilters').addEventListener('click', function () {
+      document.getElementById('filterText').value = '';
+      document.getElementById('filterCity').value = '';
+      document.getElementById('filterContract').value = '';
+      renderJobs();
+    });
+
+    // RENDER ANNUNCI (applica filtri attivi)
     function renderJobs() {
       const jobList = document.getElementById('jobList');
       jobList.innerHTML = '';
-      jobs.forEach((job) => {
+
+      const filters = getActiveFilters();
+
+      // applica i filtri
+      const filtered = jobs.filter(job => {
+        // filtro testo sul title e description
+        if (filters.text) {
+          const hay = (job.title + ' ' + job.description + ' ' + job.category).toLowerCase();
+          if (!hay.includes(filters.text)) return false;
+        }
+        if (filters.city) {
+          if (job.city !== filters.city) return false;
+        }
+        if (filters.contract) {
+          if (job.contract !== filters.contract) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        jobList.innerHTML = '<div class="text-center py-4 text-muted">Nessun annuncio corrisponde ai filtri.</div>';
+        return;
+      }
+
+      filtered.forEach((job) => {
         const jobCard = document.createElement('div');
         jobCard.classList.add('accordion-item');
         jobCard.innerHTML = `
@@ -197,6 +279,7 @@
       }
       new bootstrap.Modal(document.getElementById('candidatesModal')).show();
     }
+
   </script>
 </body>
 </html>
