@@ -648,6 +648,8 @@ public class Registration extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_CREATED);
         out.write("{\"success\": true, \"message\": \"Registrazione effettuata.\"}");
 
+        //TODO: redirect a pagina principale dell'admin/user (a seconda del caso) o da altre parti...
+
         try {
             if (statement != null)
                 statement.close();

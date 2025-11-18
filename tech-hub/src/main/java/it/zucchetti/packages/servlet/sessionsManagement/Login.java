@@ -89,6 +89,9 @@ public class Login extends HttpServlet {
                 response.setHeader("Set-Cookie", jsessionidCookie);
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"success\": true, \"message\": \"Login effettuato.\"}");
+
+                if (role.equals("admin"))
+                    response.sendRedirect("admin.html");
             }
             else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
