@@ -1,5 +1,5 @@
 // ==============================
-// ANIMAZIONE CARDS (WHY SECTION) FUNZIONA NON TOCCARE!
+// ANIMAZIONE CARD (Why Section)
 // ==============================
 const cards = document.querySelectorAll('.why-card');
 const observer = new IntersectionObserver(entries => {
@@ -14,266 +14,267 @@ cards.forEach(card => observer.observe(card));
 
 
 
+// =====================================================
+// MAPPE GLOBALI (STATIC TABLES)
+// =====================================================
+const citiesMap = new Map();        // cityId -> name
+const emptypesMap = new Map();      // emptypeId -> name
+const skillsMap = new Map();        // skillId -> name
+
+// Per i job openings
+let allJobs = [];                   // conterrà i job originali
+let jobSkillsMap = new Map();       // jobOpeningId -> array(skillId)
 
 
 
+// =====================================================
+// LOAD STATIC DATA (CITIES, EMPTYPES, SKILLS)
+// =====================================================
 
-
-// ====================================
-// FUNZIONI PER GESTIRE LE SKILL (SOFT/HARD)    FUNZIONA, NON TOCCARE!
-// ====================================
-function addSkill(inputId, listId) {
-    const input = document.getElementById(inputId);
-    const val = input.value.trim();
-    if (!val) return;
-
-    const ul = document.getElementById(listId);
-    const li = document.createElement('li');
-    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-    li.textContent = val;
-
-    // Icona di chiusura (rimozione)
-    const closeIcon = document.createElement('span');
-    closeIcon.innerHTML = '&times;';
-    closeIcon.className = 'ms-2 text-danger fw-bold';
-    closeIcon.style.cursor = 'pointer';
-
-    // Logica di rimozione cliccando sull’elemento o sull’icona
-    const removeElement = () => li.remove();
-    li.addEventListener('click', removeElement);
-    closeIcon.addEventListener('click', removeElement);
-
-    li.appendChild(closeIcon);
-    ul.appendChild(li);
-    input.value = '';
-}
-
-// Aggiunta listener ai pulsanti skill (solo se esistono)
-if (document.getElementById('addSoftSkillBtn')) {
-    document.getElementById('addSoftSkillBtn')
-        .addEventListener('click', () => addSkill('softSkillInput', 'softSkillsList'));
-}
-
-if (document.getElementById('addHardSkillBtn')) {
-    document.getElementById('addHardSkillBtn')
-        .addEventListener('click', () => addSkill('hardSkillInput', 'hardSkillsList'));
-}
-
-
-
-
-
-// ===================================
-// FORM DI REGISTRAZIONE (FETCH SIMULATA) FUNZIONA E MANDA I DATI, NON TOCCARE!
-// ===================================
-if (document.getElementById('registerForm')) {
-    document.getElementById('registerForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const firstName = document.getElementById('registerFirstName').value.trim();  //prendo tutti i valori dal form
-        const lastName = document.getElementById('registerLastName').value.trim();
-        const dob = document.getElementById('registerDob').value;
-        const birthCity = document.getElementById('registerBirthCity').value.trim();
-        const email = document.getElementById('registerEmail').value.trim();
-        const password = document.getElementById('registerPassword').value.trim();
-        const cvInput = document.getElementById('registerCv');
-
-        const skills = [
-            ...Array.from(document.querySelectorAll('#softSkillsList li')).map(li => li.childNodes[0].textContent.trim()), //unione degli array soft e hard skills (come da diagramma ER)
-            ...Array.from(document.querySelectorAll('#hardSkillsList li')).map(li => li.childNodes[0].textContent.trim())
-        ];
-
-        const formData = new FormData(); //li riassegno come oggetto
-        formData.append('firstName', firstName);
-        formData.append('lastName', lastName);
-        formData.append('dob', dob);
-        formData.append('birthCity', birthCity);
-        formData.append('email', email);
-        formData.append('password', password);
-        formData.append('skills', JSON.stringify(skills));
-
-        if (cvInput.files.length > 0) {
-            formData.append('cv', cvInput.files[0]);
-        }
-
-        try {
-            const response = await fetch('https://webhook.site/d763eb45-29b9-45a0-b739-e49cc6c61bbb', { //qui andrebbe messo l'url corretto, per prova utilizziamo webhook
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Errore durante la registrazione (status ' + response.status + ')'); 
-            }
-
-            const result = await response.json();
-            alert('Registrazione completata! Benvenuto ' + (result.firstName || firstName));
-
-            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('registerModal'));
-            modal.hide();
-
-            document.getElementById('registerForm').reset();
-            document.getElementById('softSkillsList').innerHTML = '';
-            document.getElementById('hardSkillsList').innerHTML = '';
-
-        } catch (error) {
-            console.error('Errore:', error);
-            alert('Errore durante la registrazione: ' + error.message); //con webhook darà sempre errore perché la connessione è bloccata, ma effettivamente fa vedere i dati della registrazione
-        }
-    });
-}
-
-
-
-
-
-
-// ==============================
-// GESTIONE SEZIONI (HOME / JOBS)  FUNZIONA, NON TOCCARE!
-// ==============================
-const homeContent = document.getElementById('homeContent');
-const jobSection = document.getElementById('jobSection');
-
-window.showJobsPage = function () {
-    if (homeContent) homeContent.style.display = 'none';
-    if (jobSection) jobSection.style.display = 'block';
-    loadJobs();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-window.showHomePage = function () {
-    if (homeContent) homeContent.style.display = '';
-    if (jobSection) jobSection.style.display = 'none';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-
-
-
-
-
-// ===================================
-// FETCH: CARICAMENTO DEI LAVORI DINAMICI    FINITA SERVE PER CARICARE LA GRIGLIA CON TUTTE LE OFFERTE DI LAVORO, NON TOCCARE!
-// ===================================
-async function loadJobs() {
+// -------- CITIES --------
+async function loadCities() {
     try {
-        const response = await fetch('servlet/jobopenings');
-        if (!response.ok) throw new Error('Errore nel caricamento dei job');
+        const res = await fetch('servlet/cities');
+        const json = await res.json();
+        const cities = json.data || [];
 
-        const json = await response.json();
-        const jobs = json.data || [];
-        const grid = document.getElementById("jobsGrid");
-        if (!grid) return;
+        citiesMap.clear();
+        cities.forEach(c => citiesMap.set(String(c.cityId), c.name));
 
-        grid.innerHTML = ""; // Svuota la griglia prima di ricaricare
+        // filtro città
+        const filterCity = document.getElementById('filterCity');
+        if (filterCity) {
+            filterCity.innerHTML = '<option value="">Sede (Tutte)</option>';
+            cities.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.cityId;
+                opt.textContent = c.name;
+                filterCity.appendChild(opt);
+            });
+        }
 
-        jobs.forEach(job => {
-            grid.innerHTML += cardJob(job);
-        });
+        // select registrazione
+        const registerCity = document.getElementById('registerCity');
+        if (registerCity) {
+            registerCity.innerHTML = '<option value="">Seleziona città</option>';
+            cities.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.cityId;
+                opt.textContent = c.name;
+                registerCity.appendChild(opt);
+            });
+        }
 
-        updateJobsCount();
     } catch (err) {
-        console.error('Errore:', err);
+        console.error("Errore loadCities:", err);
     }
 }
 
 
 
+// -------- EMPLOYMENT TYPES --------
+async function loadEmptypes() {
+    try {
+        const res = await fetch('servlet/emptypes');
+        const json = await res.json();
+        const types = json.data || [];
+
+        emptypesMap.clear();
+        types.forEach(t => emptypesMap.set(String(t.emptypeId), t.name));
+
+        const filterContract = document.getElementById('filterContract');
+        if (filterContract) {
+            filterContract.innerHTML = '<option value="">Contratto (Tutti)</option>';
+            types.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.emptypeId;
+                opt.textContent = t.name;
+                filterContract.appendChild(opt);
+            });
+        }
+
+    } catch (err) {
+        console.error("Errore loadEmptypes:", err);
+    }
+}
 
 
 
-// ==============================
-// TEMPLATE CARD LAVORO                FINITA SERVE PER GENERARE LE CARD DEI LAVORI, NON TOCCARE!
-// ==============================
+// -------- SKILLS --------
+async function loadSkills() {
+    try {
+        const res = await fetch('servlet/skills');
+        const json = await res.json();
+        const skills = json.data || [];
+
+        skillsMap.clear();
+        skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
+
+        // filtro skill
+        const filterSkill = document.getElementById('filterSkill');
+        if (filterSkill) {
+            filterSkill.innerHTML = '<option value="">Skill (Tutte)</option>';
+            skills.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.skillId;
+                opt.textContent = s.name;
+                filterSkill.appendChild(opt);
+            });
+        }
+
+    } catch (err) {
+        console.error("Errore loadSkills:", err);
+    }
+}
+
+
+
+// =============================================================
+// LOAD JOBS + JOIN SKILLS
+// =============================================================
+async function loadJobSkills() {
+    try {
+        const res = await fetch('servlet/jobopeningsskills');
+        const json = await res.json();
+        const list = json.data || [];
+
+        jobSkillsMap.clear();
+
+        list.forEach(entry => {
+            const jobId = String(entry.jobOpeningId);
+            const skillId = String(entry.skillId);
+
+            if (!jobSkillsMap.has(jobId)) jobSkillsMap.set(jobId, []);
+            jobSkillsMap.get(jobId).push(skillId);
+        });
+
+    } catch (err) {
+        console.error("Errore loadJobSkills:", err);
+    }
+}
+
+
+
+// ---------------- JOB OPENINGS ----------------
+async function loadJobs() {
+    try {
+        const res = await fetch('servlet/jobopenings');
+        const json = await res.json();
+        allJobs = json.data || [];
+
+        // conta posizioni initiali
+        const count = allJobs.length;
+        const pill = document.getElementById('homeJobsCountPill');
+        const card = document.getElementById('homeJobsCountCard');
+        if (pill) pill.textContent = count;
+        if (card) card.textContent = count;
+
+        // render cards
+        renderJobs(allJobs);
+
+    } catch (err) {
+        console.error("Errore loadJobs:", err);
+    }
+}
+
+
+
+// =============================================================
+// RENDER CARD LAVORO
+// =============================================================
 function cardJob(job) {
-    return `       
-        <div class="col-md-6 col-lg-4 job-card" 
-            data-category="${job.id}" 
-            data-city="${job.location_city}" 
-            data-contract="${job.employment_type_id}">
+
+    const cityName = citiesMap.get(String(job.cityId)) || 'N/D';
+    const emptypeName = emptypesMap.get(String(job.emptypeId)) || 'N/D';
+
+    const jobId = String(job.jobOpeningId);
+    const skillIds = jobSkillsMap.get(jobId) || [];
+    const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
+
+    return `
+        <div class="col-md-6 col-lg-4 job-card"
+            data-id="${jobId}"
+            data-city="${job.cityId}"
+            data-contract="${job.emptypeId}"
+            data-skills="${skillIds.join(',')}">
+
           <div class="card h-100 p-4">
+
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="mb-1">${job.title}</h5>
-              <span class="badge rounded-pill bg-light text-primary small">${job.employment_type_id}</span>
+              <span class="badge rounded-pill bg-light text-primary small">${emptypeName}</span>
             </div>
-            <div class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> ${job.location_city}</div>
+
+            <div class="text-muted small mb-2">
+              <i class="bi bi-geo-alt"></i> ${cityName}
+            </div>
+
             <p class="mb-3 text-muted small">${job.description}</p>
-            <div class="d-flex justify-content-between align-items-center mt-auto">
-              <div class="small text-muted"><i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}</div>
-              <button class="btn btn-sm btn-primary" onclick="openApplyModal('${job.title}')">Candidati</button>
+
+            <div class="small mb-3">
+              <strong>Skill richieste:</strong><br>
+              ${skillNames.length > 0 ? skillNames.join(', ') : 'Nessuna'}
             </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+              <div class="small text-muted">
+                <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
+              </div>
+
+              <button class="btn btn-sm btn-primary" onclick="openApplyModal('${job.title}')">
+                Candidati
+              </button>
+            </div>
+
           </div>
         </div>`;
 }
 
 
 
+// =============================================================
+// STAMPA JOBS NEL GRID
+// =============================================================
+function renderJobs(list) {
+    const grid = document.getElementById('jobsGrid');
+    if (!grid) return;
 
-// ==============================
-// FETCH DEI JOBS PER CONTARLI --> RENDE DINAMICO IL NUMERO NELLA HOME, RICEVE L'ARRAY CON IL FETCH DA MOCKAPI E VEDE QUANTO E' LUNGO. FUNZIONA, NON TOCCARE!
-// ==============================
-
-async function fetchJobsCount() {
-  try {
-    const response = await fetch('servlet/jobopenings');
-    if (!response.ok) throw new Error('Errore nel caricamento dei job');
-    
-    const json = await response.json();
-    const jobs = json.data || [];
-    
-    const countText = `${jobs.length} `;
-
-    // Aggiorna entrambi se esistono
-    const pill = document.getElementById('homeJobsCountPill'); //da fare per ogni elemento nell'html in cui lo vogliamo inserire
-    const card = document.getElementById('homeJobsCountCard');
-    
-    if (pill) pill.textContent = countText;
-    if (card) card.textContent = countText;
-
-    console.log('Jobs trovati:', jobs.length);
-  } catch (err) {
-    console.error('Errore:', err);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', fetchJobsCount);
-
-
-
-// ==============================
-// FILTRI E COUNTER DEI JOBS                   FUNZIONA ANCHE CON LA FETCH E I LAVORI PRESI DAL SERVLET, NON TOCCARE!
-// ==============================
-function updateJobsCount() {
-    const cards = document.querySelectorAll('.job-card');
-    const visible = Array.from(cards).filter(c => c.style.display !== 'none').length;
-    const el = document.getElementById('jobsCount');
-    if (el) el.textContent = visible + ' opportunità trovate';
+    grid.innerHTML = list.map(job => cardJob(job)).join("");
+    updateJobsCount();
 }
 
 
 
+// =============================================================
+// FILTRI (skill, city, contract, ricerca)
+// =============================================================
 function filterJobs() {
-    const q = document.getElementById('jobSearch')?.value.toLowerCase() || '';
-    const cat = document.getElementById('filterCategory')?.value || '';
-    const contract = document.getElementById('filterContract')?.value || '';
-    const city = document.getElementById('filterCity')?.value || '';
+
+    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+    const fSkill = document.getElementById('filterSkill')?.value || '';
+    const fCity = document.getElementById('filterCity')?.value || '';
+    const fContract = document.getElementById('filterContract')?.value || '';
+
     const cards = document.querySelectorAll('.job-card');
 
     cards.forEach(card => {
+
         const title = card.querySelector('h5').textContent.toLowerCase();
-        const category = card.getAttribute('data-category') || '';
-        const cty = card.getAttribute('data-city') || '';
-        const cont = card.getAttribute('data-contract') || '';
+        const city = card.dataset.city;
+        const contract = card.dataset.contract;
+        const skills = card.dataset.skills.split(',');
 
-        const matchesContract = contract ? cont.toLowerCase().includes(contract.toLowerCase()) : true;
-        const matchesQ = q ? (title.includes(q) || card.textContent.toLowerCase().includes(q)) : true;
-        const matchesCat = cat ? (category === cat) : true;
-        const matchesCity = city ? (cty === city) : true;
+        const matchSearch = search ? title.includes(search) : true;
+        const matchCity = fCity ? (city === fCity) : true;
+        const matchContract = fContract ? (contract === fContract) : true;
 
-        if (matchesQ && matchesCat && matchesContract && matchesCity) {
-            card.style.display = '';
+        // skill: un job può avere più skill → se la skill scelta è nei suoi skill
+        const matchSkill = fSkill ? skills.includes(fSkill) : true;
+
+        if (matchSearch && matchCity && matchContract && matchSkill) {
+            card.style.display = "";
         } else {
-            card.style.display = 'none';
+            card.style.display = "none";
         }
     });
 
@@ -281,60 +282,193 @@ function filterJobs() {
 }
 
 
-// ==============================
-// APERTURA MODALE CANDIDATURA  DA MODIFICARE!
-// ==============================
+
+// =============================================================
+// UPDATE COUNTER
+// =============================================================
+function updateJobsCount() {
+    const cards = document.querySelectorAll('.job-card');
+    const visible = [...cards].filter(c => c.style.display !== 'none').length;
+    const el = document.getElementById('jobsCount');
+    if (el) el.textContent = `${visible} opportunità trovate`;
+}
+
+
+
+// =============================================================
+// MODALE CANDIDATURA APPLICAZIONE
+// =============================================================
 function openApplyModal(role) {
+    const modalEl = document.getElementById('registerModal');
+    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    else alert("Candidati per: " + role);
+}
+
+
+
+// =============================================================
+// SKILL MANAGER (NO TOUCH)
+// =============================================================
+function addSkill(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if (!val) return;
+
+    const ul = document.getElementById(listId);
+
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.textContent = val;
+
+    const closeIcon = document.createElement("span");
+    closeIcon.innerHTML = "&times;";
+    closeIcon.className = "ms-2 text-danger fw-bold";
+    closeIcon.style.cursor = "pointer";
+
+    closeIcon.onclick = () => li.remove();
+    li.onclick = () => li.remove();
+
+    li.appendChild(closeIcon);
+    ul.appendChild(li);
+    input.value = "";
+}
+
+if (document.getElementById('addSoftSkillBtn'))
+    addSoftSkillBtn.onclick = () => addSkill('softSkillInput', 'softSkillsList');
+
+if (document.getElementById('addHardSkillBtn'))
+    addHardSkillBtn.onclick = () => addSkill('hardSkillInput', 'hardSkillsList');
+
+
+
+// =============================================================
+// REGISTER FORM
+// =============================================================
+async function handleRegisterSubmit(e) {
+    e.preventDefault();
+
+    const firstName = registerFirstName.value.trim();
+    const lastName = registerLastName.value.trim();
+    const dob = registerDob.value;
+    const email = registerEmail.value.trim();
+    const password = registerPassword.value.trim();
+    const cityId = registerCity.value || "";
+    const cvFile = registerCv.files[0] || null;
+
+    // Skill da soft+hard
+    const skillNames = [
+        ...[...softSkillsList.querySelectorAll('li')].map(li => li.childNodes[0].textContent.trim()),
+        ...[...hardSkillsList.querySelectorAll('li')].map(li => li.childNodes[0].textContent.trim())
+    ];
+
+    // map skill names → skillIds
+    const skillIds = [];
+    for (const [id, name] of skillsMap.entries()) {
+        if (skillNames.map(s => s.toLowerCase()).includes(name.toLowerCase()))
+            skillIds.push(id);
+    }
+
+    const formData = new FormData();
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("birthDate", dob);
+    formData.append("email", email);
+    formData.append("password", password);
+    if (cityId) formData.append("cityId", cityId);
+    formData.append("skills", JSON.stringify(skillIds));
+    if (cvFile) formData.append("cv", cvFile);
+
     try {
-        const modalEl = document.getElementById('registerModal');
-        if (modalEl) {
-            bootstrap.Modal.getOrCreateInstance(modalEl).show();
-        } else {
-            alert('Candidati per: ' + role);
-        }
-    } catch (e) {
-        alert('Candidati per: ' + role);
+        const res = await fetch('servlet/users', {
+            method: "POST",
+            body: formData
+        });
+
+        const json = await res.json();
+
+        if (!json.success) throw new Error(json.message);
+
+        alert("Registrazione completata! Benvenuto " + json.data.firstName);
+
+        bootstrap.Modal.getOrCreateInstance(registerModal).hide();
+        registerForm.reset();
+        softSkillsList.innerHTML = "";
+        hardSkillsList.innerHTML = "";
+
+    } catch (err) {
+        console.error("Errore registrazione:", err);
+        alert("Errore: " + err.message);
     }
 }
 
-
-// ==============================
-// FORM DI LOGIN 
-// ==============================
+if (document.getElementById("registerForm"))
+    registerForm.addEventListener("submit", handleRegisterSubmit);
 
 
-async function handleLogin(event) {
-  event.preventDefault();
 
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value.trim();
+// =============================================================
+// LOGIN FORM
+// =============================================================
+async function handleLogin(e) {
+    e.preventDefault();
 
-  try {
-    const res = await fetch('https://690b618f6ad3beba00f4b07b.mockapi.io/pj/Users');
-    const utenti = await res.json();
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value.trim();
 
-    // Trova utente corrispondente
-    const utente = utenti.find(u => u.email === email && u.password === password); //processo non sicuro ma lo utilizziamo per la simulazione
+    try {
+        const res = await fetch("servlet/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
 
-    if (utente) {
-      alert(`Benvenuto, ${utente.name}!`);
-      localStorage.setItem('utenteLoggato', JSON.stringify(utente));
+        const json = await res.json();
 
-    } else {
-      alert('Email o password non corretti');
+        if (!json.success) throw new Error(json.message || "Credenziali errate");
+
+        alert("Benvenuto " + json.data.firstName);
+        localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+
+    } catch (err) {
+        console.error("Errore login:", err);
+        alert(err.message);
     }
-
-  } catch (err) {
-    console.error('Errore durante il login:', err);
-    alert('Errore di connessione. Riprova.');
-  }
 }
 
-document.getElementById('loginForm').addEventListener('submit', handleLogin);
+if (document.getElementById("loginForm"))
+    loginForm.addEventListener("submit", handleLogin);
 
 
-// ==============================
-// EVENTI INIZIALI FUNZIONA, NON TOCCARE!
-// ==============================
-document.addEventListener('DOMContentLoaded', fetchJobsCount);
-document.addEventListener('DOMContentLoaded', updateJobsCount);
+
+// =============================================================
+// HOME / JOBS SWITCH
+// =============================================================
+window.showJobsPage = function () {
+    homeContent.style.display = "none";
+    jobSection.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+window.showHomePage = function () {
+    homeContent.style.display = "block";
+    jobSection.style.display = "none";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+
+
+// =============================================================
+// DOM READY
+// =============================================================
+document.addEventListener("DOMContentLoaded", async () => {
+    await Promise.all([
+        loadCities(),
+        loadEmptypes(),
+        loadSkills(),
+        loadJobSkills()
+    ]);
+
+    await loadJobs();
+
+    updateJobsCount();
+});
