@@ -446,6 +446,7 @@ async function handleLogin(e) {
         if (!json.success) throw new Error(json.message || "Credenziali errate");
 
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
     } catch (err) {
         console.error("Errore login:", err);
