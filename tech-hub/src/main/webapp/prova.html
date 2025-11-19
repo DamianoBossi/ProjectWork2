@@ -13,11 +13,10 @@
 
 <body>
 
-  <!-- HOME CONTENT -->
+  <!-- ==================== HOME ==================== -->
   <div id="homeContent">
     <div class="container text-center">
       <div class="blu-chiaro">
-        <!-- lo span viene aggiornato dallo script -->
         <span id="homeJobsCountPill"></span> posizioni aperte
       </div>
     </div>
@@ -87,9 +86,7 @@
 
     <!-- CHI SIAMO -->
     <div class="container mt-5">
-      <div class="scrittaChiSiamo">
-        Chi Siamo
-      </div>
+      <div class="scrittaChiSiamo">Chi Siamo</div>
 
       <div class="row align-items-center">
         <div class="col-md-6 mb-4 mb-md-0">
@@ -97,8 +94,7 @@
             <h2 class="fs-2 mb-3">L'Azienda Leader nel Fintech Italiano</h2>
             <p class="fs-6">
               TechHub Italia è una tech company innovativa fondata nel 2015 con la missione di rivoluzionare il settore
-              dei pagamenti digitali in Italia. Con sede principale a Milano e uffici a Roma e Torino, siamo diventati
-              il partner di riferimento per oltre 5.000 aziende italiane...
+              dei pagamenti digitali in Italia. Con sede principale a Milano e uffici a Roma e Torino...
             </p>
 
             <div class="mt-4" style="max-width:420px;">
@@ -134,7 +130,7 @@
                 </div>
                 <div>
                   <h6 class="mb-1 fw-semibold">Mercato</h6>
-                  <p class="mb-0 text-muted">Italia e espansione europea</p>
+                  <p class="mb-0 text-muted">Italia ed espansione europea</p>
                 </div>
               </div>
             </div>
@@ -170,7 +166,7 @@
               <div class="why-icon icon-tech"><i class="bi bi-lightning-fill"></i></div>
               <div>
                 <h6 class="mb-1 fw-semibold">Tecnologie All'Avanguardia</h6>
-                <p class="mb-0 text-muted small">Lavora con React, Node.js, AWS, Kubernetes...</p>
+                <p class="mb-0 text-muted small">React, Node.js, AWS, Kubernetes...</p>
               </div>
             </div>
 
@@ -178,7 +174,7 @@
               <div class="why-icon icon-culture"><i class="bi bi-people-fill"></i></div>
               <div>
                 <h6 class="mb-1 fw-semibold">Cultura Aziendale Inclusiva</h6>
-                <p class="mb-0 text-muted small">Team multiculturale, eventi di team building...</p>
+                <p class="mb-0 text-muted small">Team multiculturale, team building, hackathon interni.</p>
               </div>
             </div>
 
@@ -204,7 +200,7 @@
     </section>
   </div>
 
-  <!-- JOB SECTION -->
+  <!-- ==================== JOBS PAGE ==================== -->
   <section id="jobSection" class="container my-5" style="display:none;">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <div class="d-flex align-items-center gap-3">
@@ -231,38 +227,30 @@
 
     <!-- FILTRI -->
     <div class="row mb-4 g-2">
-      <!-- Ricerca testuale -->
       <div class="col-md-4">
         <input type="text" id="jobSearch" class="form-control"
           placeholder="Cerca una posizione in TechHub Italia" onkeyup="filterJobs()">
       </div>
 
-      <!-- Filtro Skill (ex Categoria) -->
       <div class="col-md-3">
         <select id="filterSkill" class="form-select" onchange="filterJobs()">
           <option value="">Skill (Tutte)</option>
-          <!-- popolato dinamicamente da /servlet/skills -->
         </select>
       </div>
 
-      <!-- Filtro Città -->
       <div class="col-md-3">
         <select id="filterCity" class="form-select" onchange="filterJobs()">
           <option value="">Sede (Tutte)</option>
-          <!-- popolato dinamicamente da /servlet/cities -->
         </select>
       </div>
 
-      <!-- Filtro Contratto -->
       <div class="col-md-2">
         <select id="filterContract" class="form-select" onchange="filterJobs()">
           <option value="">Contratto (Tutti)</option>
-          <!-- popolato dinamicamente da /servlet/emptypes -->
         </select>
       </div>
     </div>
 
-    <!-- GRIGLIA JOBS -->
     <div id="jobsGrid" class="row g-4"></div>
 
     <footer class="mt-5 mb-5 text-center text-muted">
@@ -270,7 +258,7 @@
     </footer>
   </section>
 
-  <!-- LOGIN MODAL -->
+  <!-- ==================== LOGIN MODAL ==================== -->
   <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -295,7 +283,7 @@
     </div>
   </div>
 
-  <!-- REGISTER MODAL -->
+  <!-- ==================== REGISTER MODAL (COUNTRY/REGION/CITY + ADDRESS + 1 ARRAY SKILLS) ==================== -->
   <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
@@ -320,13 +308,34 @@
                 <input type="date" class="form-control" id="registerDob" required>
               </div>
 
-              <!-- Città di residenza (cityId) -->
+              <!-- COUNTRY -->
               <div class="col-md-6">
-                <label for="registerCity" class="form-label">Città di residenza</label>
-                <select id="registerCity" class="form-select" required>
-                  <option value="">Seleziona città</option>
-                  <!-- popolato dinamicamente da /servlet/cities -->
+                <label for="registerCountry" class="form-label">Paese</label>
+                <select id="registerCountry" class="form-select" required>
+                  <option value="">Seleziona paese</option>
                 </select>
+              </div>
+
+              <!-- REGION -->
+              <div class="col-md-6">
+                <label for="registerRegion" class="form-label">Regione</label>
+                <select id="registerRegion" class="form-select" disabled required>
+                  <option value="">Seleziona regione</option>
+                </select>
+              </div>
+
+              <!-- CITY -->
+              <div class="col-md-6">
+                <label for="registerCity" class="form-label">Città</label>
+                <select id="registerCity" class="form-select" disabled required>
+                  <option value="">Seleziona città</option>
+                </select>
+              </div>
+
+              <!-- ADDRESS (simple string) -->
+              <div class="col-12">
+                <label for="registerAddress" class="form-label">Indirizzo</label>
+                <input type="text" class="form-control" id="registerAddress" placeholder="Via, numero, interno" required>
               </div>
 
               <div class="col-12">
@@ -347,25 +356,22 @@
 
             <hr class="my-3">
 
+            <!-- 1 SOLO ARRAY SKILLS -->
             <div class="row g-3">
-              <div class="col-12 col-md-6">
-                <label class="form-label">Soft Skills</label>
-                <div class="input-group mb-2">
-                  <input type="text" id="softSkillInput" class="form-control" placeholder="Esempio: comunicazione">
-                  <button class="btn btn-outline-secondary" type="button" id="addSoftSkillBtn">Aggiungi</button>
-                </div>
-                <ul id="softSkillsList" class="list-group"></ul>
-                <small class="text-muted">Clicca su un elemento per rimuoverlo.</small>
+              <div class="col-md-8">
+                <label class="form-label">Skills</label>
+                <input type="text" id="skillInput" class="form-control"
+                  placeholder="Esempio: React, Comunicazione, SQL">
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-outline-secondary w-100" type="button" id="addSkillBtn">
+                  Aggiungi Skill
+                </button>
               </div>
 
-              <div class="col-12 col-md-6">
-                <label class="form-label">Hard Skills</label>
-                <div class="input-group mb-2">
-                  <input type="text" id="hardSkillInput" class="form-control" placeholder="Esempio: React, Node.js">
-                  <button class="btn btn-outline-secondary" type="button" id="addHardSkillBtn">Aggiungi</button>
-                </div>
-                <ul id="hardSkillsList" class="list-group"></ul>
-                <small class="text-muted">Clicca su un elemento per rimuoverlo.</small>
+              <div class="col-12">
+                <ul id="skillsList" class="list-group"></ul>
+                <small class="text-muted">Clicca su una skill per rimuoverla.</small>
               </div>
             </div>
 
@@ -378,7 +384,7 @@
     </div>
   </div>
 
-  <!-- MODALE CANDIDATURA SPONTANEA -->
+  <!-- CANDIDATURA SPONTANEA (come prima) -->
   <div class="modal fade" id="candidaturaModal" tabindex="-1" aria-labelledby="candidaturaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
