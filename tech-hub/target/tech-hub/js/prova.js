@@ -434,7 +434,14 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password })
         });
 
+        
         const json = await res.json();
+        if (json.success) {
+          if (json.redirect) {
+            window.location.href = json.redirect;
+          }
+        }
+        
 
         if (!json.success) throw new Error(json.message || "Credenziali errate");
 
