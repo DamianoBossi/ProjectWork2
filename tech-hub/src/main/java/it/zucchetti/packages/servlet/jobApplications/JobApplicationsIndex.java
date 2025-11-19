@@ -45,6 +45,8 @@ public class JobApplicationsIndex extends HttpServlet {
 
             statement = connection.createStatement();
 
+            String requestedJobOpeningId = request.getParameter("jobOpeningId");
+
             String userIdParam = request.getParameter("userId");
 
             String query = "SELECT * FROM APPLICATIONS";
@@ -52,6 +54,12 @@ public class JobApplicationsIndex extends HttpServlet {
             if (userIdParam != null) {
                 query += " WHERE USERID = '" + userIdParam + "'";
             }
+
+            if (requestedJobOpeningId != null) {
+                query += " WHERE JOBOPENINGID = '" + requestedJobOpeningId + "'";
+            }
+
+            //TODO: se inseriti entrambi i parametri allora ritorno errore e altre possibili condizioni
 
             resultSet = statement.executeQuery(query);
             

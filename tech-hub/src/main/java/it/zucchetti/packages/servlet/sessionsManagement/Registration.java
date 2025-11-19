@@ -80,36 +80,45 @@ public class Registration extends HttpServlet {
     }
 
     private static boolean addressFormatValidation(String address) {
-        if (address == null /*|| !address.matches("(?i)^(Via|Viale|Vicolo|P\\.za|Piazza|Corso|Largo|L\\.go|Strada|S\\.da)\\s+[\\p{L}0-9 .-']+(?:,)?\\s*\\d+\\p{L}?$")*/) {
+/*
+        if (address == null || !address.matches("(?i)^(Via|Viale|Vicolo|P\\.za|Piazza|Corso|Largo|L\\.go|Strada|S\\.da)\\s+[\\p{L}0-9 .-']+(?:,)?\\s*\\d+\\p{L}?$")) {
             errorMessage += "Indirizzo non valido. ";
             return false;
         }
+            */
         return true;
     }
 
     private static boolean cityIdValidation(int id) {
+        /*
         if (id <= 0) {
             errorMessage += "Città non valida. ";
             return false;
         }
+        */
         return true;
     }
 
     private static boolean regionIdValidation(int id) {
+        /* 
         if (id <= 0) {
             errorMessage += "Regione non valida. ";
             return false;
         }
+        */
         return true;
     }
 
     private static boolean countryIdValidation(int id) {
+        /*
         if (id <= 0) {
             errorMessage += "Paese non valido. ";
             return false;
         }
+         */
         return true;
     }
+
 
     private static boolean registrationValidation(String email, String password, String firstName, String lastName, String birthdate, String address, 
             int cityid, int regionid, int countryid) {
@@ -197,6 +206,7 @@ public class Registration extends HttpServlet {
         int regionId = obj.has("region") ? obj.get("region").getAsInt() : 0;
         int countryId = obj.has("country") ? obj.get("country").getAsInt() : 0;
 
+        /* 
         if (!registrationValidation(email, password, firstName, lastName, birthdate, address, cityId, regionId, countryId)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage + "\"}");
@@ -211,6 +221,7 @@ public class Registration extends HttpServlet {
             }
             return;
         } 
+         */
 
         /*
         //impostazione di latitude e longitude
@@ -647,8 +658,6 @@ public class Registration extends HttpServlet {
 
         response.setStatus(HttpServletResponse.SC_CREATED);
         out.write("{\"success\": true, \"message\": \"Registrazione effettuata.\"}");
-
-        //TODO: redirect a pagina principale dell'admin/user (a seconda del caso) o da altre parti...
 
         try {
             if (statement != null)

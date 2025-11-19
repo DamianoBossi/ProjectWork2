@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @WebServlet("/servlet/jobapplications/*")
-public class JobApplicationsShow extends HttpServlet {
+public class JobApplicationShow extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

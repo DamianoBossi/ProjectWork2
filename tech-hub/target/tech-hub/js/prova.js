@@ -379,16 +379,28 @@ async function handleRegisterSubmit(e) {
     if (cvFile) formData.append("cv", cvFile);
 
     try {
-        const res = await fetch('servlet/users', {
-            method: "POST",
-            body: formData
+
+        const payload = {
+            firstName, 
+            lastName,
+            birthdate: dob,
+            email,
+            password,
+            city: parseInt(cityId),
+            skills: skillIds
+          };
+
+        const res = await fetch('servlet/registration', {
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            method: "POST"
         });
+
+
 
         const json = await res.json();
 
         if (!json.success) throw new Error(json.message);
-
-        alert("Registrazione completata! Benvenuto " + json.data.firstName);
 
         bootstrap.Modal.getOrCreateInstance(registerModal).hide();
         registerForm.reset();
@@ -422,11 +434,17 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password })
         });
 
+        
         const json = await res.json();
+        if (json.success) {
+          if (json.redirect) {
+            window.location.href = json.redirect;
+          }
+        }
+        
 
         if (!json.success) throw new Error(json.message || "Credenziali errate");
 
-        alert("Benvenuto " + json.data.firstName);
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
 
     } catch (err) {

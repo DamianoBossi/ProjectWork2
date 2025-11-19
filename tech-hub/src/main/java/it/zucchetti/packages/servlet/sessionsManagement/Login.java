@@ -87,11 +87,15 @@ public class Login extends HttpServlet {
                 String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub; HttpOnly;" /*+ secureFlag + "; " + sameSite*/;
                 
                 response.setHeader("Set-Cookie", jsessionidCookie);
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"success\": true, \"message\": \"Login effettuato.\"}");
-
-                if (role.equals("admin"))
-                    response.sendRedirect("admin.html");
+          
+                if (role.equals("admin")) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"success\": true, \"message\": \"Login effettuato.\", \"redirect\": \"admin.html\"}");
+                }
+                else {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"success\": true, \"message\": \"Login effettuato.\"}");
+                }
             }
             else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
