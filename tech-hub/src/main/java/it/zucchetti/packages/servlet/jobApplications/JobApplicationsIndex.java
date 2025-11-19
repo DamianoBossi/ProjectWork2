@@ -21,8 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//TODO: X CLASSIFICA METTERE FILTRO SU JOBOPENING!
-
 @WebServlet("/servlet/jobapplications")
 public class JobApplicationsIndex extends HttpServlet {
 
