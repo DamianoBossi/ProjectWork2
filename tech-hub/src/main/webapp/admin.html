@@ -62,54 +62,101 @@
          ====================================================== -->
 
     <div class="card p-4 mb-5">
-      <h4 class="mb-4 text-center text-primary"><i class="bi bi-plus-circle me-2"></i>Crea Nuovo Annuncio</h4>
-      <form id="createJobForm">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="jobTitle" class="form-label">Titolo Posizione</label>
-            <input type="text" class="form-control" id="jobTitle" placeholder="Esempio: Sviluppatore Frontend" required>
-          </div>
-          <div class="col-md-6">
-            <label for="jobCategory" class="form-label">Categoria</label>
-            <select class="form-select" id="jobCategory" required>
-              <option value="">Seleziona categoria</option>
-              <option value="Sviluppo Software">Sviluppo Software</option>
-              <option value="Consulenza e Analisi">Consulenza e Analisi</option>
-              <option value="Data & BI">Data & BI</option>
-              <option value="Logistica e Operazioni">Logistica e Operazioni</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="jobCity" class="form-label">Sede</label>
-            <select class="form-select" id="jobCity" required>
-              <option value="">Seleziona sede</option>
-              <option value="Milano, Italia">Milano</option>
-              <option value="Roma, Italia">Roma</option>
-              <option value="Torino, Italia">Torino</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="jobContract" class="form-label">Tipo Contratto</label>
-            <select class="form-select" id="jobContract" required>
-              <option value="">Seleziona contratto</option>
-              <option value="Indeterminato">Indeterminato</option>
-              <option value="Determinato">Determinato</option>
-              <option value="Part-time">Part-time</option>
-            </select>
-          </div>
-          <div class="col-12">
-            <label for="jobDescription" class="form-label">Descrizione Posizione</label>
-            <textarea class="form-control" id="jobDescription" rows="4" placeholder="Descrivi le responsabilità, i requisiti e le competenze..." required></textarea>
-          </div>
-        </div>
-        <div class="mt-4 text-center">
-          <!-- pulsante già usa btn-primary e btn-icon: verrà stilizzato dal prova.css -->
-          <button type="submit" class="btn btn-primary btn-lg btn-icon">
-            <i class="bi bi-plus-circle"></i> Crea Annuncio
-          </button>
-        </div>
-      </form>
+  <h4 class="mb-4 text-center text-primary"><i class="bi bi-plus-circle me-2"></i>Crea Nuovo Annuncio</h4>
+
+  <!-- form che invia campi con nomi uguali alle colonne della tabella JOBOPENINGS -->
+  <form id="createJobForm" method="post" action="/api/jobopenings/create">
+    <!-- campi nascosti DB -->
+    <input type="hidden" name="JOBOPENINGID" id="JOBOPENINGID" value=""> <!-- valorizzare lato server se update -->
+    <input type="hidden" name="LATITUDE" id="LATITUDE" value="">
+    <input type="hidden" name="LONGITUDE" id="LONGITUDE" value="">
+    <input type="hidden" name="CREATEDAT" id="CREATEDAT" value="">
+    <input type="hidden" name="UPDATEDAT" id="UPDATEDAT" value="">
+    <input type="hidden" name="TESTID" id="TESTID" value="">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="TITLE" class="form-label">Titolo Posizione</label>
+        <!-- name e id corrispondono al campo TITLE del DB -->
+        <input type="text" class="form-control" id="TITLE" name="TITLE"
+               placeholder="Esempio: Sviluppatore Frontend" required>
+      </div>
+
+      <div class="col-md-6">
+        <label for="EMPTYTYPEID" class="form-label">Categoria / Tipo</label>
+        <!-- EMPTYTYPEID: corrisponde alla tabella EMPTYTYPES -->
+        <select class="form-select" id="EMPTYTYPEID" name="EMPTYTYPEID" required>
+          <option value="">Seleziona categoria</option>
+          <!-- valori di esempio: usare gli ID reali dal DB -->
+          <option value="1">Sviluppo Software</option>
+          <option value="2">Consulenza e Analisi</option>
+          <option value="3">Data & BI</option>
+          <option value="4">Logistica e Operazioni</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="CITYID" class="form-label">Sede (CITYID)</label>
+        <!-- CITYID: invia l'ID della città, non la stringa "Milano, Italia" -->
+        <select class="form-select" id="CITYID" name="CITYID" required>
+          <option value="">Seleziona sede</option>
+          <!-- esempio con ID numerici: sostituire con i CITYID reali -->
+          <option value="10">Milano</option>
+          <option value="20">Roma</option>
+          <option value="30">Torino</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="WORKSCHEDID" class="form-label">Tipo Contratto / Orario (WORKSCHEDID)</label>
+        <!-- WORKSCHEDID corrisponde alla tabella WORKSCHEDS -->
+        <select class="form-select" id="WORKSCHEDID" name="WORKSCHEDID" required>
+          <option value="">Seleziona contratto</option>
+          <!-- valori di esempio: usare gli ID reali dalla tabella WORKSCHEDS -->
+          <option value="1">Indeterminato (Full-time)</option>
+          <option value="2">Determinato</option>
+          <option value="3">Part-time</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="RALFROM" class="form-label">RAL (da)</label>
+        <input type="number" class="form-control" id="RALFROM" name="RALFROM" placeholder="Es. 30000">
+      </div>
+
+      <div class="col-md-6">
+        <label for="RALTO" class="form-label">RAL (a)</label>
+        <input type="number" class="form-control" id="RALTO" name="RALTO" placeholder="Es. 45000">
+      </div>
+
+      <div class="col-12">
+        <label for="DESCRIPTION" class="form-label">Descrizione Posizione</label>
+        <!-- DESCRIPTION: campo testuale grande -->
+        <textarea class="form-control" id="DESCRIPTION" name="DESCRIPTION" rows="4"
+                  placeholder="Descrivi le responsabilità, i requisiti e le competenze..." required></textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label for="CLOSINGDATE" class="form-label">Data di Chiusura</label>
+        <input type="date" class="form-control" id="CLOSINGDATE" name="CLOSINGDATE">
+      </div>
+
+      <div class="col-md-6">
+        <label for="ISOPEN" class="form-label">Stato Annuncio</label>
+        <select class="form-select" id="ISOPEN" name="ISOPEN" required>
+          <option value="1">Aperto</option>
+          <option value="0">Chiuso</option>
+        </select>
+      </div>
     </div>
+
+    <div class="mt-4 text-center">
+      <button type="submit" class="btn btn-primary btn-lg btn-icon">
+        <i class="bi bi-plus-circle"></i> Crea Annuncio
+      </button>
+    </div>
+  </form>
+</div>
+
 
     <!-- ======================================================
          SEZIONE LISTA ANNUNCI
