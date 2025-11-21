@@ -29,14 +29,10 @@ let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
 const skillsList = [];
 
 
-// =====================================================
-// LOAD STATIC DATA (CITIES, EMPTYPES, SKILLS)
-// =====================================================
-
-// -------- CITIES --------
-async function loadCities() {
+// -------- COUNTRIES --------
+async function loadCountries() {
     try {
-        const res = await fetch('servlet/cities');
+        const res = await fetch('servlet/countries');
         const json = await res.json();
         const data = json.data || [];
 
