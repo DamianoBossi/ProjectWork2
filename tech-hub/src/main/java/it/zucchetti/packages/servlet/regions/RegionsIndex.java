@@ -53,6 +53,7 @@ public class RegionsIndex extends HttpServlet {
             while (resultSet.next()) {
                 JsonObject skillObj = new JsonObject();
                 skillObj.addProperty("regionId", resultSet.getInt("regionId"));
+                skillObj.addProperty("countryId", resultSet.getInt("countryId"));
                 skillObj.addProperty("name", resultSet.getString("name"));
                 dataArray.add(skillObj);
             }

@@ -29,7 +29,7 @@ let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
 const skillsList = [];
 
 
-// -------- CITIES --------
+// -------- COUNTRIES --------
 async function loadCountries() {
     try {
         const res = await fetch('servlet/countries');
@@ -133,6 +133,18 @@ async function loadCities(regionId) {
                 opt.textContent = c.name;
                 citySel.appendChild(opt);
             }
+        });
+
+        // filtri jobs
+        const filterCity = document.getElementById("filterCity");
+        if (!filterCity) return;
+
+        filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
+        data.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.cityId;
+            opt.textContent = c.name;
+            filterCity.appendChild(opt);
         });
 
         if (regionId) citySel.disabled = false;
@@ -282,7 +294,7 @@ function cardJob(job) {
             </div>
 
             <div class="text-muted small mb-2">
-              <i class="bi bi-geo-alt"></i> ${cityName}
+              <i class="bi bi-geo-alt"></i> ${cityName.name}
             </div>
 
             <p class="mb-3 text-muted small">${job.description}</p>
@@ -597,6 +609,7 @@ async function handleLogin(e) {
         }
 
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
     } catch (e) {
         console.error("Errore login:", e);
@@ -636,6 +649,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadEmptypes(),
         loadSkills(),
         loadJobSkills(),
+        loadCities(),
+        loadRegions()
     ]);
 
     await loadJobs();

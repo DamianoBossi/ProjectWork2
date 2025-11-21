@@ -54,6 +54,7 @@ public class CitiesIndex extends HttpServlet {
                 JsonObject skillObj = new JsonObject();
                 skillObj.addProperty("cityId", resultSet.getInt("cityId"));
                 skillObj.addProperty("name", resultSet.getString("name"));
+                skillObj.addProperty("regionId", resultSet.getString("regionId"));
                 dataArray.add(skillObj);
             }
 
