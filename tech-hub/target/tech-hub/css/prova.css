@@ -312,6 +312,14 @@
       gap: 0.4rem;
     }
 
+    #login-buttons{
+      display: flex !important;
+    }
+
+    #profile-btn{
+      display: none;
+    }
+
     .modal-header {
       background-color: #0d6efd;
       color: white;

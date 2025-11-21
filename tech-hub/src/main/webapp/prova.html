@@ -35,7 +35,7 @@
       </button>
     </div>
 
-    <div class="container text-center mb-5">
+    <div id="login-buttons-home" class="container text-center mb-5">
       <p class="text-center lh-lg mx-auto fs-6">Hai già un account?</p>
       <button type="button" class="btn btn-primary btn-lg me-1 px-3 py-1 fs-6" data-bs-toggle="modal"
         data-bs-target="#loginModal">
@@ -213,15 +213,22 @@
       <div class="d-flex align-items-center gap-2">
         <div class="text-muted" id="jobsCount">0 opportunità trovate</div>
 
-        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center" data-bs-toggle="modal"
-          data-bs-target="#loginModal" aria-label="Accedi">
-          <i class="bi bi-box-arrow-in-right me-1"></i> Accedi
-        </button>
+        <div id="login-buttons" >
+          <button id="login-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" data-bs-toggle="modal"
+            data-bs-target="#loginModal" aria-label="Accedi">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Accedi
+          </button>
+  
+          <button id="reg-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" data-bs-toggle="modal"
+            data-bs-target="#registerModal" aria-label="Registrati">
+            <i class="bi bi-person-plus me-1"></i> Registrati
+          </button>
 
-        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center" data-bs-toggle="modal"
-          data-bs-target="#registerModal" aria-label="Registrati">
-          <i class="bi bi-person-plus me-1"></i> Registrati
-        </button>
+          <button id="profile-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" data-bs-toggle="modal"
+            data-bs-target="#profileModal" aria-label="Profilo">
+            <i class="bi bi-person-plus me-1"></i>Profilo
+          </button>
+        </div>
       </div>
     </div>
 

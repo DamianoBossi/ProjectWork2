@@ -488,6 +488,25 @@ if (addSkillBtn) {
     addSkillBtn.onclick = addSkill;
 }
 
+// =====================================================
+// CHECK USER LOGGED
+// =====================================================
+
+function checkUserLogged() {
+    fetch('servlet/sessionStatus')
+        .then(res => res.json())
+        .then(json => {
+            if (json.message.isLogged) {
+                document.getElementById("login-buttons-home").style.display = "none";
+                document.getElementById("login-buttons").style.display = "none";
+                document.getElementById("profile-btn").style.display = "block";
+                document.getElementById("reg-btn").style.display = "none";
+                document.getElementById("login-btn").style.display = "none";
+                
+            }
+               })
+       
+}
 
 // =====================================================
 // REGISTER FORM (countryId, regionId, cityId, address, skills[])
@@ -610,6 +629,9 @@ async function handleLogin(e) {
 
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
         bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
+
+        checkUserLogged();
+
 
     } catch (e) {
         console.error("Errore login:", e);
