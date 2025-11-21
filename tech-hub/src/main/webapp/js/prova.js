@@ -29,7 +29,7 @@ let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
 const skillsList = [];
 
 
-// -------- COUNTRIES --------
+// -------- CITIES --------
 async function loadCountries() {
     try {
         const res = await fetch('servlet/countries');
@@ -57,56 +57,47 @@ async function loadCountries() {
     }
 }
 
-
-// =====================================================
-// LOAD REGIONS (filtrate per countryId)
-// =====================================================
+// -------- REGIONS --------
 async function loadRegions(countryId) {
+
+    const sel = document.getElementById("registerRegion");
+    const citySel = document.getElementById("registerCity");
+
     if (!countryId) {
-        const sel = document.getElementById("registerRegion");
-        const citySel = document.getElementById("registerCity");
-        if (sel) {
-            sel.innerHTML = `<option value="">Seleziona regione</option>`;
-            sel.disabled = true;
-        }
-        if (citySel) {
-            citySel.innerHTML = `<option value="">Seleziona città</option>`;
-            citySel.disabled = true;
-        }
+        sel.innerHTML = `<option value="">Seleziona regione</option>`;
+        sel.disabled = true;
+        citySel.innerHTML = `<option value="">Seleziona città</option>`;
+        citySel.disabled = true;
         return;
     }
 
     try {
-        const res = await fetch(`servlet/regions?countryId=${countryId}`);
+        const res = await fetch(`servlet/regions`);
         const json = await res.json();
         const data = json.data || [];
 
-        const sel = document.getElementById("registerRegion");
-        if (!sel) return;
-
         regionsMap.clear();
         sel.innerHTML = `<option value="">Seleziona regione</option>`;
+        citySel.innerHTML = `<option value="">Seleziona città</option>`;
+        citySel.disabled = true;
 
         data.forEach(r => {
-
             regionsMap.set(String(r.regionId), {
                 name: r.name,
-                countryId: String(countryId)
+                countryId: String(r.countryId)
             });
+        });
 
-            const opt = document.createElement("option");
-            opt.value = r.regionId;
-            opt.textContent = r.name;
-            sel.appendChild(opt);
+        data.forEach(r => {
+            if (String(r.countryId) === String(countryId)) {
+                const opt = document.createElement("option");
+                opt.value = r.regionId;
+                opt.textContent = r.name;
+                sel.appendChild(opt);
+            }
         });
 
         sel.disabled = false;
-
-        const citySel = document.getElementById("registerCity");
-        if (citySel) {
-            citySel.innerHTML = `<option value="">Seleziona città</option>`;
-            citySel.disabled = true;
-        }
 
     } catch (e) {
         console.error("Errore loadRegions:", e);
@@ -114,61 +105,43 @@ async function loadRegions(countryId) {
 }
 
 
-// =====================================================
-// LOAD CITIES 
-// =====================================================
+// -------- CITIES --------
 async function loadCities(regionId) {
     try {
-        const url = regionId
-            ? `servlet/cities?regionId=${regionId}`
-            : `servlet/cities`;
-
-        const res = await fetch(url);
+        const res = await fetch(`servlet/cities`);
         const json = await res.json();
         const data = json.data || [];
 
-        // aggiorno sempre la mappa
+        const citySel = document.getElementById("registerCity");
+        
+        citySel.innerHTML = `<option value="">Seleziona città</option>`;
+        citySel.disabled = true;
+
         citiesMap.clear();
+
         data.forEach(c => {
             citiesMap.set(String(c.cityId), {
                 name: c.name,
-                regionId: String(regionId)
+                regionId: String(c.regionId)
             });
-
         });
 
-        if (regionId) {
-            // registrazione: city sotto regione
-            const citySel = document.getElementById("registerCity");
-            if (!citySel) return;
-
-            citySel.innerHTML = `<option value="">Seleziona città</option>`;
-            data.forEach(c => {
+        data.forEach(c => {
+            if (String(c.regionId) === String(regionId)) {
                 const opt = document.createElement("option");
                 opt.value = c.cityId;
                 opt.textContent = c.name;
                 citySel.appendChild(opt);
-            });
-            citySel.disabled = false;
+            }
+        });
 
-        } else {
-            // filtri jobs
-            const filterCity = document.getElementById("filterCity");
-            if (!filterCity) return;
-
-            filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
-            data.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c.cityId;
-                opt.textContent = c.name;
-                filterCity.appendChild(opt);
-            });
-        }
+        if (regionId) citySel.disabled = false;
 
     } catch (e) {
         console.error("Errore loadCities:", e);
     }
 }
+
 
 
 
