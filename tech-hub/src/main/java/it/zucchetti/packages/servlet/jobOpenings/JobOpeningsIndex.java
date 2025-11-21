@@ -61,7 +61,7 @@ public class JobOpeningsIndex extends HttpServlet {
                 skillObj.addProperty("ralFrom", resultSet.getString("ralFrom"));
                 skillObj.addProperty("ralTo", resultSet.getString("ralTo"));
                 skillObj.addProperty("isOpen", resultSet.getString("isOpen"));
-                skillObj.addProperty("emptypeId", resultSet.getString("emptypeId"));
+                skillObj.addProperty("empTypeId", resultSet.getInt("empTypeId"));
                 skillObj.addProperty("workSchedId", resultSet.getString("workSchedId"));
                 skillObj.addProperty("cityId", resultSet.getString("cityId"));
                 skillObj.addProperty("latitude", resultSet.getString("latitude"));

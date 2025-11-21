@@ -1,10 +1,12 @@
-// =====================================================
-// ANIMAZIONE CARD WHY SECTION
-// =====================================================
+// ==============================
+// ANIMAZIONE CARD (Why Section)
+// ==============================
 const cards = document.querySelectorAll('.why-card');
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
     });
 }, { threshold: 0.3 });
 
@@ -28,11 +30,13 @@ const skillsList = [];
 
 
 // =====================================================
-// LOAD COUNTRIES
+// LOAD STATIC DATA (CITIES, EMPTYPES, SKILLS)
 // =====================================================
-async function loadCountries() {
+
+// -------- CITIES --------
+async function loadCities() {
     try {
-        const res = await fetch("servlet/countries");
+        const res = await fetch('servlet/cities');
         const json = await res.json();
         const data = json.data || [];
 
@@ -171,109 +175,106 @@ async function loadCities(regionId) {
 }
 
 
-// =====================================================
-// LOAD EMPLOYMENT TYPES (per filtro contratto)
-// =====================================================
+
+// -------- EMPLOYMENT TYPES --------
 async function loadEmptypes() {
     try {
-        const res = await fetch("servlet/emptypes");
+        const res = await fetch('servlet/emptypes');
         const json = await res.json();
-        const data = json.data || [];
+        const types = json.data || [];
 
         emptypesMap.clear();
+        types.forEach(t => emptypesMap.set(t.empTypeId, t.name));
 
-        const filterContract = document.getElementById("filterContract");
+        const filterContract = document.getElementById('filterContract');
         if (filterContract) {
-            filterContract.innerHTML = `<option value="">Contratto (Tutti)</option>`;
-        }
-
-        data.forEach(t => {
-            emptypesMap.set(String(t.emptypeId), t.name);
-
-            if (filterContract) {
-                const opt = document.createElement("option");
-                opt.value = t.emptypeId;
+            filterContract.innerHTML = '<option value="">Contratto (Tutti)</option>';
+            types.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.empTypeId;
                 opt.textContent = t.name;
                 filterContract.appendChild(opt);
-            }
-        });
+            });
+        }
 
-    } catch (e) {
-        console.error("Errore loadEmptypes:", e);
+    } catch (err) {
+        console.error("Errore loadEmptypes:", err);
     }
 }
 
 
-// =====================================================
-// LOAD SKILLS (per filtro skill e per mappare skillList → ids)
-// =====================================================
+
+// -------- SKILLS --------
 async function loadSkills() {
     try {
-        const res = await fetch("servlet/skills");
+        const res = await fetch('servlet/skills');
         const json = await res.json();
-        const data = json.data || [];
+        const skills = json.data || [];
 
         skillsMap.clear();
+        skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
 
-        const filterSkill = document.getElementById("filterSkill");
+        // filtro skill
+        const filterSkill = document.getElementById('filterSkill');
         if (filterSkill) {
-            filterSkill.innerHTML = `<option value="">Skill (Tutte)</option>`;
-        }
-
-        data.forEach(s => {
-            skillsMap.set(String(s.skillId), s.name);
-
-            if (filterSkill) {
-                const opt = document.createElement("option");
+            filterSkill.innerHTML = '<option value="">Skill (Tutte)</option>';
+            skills.forEach(s => {
+                const opt = document.createElement('option');
                 opt.value = s.skillId;
                 opt.textContent = s.name;
                 filterSkill.appendChild(opt);
-            }
-        });
+            });
+        }
 
-    } catch (e) {
-        console.error("Errore loadSkills:", e);
+    } catch (err) {
+        console.error("Errore loadSkills:", err);
     }
 }
 
 
-// =====================================================
-// LOAD JOBS + RELATED SKILLS
-// =====================================================
+
+// =============================================================
+// LOAD JOBS + JOIN SKILLS
+// =============================================================
 async function loadJobSkills() {
     try {
-        const res = await fetch("servlet/jobopeningsskills");
+        const res = await fetch('servlet/jobopeningsskills');
         const json = await res.json();
-        const data = json.data || [];
+        const list = json.data || [];
 
         jobSkillsMap.clear();
 
-        data.forEach(row => {
-            const jobId = String(row.jobOpeningId);
-            const skillId = String(row.skillId);
+        list.forEach(entry => {
+            const jobId = String(entry.jobOpeningId);
+            const skillId = String(entry.skillId);
 
             if (!jobSkillsMap.has(jobId)) jobSkillsMap.set(jobId, []);
             jobSkillsMap.get(jobId).push(skillId);
         });
 
-    } catch (e) {
-        console.error("Errore loadJobSkills:", e);
+    } catch (err) {
+        console.error("Errore loadJobSkills:", err);
     }
 }
 
+
+
+// ---------------- JOB OPENINGS ----------------
 async function loadJobs() {
     try {
-        const res = await fetch("servlet/jobopenings");
+        const res = await fetch('servlet/jobopenings');
         const json = await res.json();
         allJobs = json.data || [];
 
-        renderJobs(allJobs);
-
+        // conta posizioni initiali
         const count = allJobs.length;
-        const pill = document.getElementById("homeJobsCountPill");
-        const card = document.getElementById("homeJobsCountCard");
+        const pill = document.getElementById('homeJobsCountPill');
+        const card = document.getElementById('homeJobsCountCard');
         if (pill) pill.textContent = count;
         if (card) card.textContent = count;
+
+        // render cards
+        renderJobs(allJobs);
 
     } catch (e) {
         console.error("Errore loadJobs:", e);
@@ -281,14 +282,16 @@ async function loadJobs() {
 }
 
 
-// =====================================================
-// RENDER CARD LAVORO
-// =====================================================
-function cardJob(job) {
-    const jobId = String(job.jobOpeningId);
 
-    const cityName = citiesMap.get(String(job.cityId)) || "N/D";
-    const emptypeName = emptypesMap.get(String(job.emptypeId)) || "N/D";
+// =============================================================
+// RENDER CARD LAVORO
+// =============================================================
+function cardJob(job) {
+
+    const cityName = citiesMap.get(String(job.cityId)) || 'N/D';
+    const emptypeName = emptypesMap.get(job.empTypeId) || 'N/D';
+
+    const jobId = String(job.jobOpeningId);
 
     const skillIds = jobSkillsMap.get(jobId) || [];
     const skillNames = skillIds
@@ -297,10 +300,10 @@ function cardJob(job) {
 
     return `
         <div class="col-md-6 col-lg-4 job-card"
-             data-id="${jobId}"
-             data-city="${job.cityId}"
-             data-contract="${job.emptypeId}"
-             data-skills="${skillIds.join(',')}">
+            data-id="${jobId}"
+            data-city="${job.cityId}"
+            data-contract="${job.empTypeId}"
+            data-skills="${skillIds.join(',')}">
 
           <div class="card h-100 p-4">
 
@@ -324,6 +327,7 @@ function cardJob(job) {
               <div class="small text-muted">
                 <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
               </div>
+
               <button class="btn btn-sm btn-primary" onclick="openApplyModal('${job.title}')">
                 Candidati
               </button>
@@ -334,10 +338,16 @@ function cardJob(job) {
     `;
 }
 
+
+
+// =============================================================
+// STAMPA JOBS NEL GRID
+// =============================================================
 function renderJobs(list) {
-    const grid = document.getElementById("jobsGrid");
+    const grid = document.getElementById('jobsGrid');
     if (!grid) return;
-    grid.innerHTML = list.map(j => cardJob(j)).join("");
+
+    grid.innerHTML = list.map(job => cardJob(job)).join("");
     updateJobsCount();
 }
 
@@ -409,19 +419,85 @@ function addSkill() {
     const value = input.value.trim();
     if (!value) return;
 
-    skillsList.push(value);
+    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+    const fSkill = document.getElementById('filterSkill')?.value || '';
+    const fCity = document.getElementById('filterCity')?.value || '';
+    const fContract = document.getElementById('filterContract')?.value || '';
 
-    const ul = document.getElementById("skillsList");
+    const cards = document.querySelectorAll('.job-card');
+
+    cards.forEach(card => {
+
+        const title = card.querySelector('h5').textContent.toLowerCase();
+        const city = card.dataset.city;
+        const contract = card.dataset.contract;
+        const skills = card.dataset.skills.split(',');
+
+        const matchSearch = search ? title.includes(search) : true;
+        const matchCity = fCity ? (city === fCity) : true;
+        const matchContract = fContract ? (contract === fContract) : true;
+
+        // skill: un job può avere più skill → se la skill scelta è nei suoi skill
+        const matchSkill = fSkill ? skills.includes(fSkill) : true;
+
+        if (matchSearch && matchCity && matchContract && matchSkill) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    updateJobsCount();
+}
+
+
+
+// =============================================================
+// UPDATE COUNTER
+// =============================================================
+function updateJobsCount() {
+    const cards = document.querySelectorAll('.job-card');
+    const visible = [...cards].filter(c => c.style.display !== 'none').length;
+    const el = document.getElementById('jobsCount');
+    if (el) el.textContent = `${visible} opportunità trovate`;
+}
+
+
+
+// =============================================================
+// MODALE CANDIDATURA APPLICAZIONE
+// =============================================================
+function openApplyModal(role) {
+    const modalEl = document.getElementById('registerModal');
+    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    else alert("Candidati per: " + role);
+}
+
+
+
+// =============================================================
+// SKILL MANAGER (NO TOUCH)
+// =============================================================
+function addSkill(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if (!val) return;
+
+    const ul = document.getElementById(listId);
+
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
-    li.textContent = value;
+    li.textContent = val;
 
-    li.onclick = () => {
-        const index = skillsList.indexOf(value);
-        if (index !== -1) skillsList.splice(index, 1);
-        li.remove();
-    };
+    const closeIcon = document.createElement("span");
+    closeIcon.innerHTML = "&times;";
+    closeIcon.className = "ms-2 text-danger fw-bold";
+    closeIcon.style.cursor = "pointer";
 
+    closeIcon.onclick = () => li.remove();
+    li.onclick = () => li.remove();
+
+    li.appendChild(closeIcon);
     ul.appendChild(li);
     input.value = "";
 }
@@ -596,9 +672,10 @@ if (document.getElementById("loginForm")) {
 }
 
 
-// =====================================================
-// SWITCH HOME/JOBS
-// =====================================================
+
+// =============================================================
+// HOME / JOBS SWITCH
+// =============================================================
 window.showJobsPage = function () {
     homeContent.style.display = "none";
     jobSection.style.display = "block";
@@ -612,9 +689,10 @@ window.showHomePage = function () {
 };
 
 
-// =====================================================
+
+// =============================================================
 // DOM READY
-// =====================================================
+// =============================================================
 document.addEventListener("DOMContentLoaded", async () => {
     await Promise.all([
         loadCountries(),
@@ -625,5 +703,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     ]);
 
     await loadJobs();
+
     updateJobsCount();
 });
