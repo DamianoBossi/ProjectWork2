@@ -17,8 +17,8 @@ cards.forEach(card => observer.observe(card));
 // MAPPE GLOBALI
 // =====================================================
 const countriesMap = new Map(); // countryId -> { name }
-const regionsMap   = new Map(); // regionId  -> { name, countryId }
-const citiesMap    = new Map(); // cityId    -> { name, regionId }
+const regionsMap = new Map(); // regionId  -> { name, countryId }
+const citiesMap = new Map(); // cityId    -> { name, regionId }
 const emptypesMap = new Map(); // emptypeId -> name
 const skillsMap = new Map(); // skillId   -> name
 
@@ -113,7 +113,7 @@ async function loadCities(regionId) {
         const data = json.data || [];
 
         const citySel = document.getElementById("registerCity");
-        
+
         citySel.innerHTML = `<option value="">Seleziona città</option>`;
         citySel.disabled = true;
 
@@ -282,7 +282,7 @@ function cardJob(job) {
             </div>
 
             <div class="text-muted small mb-2">
-              <i class="bi bi-geo-alt"></i> ${cityName.name}
+              <i class="bi bi-geo-alt"></i> ${cityName}
             </div>
 
             <p class="mb-3 text-muted small">${job.description}</p>
@@ -554,53 +554,21 @@ if (document.getElementById("registerForm")) {
 }
 
 
-// =====================================================
-// COUNTRY 
-// =====================================================
+//Country on change
 if (document.getElementById("registerCountry")) {
     registerCountry.onchange = () => {
-    const cid = registerCountry.value;
-
-    const regionSel = document.getElementById("registerRegion");
-    const citySel   = document.getElementById("registerCity");
-
-    regionSel.innerHTML = `<option value="">Seleziona regione</option>`;
-    citySel.innerHTML   = `<option value="">Seleziona città</option>`;
-    citySel.disabled = true;
-
-    for (const [regionId, obj] of regionsMap.entries()) {
-        if (obj.countryId === cid) {
-            const opt = document.createElement("option");
-            opt.value = regionId;
-            opt.textContent = obj.name;
-            regionSel.appendChild(opt);
-        }
-    }
-
-    regionSel.disabled = cid === "";
-};
-
+        const cid = registerCountry.value;
+        loadRegions(cid);
+    };
 }
 
+
+//Region on change
 if (document.getElementById("registerRegion")) {
     registerRegion.onchange = () => {
-    const rid = registerRegion.value;
-
-    const citySel = document.getElementById("registerCity");
-    citySel.innerHTML = `<option value="">Seleziona città</option>`;
-
-    for (const [cityId, obj] of citiesMap.entries()) {
-        if (obj.regionId === rid) {
-            const opt = document.createElement("option");
-            opt.value = cityId;
-            opt.textContent = obj.name;
-            citySel.appendChild(opt);
-        }
-    }
-
-    citySel.disabled = rid === "";
-};
-
+        const rid = registerRegion.value;
+        loadCities(rid);
+    };
 }
 
 
@@ -629,7 +597,6 @@ async function handleLogin(e) {
         }
 
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
-        bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
     } catch (e) {
         console.error("Errore login:", e);
@@ -669,7 +636,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadEmptypes(),
         loadSkills(),
         loadJobSkills(),
-        loadCities()
     ]);
 
     await loadJobs();
