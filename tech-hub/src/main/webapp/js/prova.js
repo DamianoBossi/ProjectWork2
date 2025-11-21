@@ -282,7 +282,7 @@ function cardJob(job) {
             </div>
 
             <div class="text-muted small mb-2">
-              <i class="bi bi-geo-alt"></i> ${cityName}
+              <i class="bi bi-geo-alt"></i> ${cityName.name}
             </div>
 
             <p class="mb-3 text-muted small">${job.description}</p>
@@ -629,6 +629,7 @@ async function handleLogin(e) {
         }
 
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
     } catch (e) {
         console.error("Errore login:", e);
