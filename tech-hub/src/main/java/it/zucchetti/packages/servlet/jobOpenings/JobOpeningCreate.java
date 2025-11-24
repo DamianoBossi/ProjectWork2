@@ -22,12 +22,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/*TODO: cambiare tipi delle var e degli oggetti che pongo uguali alle cose che mi arrivano dal json di richiesta (x controllo se null o meno, se va bene o meno) (magari metterli 
+tutti a String in modo che posso verificare che siano null e in modo che il frontend possa mandarmeli null)*/
+
 @WebServlet("/servlet/jobopenings/create")
 public class JobOpeningCreate extends HttpServlet {
 
     private static String errorMessage = ""; //TODO: fixa! non è thread safe!
 
-    private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int cityId, String closingDate) {
+    private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int workSchedId, int cityId, String closingDate) {
         return true; //TODO
     }
 
@@ -93,12 +96,15 @@ public class JobOpeningCreate extends HttpServlet {
 
         String title = obj.has("title") ? obj.get("title").getAsString() : null;
         String description = obj.has("description") ? obj.get("description").getAsString() : null;
-        Double ralFrom = obj.has("ralFrom") ? obj.get("ralFrom").getAsDouble() : null;
-        Double ralTo = obj.has("ralTo") ? obj.get("ralTo").getAsDouble() : null;
+        Double ralFrom = obj.has("ralFrom") ? obj.get("ralFrom").getAsDouble() : 0;
+        Double ralTo = obj.has("ralTo") ? obj.get("ralTo").getAsDouble() : 0;
         boolean isOpen = obj.has("isOpen") ? obj.get("isOpen").getAsBoolean() : false; //mi aspetto che la richiesta qui mi invi un booleano true/false
         int empTypeId = obj.has("empTypeId") ? obj.get("empTypeId").getAsInt() : 0;
+        int workSchedId = obj.has("workSchedId") ? obj.get("workSchedId").getAsInt() : 0;
         int cityId = obj.has("cityId") ? obj.get("cityId").getAsInt() : 0;
         
+        out.print("title: " + title +", description: " + description + ", ralFrom: " + ralFrom + ", ralTo: " + ralTo + ", isOpen: " + isOpen + ", empTypeId: " + empTypeId + ", workSchedId: " + workSchedId + ", cityId: " + cityId + "\n" );
+
         //TODO: calcolo latitude e longitude
         double latitude = 0;
         double longitude = 0;
@@ -107,7 +113,7 @@ public class JobOpeningCreate extends HttpServlet {
 
         String closingDate = obj.has("closingDate") ? obj.get("closingDate").getAsString() : null;
 
-        if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, cityId, closingDate)) {
+        if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workSchedId, cityId, closingDate)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage + "\"}");
             try {
@@ -124,8 +130,9 @@ public class JobOpeningCreate extends HttpServlet {
 
         try {
             //inserimento jobOpening nel db
-            String insertion = "INSERT INTO JOBOPENINGS (TITLE, DESCRIPTION, RALFROM, RALTO, ISOPEN, EMPTYPEID, CITYID, LATITUDE, LONGITUDE, UPDATEDAT, CLOSINGDATE) VALUES ('" + 
-                title + "', '" + description + "', '" + ralFrom + "', '" + ralTo + "', '" + isOpen + "', '" + empTypeId + "', '" + cityId + "', '" + latitude + "', '" + longitude + "', '" + updatedAt + "', '" + closingDate + "')"; 
+            //TODO: fa un pò schifo sto inserimento ed è illeggibile e immanutenibile... magari fixare
+            String insertion = "INSERT INTO JOBOPENINGS (TITLE, DESCRIPTION, RALFROM, RALTO, ISOPEN, EMPTYPEID, WORKSCHEDID, CITYID, LATITUDE, LONGITUDE, UPDATEDAT, CLOSINGDATE) VALUES ('" + 
+                title + "', '" + description + "', '" + (ralFrom==0?null:ralFrom) + "', '" + (ralTo==0?null:ralTo) + "', '" + isOpen + "', '" + empTypeId + "', '" + workSchedId + "', '" + cityId + "', '" + latitude + "', '" + longitude + "', '" + updatedAt + "', '" + closingDate + "')"; 
             
             int rowsInserted = statement.executeUpdate(insertion);
 

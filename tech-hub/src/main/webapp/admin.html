@@ -65,14 +65,7 @@
   <h4 class="mb-4 text-center text-primary"><i class="bi bi-plus-circle me-2"></i>Crea Nuovo Annuncio</h4>
 
   <!-- form che invia campi con nomi uguali alle colonne della tabella JOBOPENINGS -->
-  <form id="createJobForm" method="post" action="/api/jobopenings/create">
-    <!-- campi nascosti DB -->
-    <input type="hidden" name="JOBOPENINGID" id="JOBOPENINGID" value=""> <!-- valorizzare lato server se update -->
-    <input type="hidden" name="LATITUDE" id="LATITUDE" value="">
-    <input type="hidden" name="LONGITUDE" id="LONGITUDE" value="">
-    <input type="hidden" name="CREATEDAT" id="CREATEDAT" value="">
-    <input type="hidden" name="UPDATEDAT" id="UPDATEDAT" value="">
-    <input type="hidden" name="TESTID" id="TESTID" value="">
+  <form id="createJobForm">
     <div class="row g-3">
       <div class="col-md-6">
         <label for="TITLE" class="form-label">Titolo Posizione</label>
@@ -132,7 +125,7 @@
         <label for="DESCRIPTION" class="form-label">Descrizione Posizione</label>
         <!-- DESCRIPTION: campo testuale grande -->
         <textarea class="form-control" id="DESCRIPTION" name="DESCRIPTION" rows="4"
-                  placeholder="Descrivi le responsabilità, i requisiti e le competenze..." required></textarea>
+                  placeholder="Descrivi le responsabilità, i requisiti e le competenze..."></textarea>
       </div>
 
       <div class="col-md-6">
@@ -208,22 +201,58 @@
       };
     }
 
-    // CREAZIONE NUOVO ANNUNCIO
-    document.getElementById('createJobForm').addEventListener('submit', function (e) {
+    // CREAZIONE NUOVO ANNUNCIO 
+    document.getElementById('createJobForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      const job = {
-        id: Date.now(),
-        title: document.getElementById('jobTitle').value,
-        category: document.getElementById('jobCategory').value,
-        city: document.getElementById('jobCity').value,
-        contract: document.getElementById('jobContract').value,
-        description: document.getElementById('jobDescription').value,
-        status: 'Aperto',
-        candidates: []
-      };
-      jobs.push(job);
-      renderJobs();
-      this.reset();
+
+      try {
+        const title = document.getElementById('TITLE').value.trim() || "";
+        const description = document.getElementById('DESCRIPTION').value.trim() || "";
+        const ralFrom = document.getElementById('RALFROM').value.trim() || 0;
+        const ralTo = document.getElementById('RALTO').value.trim() || 0;
+        if (ralFrom > ralTo) {
+          throw new Error("RAL 'da' non può essere maggiore di RAL 'a'");
+        }
+        const isOpen = Boolean(document.getElementById('ISOPEN').value);
+        const empTypeId = parseInt(document.getElementById('EMPTYTYPEID').value);
+        const workschedId = parseInt(document.getElementById('WORKSCHEDID').value);
+        const cityId = parseInt(document.getElementById('CITYID').value);
+        const closingDate = String(document.getElementById('CLOSINGDATE').value);
+
+        const payload = {
+            title,
+            description,
+            ralFrom,
+            ralTo,
+            isOpen,
+            empTypeId,
+            workschedId,
+            cityId
+        };
+
+        try {
+            const res = await fetch('servlet/jobopenings/create', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const json = await res.json();
+
+            if (!json.success) throw new Error(json.message || "Creazione posizione lavorativa fallita");
+
+            alert("Posizione lavorativa creata con successo!");
+
+            location.reload();
+
+        } catch (err) {
+            console.error("Errore creazione posizione lavorativa:", err);
+            alert("Errore: " + err.message);
+        }
+      } catch (err) {
+            console.error("Errore creazione posizione lavorativa:", err);
+            alert("Errore: " + err.message);
+      }
     });
 
     // EVENTI FILTRI
@@ -322,7 +351,7 @@
       }
       new bootstrap.Modal(document.getElementById('candidatesModal')).show();
     }
-
+    
   </script>
 </body>
 </html>              
