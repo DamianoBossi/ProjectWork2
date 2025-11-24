@@ -101,13 +101,13 @@
             </select>
           </div>
 
+          <!--METTERE CHE LE CITTA VENGANO PRESE DAL BACKEND!!!!-->
           <div class="col-md-6">
             <label for="CITYID" class="form-label">Sede</label>
             <select class="form-select" id="CITYID" name="CITYID" required>
               <option value="">Seleziona sede</option>
-              <option value="10">Milano</option>
-              <option value="20">Roma</option>
-              <option value="30">Torino</option>
+              <option value="1">Milano</option>
+              <option value="2">Parma</option>
             </select>
           </div>
 
@@ -140,7 +140,7 @@
 
           <div class="col-md-6">
             <label for="CLOSINGDATE" class="form-label">Data di Chiusura</label>
-            <input type="date" class="form-control" id="CLOSINGDATE" name="CLOSINGDATE">
+            <input type="date" class="form-control" id="CLOSINGDATE" name="CLOSINGDATE" required>
           </div>
 
           <div class="col-md-6">
@@ -211,18 +211,15 @@
       e.preventDefault();
 
       try {
-        const title = document.getElementById('TITLE').value.trim() || "";
-        const description = document.getElementById('DESCRIPTION').value.trim() || "";
-        const ralFrom = document.getElementById('RALFROM').value.trim() || 0;
-        const ralTo = document.getElementById('RALTO').value.trim() || 0;
-        if (ralFrom > ralTo) {
-          throw new Error("RAL 'da' non può essere maggiore di RAL 'a'");
-        }
-        const isOpen = Boolean(document.getElementById('ISOPEN').value);
-        const empTypeId = parseInt(document.getElementById('EMPTYTYPEID').value);
-        const workschedId = parseInt(document.getElementById('WORKSCHEDID').value);
-        const cityId = parseInt(document.getElementById('CITYID').value);
-        const closingDate = String(document.getElementById('CLOSINGDATE').value);
+        const title = document.getElementById('TITLE').value.trim() || null;
+        const description = document.getElementById('DESCRIPTION').value.trim() || null;
+        const ralFrom = document.getElementById('RALFROM').value.trim() || null;
+        const ralTo = document.getElementById('RALTO').value.trim() || null;
+        const isOpen = Boolean(document.getElementById('ISOPEN').value) || null;
+        const empTypeId = parseInt(document.getElementById('EMPTYTYPEID').value) || null;
+        const workschedId = parseInt(document.getElementById('WORKSCHEDID').value) || null;
+        const cityId = parseInt(document.getElementById('CITYID').value) || null;
+        const closingDate = String(document.getElementById('CLOSINGDATE').value) || null;
 
         const payload = {
             title,
@@ -232,7 +229,8 @@
             isOpen,
             empTypeId,
             workschedId,
-            cityId
+            cityId,
+            closingDate
         };
 
         try {

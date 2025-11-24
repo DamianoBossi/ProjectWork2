@@ -30,9 +30,9 @@ public class JobOpeningCreate extends HttpServlet {
 
     private static String errorMessage = ""; //TODO: fixa! non è thread safe!
 
-    private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int workSchedId, int cityId, String closingDate) {
+    /*private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int workschedId, int cityId, String closingDate) {
         return true; //TODO
-    }
+    }*/
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -94,26 +94,26 @@ public class JobOpeningCreate extends HttpServlet {
 
         JsonObject obj = JsonParser.parseString(jsonString).getAsJsonObject();
 
-        String title = obj.has("title") ? obj.get("title").getAsString() : null;
-        String description = obj.has("description") ? obj.get("description").getAsString() : null;
-        Double ralFrom = obj.has("ralFrom") ? obj.get("ralFrom").getAsDouble() : 0;
-        Double ralTo = obj.has("ralTo") ? obj.get("ralTo").getAsDouble() : 0;
-        boolean isOpen = obj.has("isOpen") ? obj.get("isOpen").getAsBoolean() : false; //mi aspetto che la richiesta qui mi invi un booleano true/false
-        int empTypeId = obj.has("empTypeId") ? obj.get("empTypeId").getAsInt() : 0;
-        int workSchedId = obj.has("workSchedId") ? obj.get("workSchedId").getAsInt() : 0;
-        int cityId = obj.has("cityId") ? obj.get("cityId").getAsInt() : 0;
-        
-        out.print("title: " + title +", description: " + description + ", ralFrom: " + ralFrom + ", ralTo: " + ralTo + ", isOpen: " + isOpen + ", empTypeId: " + empTypeId + ", workSchedId: " + workSchedId + ", cityId: " + cityId + "\n" );
+        String title = obj.has("title") && !obj.get("title").isJsonNull()? obj.get("title").getAsString() : null;
+        String description = obj.has("description") && !obj.get("description").isJsonNull()? obj.get("description").getAsString() : "";
+        //uso di Double (wrapper di double)
+        Double ralFrom = obj.has("ralFrom") && !obj.get("ralFrom").isJsonNull() ? obj.get("ralFrom").getAsDouble() : null;
+        Double ralTo = obj.has("ralTo") && !obj.get("ralTo").isJsonNull() ? obj.get("ralTo").getAsDouble() : null;
+        //uso di Boolean (wrapper di boolean)
+        Boolean isOpen = obj.has("isOpen") && !obj.get("isOpen").isJsonNull()? obj.get("isOpen").getAsBoolean() : null; //mi aspetto che la richiesta qui mi invi un booleano true/false
+        Integer empTypeId = obj.has("empTypeId") && !obj.get("empTypeId").isJsonNull()? obj.get("empTypeId").getAsInt() : null;
+        Integer workschedId = obj.has("workschedId") && !obj.get("workschedId").isJsonNull()? obj.get("workschedId").getAsInt() : null;
+        Integer cityId = obj.has("cityId") && !obj.get("cityId").isJsonNull()? obj.get("cityId").getAsInt() : null;
 
         //TODO: calcolo latitude e longitude
-        double latitude = 0;
-        double longitude = 0;
+        Double latitude = (double) 0;
+        Double longitude = (double) 0;
 
         String updatedAt = (new Date(System.currentTimeMillis())).toString();
 
-        String closingDate = obj.has("closingDate") ? obj.get("closingDate").getAsString() : null;
+        String closingDate = obj.has("closingDate") && !obj.get("closingDate").isJsonNull()? obj.get("closingDate").getAsString() : null;
 
-        if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workSchedId, cityId, closingDate)) {
+        /*if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workschedId, cityId, closingDate)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage + "\"}");
             try {
@@ -126,14 +126,25 @@ public class JobOpeningCreate extends HttpServlet {
                 out.write("{\"success\": false, \"message\": \"Errore: " + errorMessage + "errore durante la chiusura delle risorse.\"}");
             }
             return;
-        } 
+        } */
 
         try {
             //inserimento jobOpening nel db
-            //TODO: fa un pò schifo sto inserimento ed è illeggibile e immanutenibile... magari fixare
-            String insertion = "INSERT INTO JOBOPENINGS (TITLE, DESCRIPTION, RALFROM, RALTO, ISOPEN, EMPTYPEID, WORKSCHEDID, CITYID, LATITUDE, LONGITUDE, UPDATEDAT, CLOSINGDATE) VALUES ('" + 
-                title + "', '" + description + "', '" + (ralFrom==0?null:ralFrom) + "', '" + (ralTo==0?null:ralTo) + "', '" + isOpen + "', '" + empTypeId + "', '" + workSchedId + "', '" + cityId + "', '" + latitude + "', '" + longitude + "', '" + updatedAt + "', '" + closingDate + "')"; 
-            
+            String insertion =
+                "INSERT INTO JOBOPENINGS (TITLE, DESCRIPTION, RALFROM, RALTO, ISOPEN, EMPTYPEID, WORKSCHEDID, CITYID, LATITUDE, LONGITUDE, UPDATEDAT, CLOSINGDATE) VALUES ("
+                + "'" + title.replace("'", "''") + "', "
+                + "'" + description.replace("'", "''") + "', "
+                + (ralFrom != null ? ralFrom : "NULL") + ", "
+                + (ralTo != null ? ralTo : "NULL") + ", "
+                + (isOpen ? 1 : 0) + ", "
+                + empTypeId + ", "
+                + workschedId + ", "
+                + cityId + ", "
+                + latitude + ", "
+                + longitude + ", "
+                + "CONVERT(DATETIME2, '" + updatedAt + "'), "
+                + "CONVERT(DATE, '" + closingDate + "')" + ")"; 
+
             int rowsInserted = statement.executeUpdate(insertion);
 
             if (rowsInserted == 0) {
