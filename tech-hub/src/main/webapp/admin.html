@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="it">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,8 @@
   <!-- Bootstrap (load first) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Il tuo CSS unificato (sovrascrive i bottoni Bootstrap) -->
   <link rel="stylesheet" href="css/prova.css">
 </head>
 
@@ -24,7 +27,9 @@
       </a>
     </div>
 
-    <!-- ANNUNCI ESISTENTI -->
+    <!-- ======================================================
+         SEZIONE ANNUNCI ESISTENTI 
+         ====================================================== -->
     <div class="card p-4 shadow-sm mb-5">
       <h4 class="mb-4 text-center text-primary">
         <i class="bi bi-card-list me-2"></i>Annunci Esistenti
@@ -32,79 +37,106 @@
       <div id="jobList" class="accordion"></div>
     </div>
 
-    <!-- FILTRI -->
+    <!-- ======================================================
+         SEZIONE FILTRI
+         ====================================================== -->
     <div class="card p-3 mb-4 filter-bar">
       <div class="row g-2 align-items-center">
         <div class="col-md-6">
           <label for="filterText" class="form-label mb-1">Cerca (titolo / descrizione)</label>
           <input id="filterText" class="form-control" type="text" placeholder="Inserisci testo da cercare...">
         </div>
-
         <div class="col-md-3">
-          <label for="filterCity" class="form-label visually-hidden">Sede (Tutte)</label>
+          <label for="filterCity" class="form-label mb-1">Sede</label>
           <select id="filterCity" class="form-select">
-            <option value="">Sede (Tutte)</option>
+            <option value="">Tutte le sedi</option>
+            <option value="Milano, Italia">Milano</option>
+            <option value="Roma, Italia">Roma</option>
+            <option value="Torino, Italia">Torino</option>
           </select>
         </div>
-
-        <div class="col-md-2">
-          <label for="filterContract" class="form-label visually-hidden">Contratto (Tutti)</label>
+        <div class="col-md-3">
+          <label for="filterContract" class="form-label mb-1">Contratto</label>
           <select id="filterContract" class="form-select">
-            <option value="">Contratto (Tutti)</option>
+            <option value="">Tutti i contratti</option>
+            <option value="Indeterminato">Indeterminato</option>
+            <option value="Determinato">Determinato</option>
+            <option value="Part-time">Part-time</option>
           </select>
         </div>
+      </div>
 
-        <div class="col-md-1 text-end">
-          <button id="resetFilters" type="button" class="btn btn-primary">Reset</button>
-        </div>
+      <div class="mt-3 text-end">
+        <button id="resetFilters" class="btn btn-primary btn-lg btn-icon">Reset filtri</button>
       </div>
     </div>
 
-    <!-- CREA NUOVO ANNUNCIO -->
+    <!-- ======================================================
+         SEZIONE CREAZIONE NUOVO ANNUNCIO
+         ====================================================== -->
+
     <div class="card p-4 mb-5">
       <h4 class="mb-4 text-center text-primary">
         <i class="bi bi-plus-circle me-2"></i>Crea Nuovo Annuncio
       </h4>
 
-      <form id="createJobForm" autocomplete="off">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="TITLE" class="form-label">Titolo Posizione</label>
-            <input type="text" class="form-control" id="TITLE" name="TITLE"
-              placeholder="Esempio: Sviluppatore Frontend" required>
-          </div>
+  <!-- form che invia campi con nomi uguali alle colonne della tabella JOBOPENINGS -->
+  <form id="createJobForm">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="TITLE" class="form-label">Titolo Posizione</label>
+        <!-- name e id corrispondono al campo TITLE del DB -->
+        <input type="text" class="form-control" id="TITLE" name="TITLE"
+               placeholder="Esempio: Sviluppatore Frontend" required>
+      </div>
 
-          <!-- CITTA' prese dal backend nella select CITYID -->
-          <div class="col-md-3">
-            <label for="CITYID" class="form-label">Sede</label>
-            <select id="CITYID" class="form-select" name="CITYID">
-              <option value="">Seleziona città</option>
+          <div class="col-md-6">
+            <label for="EMPTYTYPEID" class="form-label">Categoria / Tipo</label>
+            <select class="form-select" id="EMPTYTYPEID" name="EMPTYTYPEID" required>
+              <option value="">Seleziona categoria</option>
+              <option value="1">Sviluppo Software</option>
+              <option value="2">Consulenza e Analisi</option>
+              <option value="3">Data & BI</option>
+              <option value="4">Logistica e Operazioni</option>
             </select>
           </div>
 
-          <!-- CONTRACT (CONTRACTID) -->
-          <div class="col-md-2">
-            <label for="CONTRACTID" class="form-label">Contratto</label>
-            <select id="CONTRACTID" class="form-select" name="CONTRACTID">
-              <option value="">Contratto</option>
+          <!--METTERE CHE LE CITTA VENGANO PRESE DAL BACKEND!!!!-->
+          <div class="col-md-6">
+            <label for="CITYID" class="form-label">Sede</label>
+            <select class="form-select" id="CITYID" name="CITYID" required>
+              <option value="">Seleziona sede</option>
+              <option value="1">Milano</option>
+              <option value="2">Parma</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="WORKSCHEDID" class="form-label">Tipo Contratto / Orario</label>
+            <select class="form-select" id="WORKSCHEDID" name="WORKSCHEDID" required>
+              <option value="">Seleziona contratto</option>
+              <option value="1">Indeterminato (Full-time)</option>
+              <option value="2">Determinato</option>
+              <option value="3">Part-time</option>
             </select>
           </div>
 
           <div class="col-md-6">
             <label for="RALFROM" class="form-label">RAL (da)</label>
-            <input type="number" class="form-control" id="RALFROM" name="RALFROM" placeholder="Es. 30000" min="0">
+            <input type="number" class="form-control" id="RALFROM" name="RALFROM" placeholder="Es. 30000">
           </div>
 
           <div class="col-md-6">
             <label for="RALTO" class="form-label">RAL (a)</label>
-            <input type="number" class="form-control" id="RALTO" name="RALTO" placeholder="Es. 45000" min="0">
+            <input type="number" class="form-control" id="RALTO" name="RALTO" placeholder="Es. 45000">
           </div>
 
-          <div class="col-12">
-            <label for="DESCRIPTION" class="form-label">Descrizione Posizione</label>
-            <textarea class="form-control" id="DESCRIPTION" name="DESCRIPTION" rows="4"
-              placeholder="Descrivi le responsabilità, i requisiti e le competenze..."></textarea>
-          </div>
+      <div class="col-12">
+        <label for="DESCRIPTION" class="form-label">Descrizione Posizione</label>
+        <!-- DESCRIPTION: campo testuale grande -->
+        <textarea class="form-control" id="DESCRIPTION" name="DESCRIPTION" rows="4"
+                  placeholder="Descrivi le responsabilità, i requisiti e le competenze..."></textarea>
+      </div>
 
           <div class="col-md-6">
             <label for="CLOSINGDATE" class="form-label">Data di Chiusura</label>
@@ -130,7 +162,10 @@
 
   </div>
 
-  <!-- MODALE CANDIDATI -->
+  <!-- ======================================================
+       MODALE CANDIDATI
+       ====================================================== -->
+
   <div class="modal fade" id="candidatesModal" tabindex="-1" aria-labelledby="candidatesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
@@ -138,7 +173,7 @@
           <h5 class="modal-title" id="candidatesModalLabel">
             <i class="bi bi-people-fill me-2"></i>Candidati Posizione
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
         </div>
         <div class="modal-body">
           <ul id="candidateList" class="list-group candidate-list"></ul>
@@ -147,7 +182,7 @@
     </div>
   </div>
 
-  <footer class="text-center py-3">
+  <footer>
     © 2024 TechHub Italia - Pannello Admin
   </footer>
 
@@ -155,82 +190,71 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
 
-  <script>
-    // Dati in memoria
-    let jobs = []; // array di oggetti job caricati dal backend
-    const emptypesMap = new Map();
-    const citiesMap = new Map();
 
-    // --- HELPERS ---
+
+
+
+  <script>
+    let jobs = [];
+
+    // --- LO SCRIPT VA SISTEMATO E SPOSTATO  ---
     function getActiveFilters() {
       return {
-        text: (document.getElementById('filterText').value || '').trim().toLowerCase(),
+        text: document.getElementById('filterText').value.trim().toLowerCase(),
         city: document.getElementById('filterCity').value,
         contract: document.getElementById('filterContract').value
       };
     }
 
-    // --- CREAZIONE NUOVO ANNUNCIO ---
+    // CREAZIONE NUOVO ANNUNCIO 
     document.getElementById('createJobForm').addEventListener('submit', async function (e) {
       e.preventDefault();
+
       try {
-        const title = (document.getElementById('TITLE').value || '').trim() || null;
-        const description = (document.getElementById('DESCRIPTION').value || '').trim() || null;
-        const ralFromRaw = document.getElementById('RALFROM').value;
-        const ralToRaw = document.getElementById('RALTO').value;
-        const ralFrom = ralFromRaw === '' ? null : Number(ralFromRaw);
-        const ralTo = ralToRaw === '' ? null : Number(ralToRaw);
-
-        const isOpen = document.getElementById('ISOPEN').value === '1';
-
-        // EMPTYTYPEID rimosso: empTypeId impostato a null
-        const empTypeId = null;
-        const cityId = document.getElementById('CITYID').value ? Number(document.getElementById('CITYID').value) : null;
-        const contractId = document.getElementById('CONTRACTID').value ? Number(document.getElementById('CONTRACTID').value) : null;
-        const closingDate = document.getElementById('CLOSINGDATE').value || null;
+        const title = document.getElementById('TITLE').value.trim() || null;
+        const description = document.getElementById('DESCRIPTION').value.trim() || null;
+        const ralFrom = document.getElementById('RALFROM').value.trim() || null;
+        const ralTo = document.getElementById('RALTO').value.trim() || null;
+        const isOpen = Boolean(document.getElementById('ISOPEN').value) || null;
+        const empTypeId = parseInt(document.getElementById('EMPTYTYPEID').value) || null;
+        const workschedId = parseInt(document.getElementById('WORKSCHEDID').value) || null;
+        const cityId = parseInt(document.getElementById('CITYID').value) || null;
+        const closingDate = String(document.getElementById('CLOSINGDATE').value) || null;
 
         const payload = {
-          title,
-          description,
-          ralFrom,
-          ralTo,
-          isOpen,
-          empTypeId,
-          cityId,
-          contractId,
-          closingDate
+            title,
+            description,
+            ralFrom,
+            ralTo,
+            isOpen,
+            empTypeId,
+            workschedId,
+            cityId,
+            closingDate
         };
 
-        // valida minima lato client
-        if (!title || !closingDate) {
-          alert('Compila i campi obbligatori: Titolo e Data di Chiusura.');
-          return;
-        }
-
         try {
-          const res = await fetch('servlet/jobopenings/create', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
+            const res = await fetch('servlet/jobopenings/create', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
 
-          if (!res.ok) throw new Error('Errore nella chiamata al server: ' + res.status);
+            const json = await res.json();
 
-          const json = await res.json();
+            if (!json.success) throw new Error(json.message || "Creazione posizione lavorativa fallita");
 
-          if (!json.success) throw new Error(json.message || "Creazione posizione lavorativa fallita");
+            alert("Posizione lavorativa creata con successo!");
 
-          alert("Posizione lavorativa creata con successo!");
-          await loadJobs();
-          renderJobs();
+            location.reload();
 
         } catch (err) {
-          console.error("Errore creazione posizione lavorativa:", err);
-          alert("Errore: " + (err.message || err));
+            console.error("Errore creazione posizione lavorativa:", err);
+            alert("Errore: " + err.message);
         }
       } catch (err) {
-        console.error("Errore creazione posizione lavorativa:", err);
-        alert("Errore: " + (err.message || err));
+            console.error("Errore creazione posizione lavorativa:", err);
+            alert("Errore: " + err.message);
       }
     });
 
@@ -252,16 +276,18 @@
 
       const filters = getActiveFilters();
 
+      // applica i filtri
       const filtered = jobs.filter(job => {
+        // filtro testo sul title e description
         if (filters.text) {
-          const hay = ((job.title || '') + ' ' + (job.description || '') + ' ' + (job.category || '')).toLowerCase();
+          const hay = (job.title + ' ' + job.description + ' ' + job.category).toLowerCase();
           if (!hay.includes(filters.text)) return false;
         }
         if (filters.city) {
-          if (String(job.cityId || job.city) !== String(filters.city)) return false;
+          if (job.city !== filters.city) return false;
         }
         if (filters.contract) {
-          if (String(job.contractId || job.contract) !== String(filters.contract)) return false;
+          if (job.contract !== filters.contract) return false;
         }
         return true;
       });
@@ -272,32 +298,26 @@
       }
 
       filtered.forEach((job) => {
-        const statusText = job.isOpen || job.status === 'Aperto' ? 'Aperto' : 'Chiuso';
-        const badgeClass = statusText === 'Aperto' ? 'bg-success' : 'bg-secondary';
-        const candidatesCount = Array.isArray(job.candidates) ? job.candidates.length : 0;
-        const categoryText = job.category || ''; 
-        const cityText = job.cityName || citiesMap.get(String(job.cityId))?.name || job.city || '';
-
         const jobCard = document.createElement('div');
         jobCard.classList.add('accordion-item');
         jobCard.innerHTML = `
           <h2 class="accordion-header" id="heading${job.id}">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${job.id}" aria-expanded="false" aria-controls="collapse${job.id}">
-              ${escapeHtml(job.title || '—')} &nbsp; <span class="badge ${badgeClass} ms-2">${statusText}</span>
+              ${job.title} - <span class="badge badge-status ${job.status === 'Aperto' ? 'bg-success' : 'bg-secondary'}">${job.status}</span>
             </button>
           </h2>
           <div id="collapse${job.id}" class="accordion-collapse collapse" aria-labelledby="heading${job.id}">
             <div class="accordion-body">
-              <p><strong>Categoria:</strong> ${escapeHtml(categoryText)}</p>
-              <p><strong>Sede:</strong> ${escapeHtml(cityText)}</p>
-              <p><strong>Contratto:</strong> ${escapeHtml(job.contractName || job.contract || '')}</p>
-              <p><strong>Descrizione:</strong> ${escapeHtml(job.description || '')}</p>
+              <p><strong>Categoria:</strong> ${job.category}</p>
+              <p><strong>Sede:</strong> ${job.city}</p>
+              <p><strong>Contratto:</strong> ${job.contract}</p>
+              <p><strong>Descrizione:</strong> ${job.description}</p>
               <div class="d-flex gap-2 mt-3">
                 <button class="btn btn-outline-primary btn-sm btn-icon" onclick="toggleJobStatus(${job.id})">
-                  <i class="bi bi-pencil-square"></i> ${statusText === 'Aperto' ? 'Chiudi Annuncio' : 'Riapri Annuncio'}
+                  <i class="bi bi-pencil-square"></i> ${job.status === 'Aperto' ? 'Chiudi Annuncio' : 'Riapri Annuncio'}
                 </button>
                 <button class="btn btn-outline-primary btn-sm btn-icon" onclick="viewCandidates(${job.id})">
-                  <i class="bi bi-people-fill"></i> Visualizza Candidati (${candidatesCount})
+                  <i class="bi bi-people-fill"></i> Visualizza Candidati (${job.candidates.length})
                 </button>
               </div>
             </div>
@@ -310,7 +330,7 @@
     function toggleJobStatus(id) {
       const job = jobs.find(j => j.id === id);
       if (job) {
-        job.isOpen = !job.isOpen;
+        job.status = job.status === 'Aperto' ? 'Chiuso' : 'Aperto';
         renderJobs();
       }
     }
@@ -319,11 +339,11 @@
       const job = jobs.find(j => j.id === id);
       const candidateList = document.getElementById('candidateList');
       candidateList.innerHTML = '';
-      if (job && Array.isArray(job.candidates) && job.candidates.length) {
+      if (job && job.candidates.length) {
         job.candidates.forEach(c => {
           const li = document.createElement('li');
           li.className = 'list-group-item';
-          li.textContent = `${c.name || '—'} - ${c.email || '—'}`;
+          li.textContent = `${c.name} - ${c.email}`;
           candidateList.appendChild(li);
         });
       } else {
@@ -332,133 +352,9 @@
         li.textContent = 'Nessun candidato per questo annuncio.';
         candidateList.appendChild(li);
       }
-      const modalEl = document.getElementById('candidatesModal');
-      const modal = new bootstrap.Modal(modalEl);
-      modal.show();
+      new bootstrap.Modal(document.getElementById('candidatesModal')).show();
     }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-    }
-
-    // -------- EMPLOYMENT TYPES (popola CONTRACTID e filterContract) --------
-    async function loadEmptypes() {
-      try {
-        const res = await fetch('servlet/emptypes');
-        if (!res.ok) throw new Error('Errore fetch emptypes: ' + res.status);
-        const json = await res.json();
-        const types = json.data || [];
-
-        emptypesMap.clear();
-        types.forEach(t => emptypesMap.set(String(t.empTypeId), t.name));
-
-        const contractSelect = document.getElementById('CONTRACTID');
-        const filterContract = document.getElementById('filterContract');
-
-        if (contractSelect) {
-          contractSelect.innerHTML = '<option value="">Contratto</option>';
-          types.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.empTypeId;
-            opt.textContent = t.name;
-            contractSelect.appendChild(opt);
-          });
-        }
-        if (filterContract) {
-          filterContract.innerHTML = '<option value="">Contratto (Tutti)</option>';
-          types.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.empTypeId;
-            opt.textContent = t.name;
-            filterContract.appendChild(opt);
-          });
-        }
-      } catch (err) {
-        console.error("Errore loadEmptypes:", err);
-      }
-    }
-
-    // -------- CITIES --------
-    async function loadCities() {
-      try {
-        const res = await fetch('servlet/cities');
-        if (!res.ok) throw new Error('Errore fetch cities: ' + res.status);
-        const json = await res.json();
-        const data = json.data || [];
-
-        citiesMap.clear();
-        data.forEach(c => {
-          citiesMap.set(String(c.cityId), { name: c.name, regionId: String(c.regionId) });
-        });
-
-        const citySel = document.getElementById("CITYID");
-        const filterCity = document.getElementById("filterCity");
-
-        if (citySel) {
-          citySel.innerHTML = `<option value="">Seleziona città</option>`;
-          data.forEach(c => {
-            const opt = document.createElement("option");
-            opt.value = c.cityId;
-            opt.textContent = c.name;
-            citySel.appendChild(opt);
-          });
-        }
-
-        if (filterCity) {
-          filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
-          data.forEach(c => {
-            const opt = document.createElement("option");
-            opt.value = c.cityId;
-            opt.textContent = c.name;
-            filterCity.appendChild(opt);
-          });
-        }
-      } catch (e) {
-        console.error("Errore loadCities:", e);
-      }
-    }
-
-    // -------- JOBS (caricamento) --------
-    async function loadJobs() {
-      try {
-        const res = await fetch('servlet/jobopenings/list');
-        if (!res.ok) throw new Error('Errore fetch jobopenings: ' + res.status);
-        const json = await res.json();
-        jobs = (json.data || []).map(j => ({
-          id: j.id,
-          title: j.title,
-          description: j.description,
-          isOpen: j.isOpen === true || j.status === 'Aperto' || j.status === 'OPEN',
-          status: j.status || (j.isOpen ? 'Aperto' : 'Chiuso'),
-          empTypeId: j.empTypeId || null,
-          category: j.category || null,
-          cityId: j.cityId || j.CITYID || null,
-          cityName: j.cityName || j.city || '',
-          contractId: j.contractId || j.CONTRACTID || null,
-          contractName: j.contractName || j.contract || '',
-          ralFrom: j.ralFrom || j.RALFROM || null,
-          ralTo: j.ralTo || j.RALTO || null,
-          closingDate: j.closingDate || j.CLOSINGDATE || null,
-          candidates: j.candidates || []
-        }));
-      } catch (err) {
-        console.error('Errore loadJobs:', err);
-        jobs = [];
-      }
-    }
-
-    // Inizializzazione pagina
-    async function init() {
-      await Promise.allSettled([loadEmptypes(), loadCities(), loadJobs()]);
-      renderJobs();
-    }
-
-    init();
+    
   </script>
 </body>
-</html>
+</html>              
