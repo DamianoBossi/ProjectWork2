@@ -550,8 +550,7 @@ public class Registration extends HttpServlet {
         try {
             // inserimento utente nel db
             String insertion = "INSERT INTO USERS (ROLEID, EMAIL, PASSWORD, FIRSTNAME, LASTNAME, BIRTHDATE, ADDRESS, CITYID, REGIONID, COUNTRYID, LATITUDE,"
-                    +
-                    " LONGITUDE, CVFILEPATH, UPDATEDAT) VALUES ('" + roleId + "', '" + email + "', '" + password
+                    + " LONGITUDE, CVFILEPATH, UPDATEDAT) VALUES ('" + roleId + "', '" + email + "', '" + password
                     + "', '" + firstName + "', '" +
                     lastName + "', '" + birthdate + "', '" + address + "', '" + cityId + "', '" + regionId + "', '"
                     + countryId + "', '" + latitude + "', '" +

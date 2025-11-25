@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -19,11 +20,14 @@ import it.zucchetti.packages.jdbc.JDBCConnection;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /*TODO: cambiare tipi delle var e degli oggetti che pongo uguali alle cose che mi arrivano dal json di richiesta (x controllo se null o meno, se va bene o meno) (magari metterli 
 tutti a String in modo che posso verificare che siano null e in modo che il frontend possa mandarmeli null)*/
+
+//TODO: ricontrollare la parte del recuperare il jobOpeningId e l'inserimento delle skill (anche se sembrano funzionare)
 
 @WebServlet("/servlet/jobopenings/create")
 public class JobOpeningCreate extends HttpServlet {
@@ -112,6 +116,19 @@ public class JobOpeningCreate extends HttpServlet {
         String updatedAt = (new Date(System.currentTimeMillis())).toString();
 
         String closingDate = obj.has("closingDate") && !obj.get("closingDate").isJsonNull()? obj.get("closingDate").getAsString() : null;
+
+        int[] jobOpeningSkills = null;
+        if (obj.has("skills")) {
+            JsonArray skillsArray = obj.getAsJsonArray("skills");
+
+            jobOpeningSkills = new int[skillsArray.size()];
+
+            for (int i = 0; i < skillsArray.size(); i++) {
+                jobOpeningSkills[i] = skillsArray.get(i).getAsInt();
+            }
+        } else {
+            jobOpeningSkills = new int[0];
+        }
 
         /*if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workschedId, cityId, closingDate)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -203,8 +220,108 @@ public class JobOpeningCreate extends HttpServlet {
             return;
         }
 
-        response.setStatus(HttpServletResponse.SC_CREATED);
-        out.write("{\"success\": true, \"message\": \"Posizione lavorativa correttamente inserita nel db.\"}");
+        int jobOpeningId = 0;
+        try {
+            // prelevo l'id della posizione lavorativa inserita
+            String jobOpeningIdQuery = "SELECT JOBOPENINGID FROM JOBOPENINGS WHERE JOBOPENINGID = (SELECT MAX(JOBOPENINGID) FROM JOBOPENINGS)";
+            ResultSet resultSet = statement.executeQuery(jobOpeningIdQuery);
+            if (resultSet.next()) {
+                jobOpeningId = resultSet.getInt("JOBOPENINGID");
+                try {
+                    if (resultSet != null)
+                        resultSet.close();
+                } catch (SQLException e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse dopo aver recuperato correttamente l'ID della posizione lavorativa .\"}");
+                    return;
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID della posizione lavorativa dopo la registrazione.\"}");
+                try {
+                    if (resultSet != null)
+                        resultSet.close();
+                    if (statement != null)
+                        statement.close();
+                    if (connection != null)
+                        connection.close();
+                } catch (SQLException e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID della posizione lavorativa dopo la registrazione e errore durante la chiusura delle risorse.\"}");
+                }
+                return;
+            }
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID della posizione lavorativa.\"}");
+            try {
+                if (statement != null)
+                    statement.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e2) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID della posizione lavorativa e errore durante la chiusura delle risorse.\"}");
+            }
+            return;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID della posizione lavorativa.\"}");
+            try {
+                if (statement != null)
+                    statement.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e2) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID della posizione lavorativa e errore durante la chiusura delle risorse.\"}");
+            }
+            return;
+        }
+
+        try {
+            // inserimento skill della posizione lavorativa nel db
+            String skillInsertion = "";
+            for (int skillId : jobOpeningSkills) {
+                skillInsertion = "INSERT INTO JOBOPENINGSSKILLS (JOBOPENINGID, SKILLID) VALUES (" + jobOpeningId + ", " + skillId + ")";
+                statement.executeUpdate(skillInsertion);
+            }
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento delle skill della posizione lavorativa nel db.\"}");
+            try {
+                if (statement != null)
+                    statement.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e2) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento delle skill della posizione lavorativa nel db e errore durante la chiusura delle risorse.\"}");
+            }
+            return;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento delle skill della posizione lavorativa nel db.\"}");
+            try {
+                if (statement != null)
+                    statement.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e2) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento delle skill della posizione lavorativa nel db e errore durante la chiusura delle risorse.\"}");
+            }
+            return;
+        }
 
         try {
             if (statement != null)
@@ -214,7 +331,11 @@ public class JobOpeningCreate extends HttpServlet {
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse.\"}");
+            return;
         }
+
+        response.setStatus(HttpServletResponse.SC_CREATED);
+        out.write("{\"success\": true, \"message\": \"Posizione lavorativa correttamente inserita nel db.\"}");
 
         return;
 
