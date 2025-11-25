@@ -142,11 +142,11 @@
         </div>
       </div>
     </div>
-
+    
     <!-- WHY SECTION -->
     <section class="why-section">
       <div class="container text-center">
-        <div class="why-heading-small">Lavora Con Noi</div>
+        <btn onclick="showJobsPage()"; class="why-heading-small">Lavora Con Noi</btn>
         <h2 class="why-title">Perché Scegliere TechHub Italia</h2>
         <p class="why-subtitle mx-auto">
           Offriamo un ambiente di lavoro stimolante dove puoi crescere professionalmente e fare davvero la differenza.
@@ -224,10 +224,15 @@
             <i class="bi bi-person-plus me-1"></i> Registrati
           </button>
 
-          <button id="profile-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" data-bs-toggle="modal"
-            data-bs-target="#profileModal" aria-label="Profilo">
-            <i class="bi bi-person-plus me-1"></i>Profilo
-          </button>
+           <a id="profile-btn" href="profilo.html" class="btn btn-outline-primary btn-sm align-items-center" aria-label="Profilo">
+           <i class="bi bi-person me-1"></i> Profilo
+            </a>
+
+
+
+          <btn id="logout-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" aria-label="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>Logout
+          </btn>
         </div>
       </div>
     </div>

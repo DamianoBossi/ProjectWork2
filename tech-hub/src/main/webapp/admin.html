@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechHub Italia - Admin</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Il tuo CSS unificato (sovrascrive i bottoni Bootstrap) -->
+  <link rel="stylesheet" href="css/prova.css">
+</head>
+
+<body class="admin-area">
+  <div class="container my-5">
+
+    <h1 class="text-center text-primary mb-4">
+      <i class="bi bi-shield-lock me-2"></i>Admin - Gestione Posizioni
+    </h1>
+
+    <div class="text-end mb-4">
+      <a href="prova.html" class="btn btn-primary btn-lg btn-icon">
+        <i class="bi bi-arrow-left-circle"></i> Torna al sito
+      </a>
+    </div>
+
+    <!-- ======================================================
+         SEZIONE ANNUNCI ESISTENTI 
+         ====================================================== -->
+    <div class="card p-4 shadow-sm mb-5">
+      <h4 class="mb-4 text-center text-primary">
+        <i class="bi bi-card-list me-2"></i>Annunci Esistenti
+      </h4>
+      <div id="jobList" class="accordion" aria-live="polite">
+       
+      </div>
+    </div>
+
+    <!-- ======================================================
+         SEZIONE FILTRI
+         ====================================================== -->
+    <div class="card p-3 mb-4 filter-bar">
+      <div class="row g-3 align-items-end">
+        <!-- Campo ricerca -->
+        <div class="col-md-4">
+          <label for="filterText" class="form-label mb-1">Cerca (titolo / descrizione)</label>
+          <input id="filterText" class="form-control" type="text" placeholder="Inserisci testo da cercare...">
+        </div>
+
+        <!-- Sede -->
+        <div class="col-md-3">
+          <label for="filterCity" class="form-label mb-1">Sede</label>
+          <select id="filterCity" class="form-select">
+            <option value="">Tutte le sedi</option>
+            <option value="Milano, Italia">Milano</option>
+            <option value="Roma, Italia">Roma</option>
+            <option value="Torino, Italia">Torino</option>
+          </select>
+        </div>
+
+        <!-- Contratto -->
+        <div class="col-md-3">
+          <label for="filterContract" class="form-label mb-1">Contratto</label>
+          <select id="filterContract" class="form-select">
+            <option value="">Tutti i contratti</option>
+            <option value="Indeterminato">Indeterminato</option>
+            <option value="Determinato">Determinato</option>
+            <option value="Part-time">Part-time</option>
+          </select>
+        </div>
+      </div>
+
+        <!-- Pulsante Reset centrato -->
+        <div class="col-md-2 d-flex justify-content-center">
+          <button id="resetFilters" type="button" class="btn btn-primary btn-lg px-4">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         SEZIONE CREAZIONE NUOVO ANNUNCIO
+         ====================================================== -->
+
+    <div class="card p-4 mb-5">
+      <h4 class="mb-4 text-center text-primary">
+        <i class="bi bi-plus-circle me-2"></i>Crea Nuovo Annuncio
+      </h4>
+
+      <form id="createJobForm" autocomplete="off" novalidate>
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label for="TITLE" class="form-label">Titolo Posizione</label>
+            <input type="text" class="form-control" id="TITLE" name="TITLE"
+              placeholder="Esempio: Sviluppatore Frontend" required>
+          </div>
+
+          <!-- CITTA'-->
+          <div class="col-md-3">
+            <label for="CITYID" class="form-label">Sede</label>
+            <select id="CITYID" class="form-select" name="CITYID" required>
+              <option value="">Seleziona città</option>
+              
+            </select>
+          </div>
+
+          <!-- CONTRATTI  -->
+          <div class="col-md-3">
+            <label for="CONTRACTID" class="form-label">Contratto</label>
+            <select id="CONTRACTID" class="form-select" name="CONTRACTID" required>
+              <option value="">Contratto</option>
+            
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="RALFROM" class="form-label">RAL (da)</label>
+            <input type="number" class="form-control" id="RALFROM" name="RALFROM" placeholder="Es. 30000">
+          </div>
+
+          <div class="col-md-6">
+            <label for="RALTO" class="form-label">RAL (a)</label>
+            <input type="number" class="form-control" id="RALTO" name="RALTO" placeholder="Es. 45000">
+          </div>
+
+      <div class="col-12">
+        <label for="DESCRIPTION" class="form-label">Descrizione Posizione</label>
+        <!-- DESCRIPTION: campo testuale grande -->
+        <textarea class="form-control" id="DESCRIPTION" name="DESCRIPTION" rows="4"
+                  placeholder="Descrivi le responsabilità, i requisiti e le competenze..."></textarea>
+      </div>
+
+          <!-- SKILL -->
+          <div class="col-md-6">
+            <label for="SKILLID" class="form-label">Skill </label>
+            <select id="SKILLID" class="form-select" name="SKILLID" aria-label="Seleziona skill">
+              <option value="">Seleziona Skill</option>
+            </select>
+          </div>
+
+          <!-- DATA DI CHIUSURA -->
+          <div class="col-md-6">
+            <label for="CLOSINGDATE" class="form-label">Data di Chiusura</label>
+            <input type="date" class="form-control" id="CLOSINGDATE" name="CLOSINGDATE" required>
+          </div>
+
+          <!-- STATO ANNUNCIO -->
+          <div class="col-md-6">
+            <label for="ISOPEN" class="form-label">Stato Annuncio</label>
+            <select class="form-select" id="ISOPEN" name="ISOPEN" required>
+              <option value="1">Aperto</option>
+              <option value="0">Chiuso</option>
+            </select>
+          </div>
+
+          <div class="col-12 text-center mt-3">
+            <button type="submit" class="btn btn-primary btn-lg btn-icon">
+              <i class="bi bi-plus-circle me-2"></i> Crea Annuncio
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- ======================================================
+       MODALE CANDIDATI
+       ====================================================== -->
+
+  <div class="modal fade" id="candidatesModal" tabindex="-1" aria-labelledby="candidatesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="candidatesModalLabel">
+            <i class="bi bi-people-fill me-2"></i>Candidati Posizione
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body">
+          <ul id="candidateList" class="list-group candidate-list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2024 TechHub Italia - Pannello Admin
+  </footer>
+
+  
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+  <!-- script admin -->
+  <script src="js/admin.js"></script>
+</body>
+
+</html>
