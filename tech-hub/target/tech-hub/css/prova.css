@@ -320,6 +320,13 @@
       display: none;
     }
 
+    #logout-btn{
+      display: none;
+    }
+
+    btn.why-heading-small{
+      cursor: pointer;
+    }
     .modal-header {
       background-color: #0d6efd;
       color: white;

@@ -107,7 +107,15 @@
             <select class="form-select" id="CITYID" name="CITYID" required>
               <option value="">Seleziona sede</option>
               <option value="1">Milano</option>
-              <option value="2">Parma</option>
+              <option value="1">Roma</option>
+              <option value="1">Torino</option>
+              <option value="1">Genova</option>
+              <option value="1">Firenze</option>
+              <option value="1">Palermo</option>
+              <option value="1">Napoli</option>
+              <option value="1">Aosta</option>
+              <option value="1">Venezia</option>
+              <option value="1">Campobasso</option>
             </select>
           </div>
 
@@ -115,9 +123,9 @@
             <label for="WORKSCHEDID" class="form-label">Tipo Contratto / Orario</label>
             <select class="form-select" id="WORKSCHEDID" name="WORKSCHEDID" required>
               <option value="">Seleziona contratto</option>
-              <option value="1">Indeterminato (Full-time)</option>
+              <option value="1">Indeterminato</option>
               <option value="2">Determinato</option>
-              <option value="3">Part-time</option>
+              <option value="3">Stage</option>
             </select>
           </div>
 
@@ -354,6 +362,57 @@
       }
       new bootstrap.Modal(document.getElementById('candidatesModal')).show();
     }
+
+/* ADATTARE LOAD CITIES 
+    async function loadCities(regionId) {
+        try {
+          const res = await fetch(`servlet/cities`);
+          const json = await res.json();
+          const data = json.data || [];
+
+          const citySel = document.getElementById("registerCity");
+
+          citySel.innerHTML = `<option value="">Seleziona città</option>`;
+          citySel.disabled = true;
+
+          citiesMap.clear();
+
+          data.forEach(c => {
+            citiesMap.set(String(c.cityId), {
+              name: c.name,
+              regionId: String(c.regionId)
+            });
+          });
+
+          data.forEach(c => {
+            if (String(c.regionId) === String(regionId)) {
+              const opt = document.createElement("option");
+              opt.value = c.cityId;
+              opt.textContent = c.name;
+              citySel.appendChild(opt);
+            }
+          });
+
+          // filtri jobs
+          const filterCity = document.getElementById("filterCity");
+          if (!filterCity) return;
+
+          filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
+          data.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.cityId;
+            opt.textContent = c.name;
+            filterCity.appendChild(opt);
+          });
+
+          if (regionId) citySel.disabled = false;
+
+        } catch (e) {
+          console.error("Errore loadCities:", e);
+        }
+      }
+    */
+
     
   </script>
 </body>

@@ -500,6 +500,7 @@ function checkUserLogged() {
                 document.getElementById("login-buttons-home").style.display = "none";
                 document.getElementById("login-buttons").style.display = "none";
                 document.getElementById("profile-btn").style.display = "block";
+                document.getElementById("logout-btn").style.display = "block";
                 document.getElementById("reg-btn").style.display = "none";
                 document.getElementById("login-btn").style.display = "none";
                 
