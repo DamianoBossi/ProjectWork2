@@ -1,305 +1,264 @@
-  
-    // Dati in memoria
-    let jobs = []; // array di oggetti job caricati dal backend
-    const emptypesMap = new Map();
-    const citiesMap = new Map();
+//TODO: METTERE CONTROLLI FRONTEND PER VERIFICARE CHE LE COSE INSERITE NELLA CREAZIONE DELLA JOB OP SIANO SENSATE
 
-    // --- HELPERS ---
-    function getActiveFilters() {
-      return {
-        text: (document.getElementById('filterText').value || '').trim().toLowerCase(),
-        city: document.getElementById('filterCity').value,
-        contract: document.getElementById('filterContract').value
-      };
-    }
+var allJobOpenings = [];
 
-    // --- CREAZIONE NUOVO ANNUNCIO ---
-    document.getElementById('createJobForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      try {
-        const title = (document.getElementById('TITLE').value || '').trim() || null;
-        const description = (document.getElementById('DESCRIPTION').value || '').trim() || null;
-        const ralFromRaw = document.getElementById('RALFROM').value;
-        const ralToRaw = document.getElementById('RALTO').value;
-        const ralFrom = ralFromRaw === '' ? null : Number(ralFromRaw);
-        const ralTo = ralToRaw === '' ? null : Number(ralToRaw);
+//MAPPE GLOBALI
+var skillsMap = new Map(); // skillId -> name 
+var citiesMap = new Map(); // cityId -> name 
+var empTypesMap = new Map(); // emptypeId -> name 
+var workSchedMap = new Map(); // workSchedId -> name 
+var skillsMap = new Map(); // jobOpeningId -> array di skillId
 
-        const isOpen = document.getElementById('ISOPEN').value === '1';
+//array JS con gli id delle skill inserite nel form
+var skillsList = [];
 
-        // EMPTYTYPEID rimosso: empTypeId impostato a null
-        const empTypeId = null;
-        const cityId = document.getElementById('CITYID').value ? Number(document.getElementById('CITYID').value) : null;
-        const contractId = document.getElementById('CONTRACTID').value ? Number(document.getElementById('CONTRACTID').value) : null;
-        const closingDate = document.getElementById('CLOSINGDATE').value || null;
+//SKILLS
+async function loadSkills() {
+    try {
+        var res = await fetch(`servlet/skills`);
+        var json = await res.json();
+        var data = json.data || [];
 
-        const payload = {
-          title,
-          description,
-          ralFrom,
-          ralTo,
-          isOpen,
-          empTypeId,
-          cityId,
-          contractId,
-          closingDate
-        };
+        skillsMap.clear();
 
-        // valida minima lato client
-        if (!title || !closingDate) {
-          alert('Compila i campi obbligatori: Titolo e Data di Chiusura.');
-          return;
-        }
-
-        try {
-          const res = await fetch('servlet/jobopenings/create', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-
-          if (!res.ok) throw new Error('Errore nella chiamata al server: ' + res.status);
-
-          const json = await res.json();
-
-          if (!json.success) throw new Error(json.message || "Creazione posizione lavorativa fallita");
-
-          alert("Posizione lavorativa creata con successo!");
-          await loadJobs();
-          renderJobs();
-
-        } catch (err) {
-          console.error("Errore creazione posizione lavorativa:", err);
-          alert("Errore: " + (err.message || err));
-        }
-      } catch (err) {
-        console.error("Errore creazione posizione lavorativa:", err);
-        alert("Errore: " + (err.message || err));
-      }
-    });
-
-    // EVENTI FILTRI
-    document.getElementById('filterText').addEventListener('input', renderJobs);
-    document.getElementById('filterCity').addEventListener('change', renderJobs);
-    document.getElementById('filterContract').addEventListener('change', renderJobs);
-    document.getElementById('resetFilters').addEventListener('click', function () {
-      document.getElementById('filterText').value = '';
-      document.getElementById('filterCity').value = '';
-      document.getElementById('filterContract').value = '';
-      renderJobs();
-    });
-
-    // RENDER ANNUNCI (applica filtri attivi)
-    function renderJobs() {
-      const jobList = document.getElementById('jobList');
-      jobList.innerHTML = '';
-
-      const filters = getActiveFilters();
-
-      const filtered = jobs.filter(job => {
-        if (filters.text) {
-          const hay = ((job.title || '') + ' ' + (job.description || '') + ' ' + (job.category || '')).toLowerCase();
-          if (!hay.includes(filters.text)) return false;
-        }
-        if (filters.city) {
-          if (String(job.cityId || job.city) !== String(filters.city)) return false;
-        }
-        if (filters.contract) {
-          if (String(job.contractId || job.contract) !== String(filters.contract)) return false;
-        }
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        jobList.innerHTML = '<div class="text-center py-4 text-muted">Nessun annuncio corrisponde ai filtri.</div>';
-        return;
-      }
-
-      filtered.forEach((job) => {
-        const statusText = job.isOpen || job.status === 'Aperto' ? 'Aperto' : 'Chiuso';
-        const badgeClass = statusText === 'Aperto' ? 'bg-success' : 'bg-secondary';
-        const candidatesCount = Array.isArray(job.candidates) ? job.candidates.length : 0;
-        const categoryText = job.category || ''; 
-        const cityText = job.cityName || citiesMap.get(String(job.cityId))?.name || job.city || '';
-
-        const jobCard = document.createElement('div');
-        jobCard.classList.add('accordion-item');
-        jobCard.innerHTML = `
-          <h2 class="accordion-header" id="heading${job.id}">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${job.id}" aria-expanded="false" aria-controls="collapse${job.id}">
-              ${escapeHtml(job.title || '—')} &nbsp; <span class="badge ${badgeClass} ms-2">${statusText}</span>
-            </button>
-          </h2>
-          <div id="collapse${job.id}" class="accordion-collapse collapse" aria-labelledby="heading${job.id}">
-            <div class="accordion-body">
-              <p><strong>Categoria:</strong> ${escapeHtml(categoryText)}</p>
-              <p><strong>Sede:</strong> ${escapeHtml(cityText)}</p>
-              <p><strong>Contratto:</strong> ${escapeHtml(job.contractName || job.contract || '')}</p>
-              <p><strong>Descrizione:</strong> ${escapeHtml(job.description || '')}</p>
-              <div class="d-flex gap-2 mt-3">
-                <button class="btn btn-outline-primary btn-sm btn-icon" onclick="toggleJobStatus(${job.id})">
-                  <i class="bi bi-pencil-square"></i> ${statusText === 'Aperto' ? 'Chiudi Annuncio' : 'Riapri Annuncio'}
-                </button>
-                <button class="btn btn-outline-primary btn-sm btn-icon" onclick="viewCandidates(${job.id})">
-                  <i class="bi bi-people-fill"></i> Visualizza Candidati (${candidatesCount})
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-        jobList.appendChild(jobCard);
-      });
-    }
-
-    function toggleJobStatus(id) {
-      const job = jobs.find(j => j.id === id);
-      if (job) {
-        job.isOpen = !job.isOpen;
-        renderJobs();
-      }
-    }
-
-    function viewCandidates(id) {
-      const job = jobs.find(j => j.id === id);
-      const candidateList = document.getElementById('candidateList');
-      candidateList.innerHTML = '';
-      if (job && Array.isArray(job.candidates) && job.candidates.length) {
-        job.candidates.forEach(c => {
-          const li = document.createElement('li');
-          li.className = 'list-group-item';
-          li.textContent = `${c.name || '—'} - ${c.email || '—'}`;
-          candidateList.appendChild(li);
+        //popolo la mappa delle skill   
+        data.forEach(function(s) {
+            skillsMap.set(s.skillId, { name: s.name });
         });
-      } else {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = 'Nessun candidato per questo annuncio.';
-        candidateList.appendChild(li);
-      }
-      const modalEl = document.getElementById('candidatesModal');
-      const modal = new bootstrap.Modal(modalEl);
-      modal.show();
+
+        //popolo la lista di città della creazione della job opening
+        var skillsjobOpCreate = document.getElementById("skillsjobOpCreate");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.skillId;
+            opt.textContent = c.name;
+            skillsjobOpCreate.appendChild(opt);
+        });
+
+        //popolo la lista delle skill del filtro
+        var filterSkills = document.getElementById("filterSkills");
+
+        data.forEach(function(s) {
+            var opt = document.createElement("option");
+            opt.value = s.skillId;
+            opt.textContent = s.name;
+            filterSkills.appendChild(opt);
+        });
+    } catch (e) { 
+        console.error("Errore loadSkills:", e); 
     }
+}
 
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-    }
-
-    // -------- EMPLOYMENT TYPES (popola CONTRACTID e filterContract) --------
-    async function loadEmptypes() {
-      try {
-        const res = await fetch('servlet/emptypes');
-        if (!res.ok) throw new Error('Errore fetch emptypes: ' + res.status);
-        const json = await res.json();
-        const types = json.data || [];
-
-        emptypesMap.clear();
-        types.forEach(t => emptypesMap.set(String(t.empTypeId), t.name));
-
-        const contractSelect = document.getElementById('CONTRACTID');
-        const filterContract = document.getElementById('filterContract');
-
-        if (contractSelect) {
-          contractSelect.innerHTML = '<option value="">Contratto</option>';
-          types.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.empTypeId;
-            opt.textContent = t.name;
-            contractSelect.appendChild(opt);
-          });
-        }
-        if (filterContract) {
-          filterContract.innerHTML = '<option value="">Contratto (Tutti)</option>';
-          types.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.empTypeId;
-            opt.textContent = t.name;
-            filterContract.appendChild(opt);
-          });
-        }
-      } catch (err) {
-        console.error("Errore loadEmptypes:", err);
-      }
-    }
-
-    // -------- CITTA' --------
-    async function loadCities() {
-      try {
-        const res = await fetch('servlet/cities');
-        if (!res.ok) throw new Error('Errore fetch cities: ' + res.status);
-        const json = await res.json();
-        const data = json.data || [];
+//CITIES
+async function loadCities() {
+    try {
+        var res = await fetch(`servlet/cities`);
+        var json = await res.json();
+        var data = json.data || [];
 
         citiesMap.clear();
-        data.forEach(c => {
-          citiesMap.set(String(c.cityId), { name: c.name, regionId: String(c.regionId) });
+
+        //popolo la mappa delle città
+        data.forEach(function(c) {
+            citiesMap.set(c.cityId, {
+                name: c.name
+            });
         });
 
-        const citySel = document.getElementById("CITYID");
-        const filterCity = document.getElementById("filterCity");
+        //popolo la lista di città della creazione della job opening
+        var cityjobOpCreate = document.getElementById("cityIdjobOpCreate");
 
-        if (citySel) {
-          citySel.innerHTML = `<option value="">Seleziona città</option>`;
-          data.forEach(c => {
-            const opt = document.createElement("option");
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
             opt.value = c.cityId;
             opt.textContent = c.name;
-            citySel.appendChild(opt);
-          });
-        }
+            cityjobOpCreate.appendChild(opt);
+        });
 
-        if (filterCity) {
-          filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
-          data.forEach(c => {
-            const opt = document.createElement("option");
+        //popolo la lista di città del filtro delle città
+        var filterCity = document.getElementById("filterCity");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
             opt.value = c.cityId;
             opt.textContent = c.name;
             filterCity.appendChild(opt);
-          });
-        }
-      } catch (e) {
+        });
+
+    } catch (e) {
         console.error("Errore loadCities:", e);
-      }
+    }
+}
+
+//EMPTYPES
+async function loadEmpTypes() {
+    try {
+        var res = await fetch(`servlet/emptypes`);
+        var json = await res.json();
+        var data = json.data || [];
+
+        empTypesMap.clear();
+
+        //popolo la mappa dei tipi di contratto
+        data.forEach(function(c) {
+            empTypesMap.set(c.empTypeId, {
+                name: c.name
+            });
+        });
+
+        //popolo la lista di città della creazione della job opening
+        var empTypejobOpCreate = document.getElementById("empTypeIdjobOpCreate");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.empTypeId;
+            opt.textContent = c.name;
+            empTypejobOpCreate.appendChild(opt);
+        });
+
+        //popolo la lista dei tipi di contratto del filtro
+        var filterEmpType = document.getElementById("filterEmpType");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.empTypeId;
+            opt.textContent = c.name;
+            filterEmpType.appendChild(opt);
+        });
+
+    } catch (e) {
+        console.error("Errore loadEmpTypes:", e);
+    }
+}
+
+//WORKSCHED
+async function loadWorkSched() {
+    try {
+        var res = await fetch(`servlet/workscheds`);
+        var json = await res.json();
+        var data = json.data || [];
+
+        workSchedMap.clear();
+
+        //popolo la mappa degli orari di lavoro
+        data.forEach(function(c) {
+            workSchedMap.set(String(c.workSchedId), {
+                name: c.name
+            });
+        });
+
+        //popolo la lista degli orari di lavoro della creazione della job opening
+        var workSchedjobOpCreate = document.getElementById("workSchedIdjobOpCreate");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.workSchedId;
+            opt.textContent = c.name;
+            workSchedjobOpCreate.appendChild(opt);
+        });
+
+        //popolo la lista degli orari di lavoro del filtro
+        var filterWorkSched = document.getElementById("filterWorkSched");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.workSchedId;
+            opt.textContent = c.name;
+            filterWorkSched.appendChild(opt);
+        });
+
+    } catch (e) {
+        console.error("Errore loadWorkSched:", e);
+    }
+}
+
+//CREAZIONE NUOVO ANNUNCIO 
+document.getElementById('createJobOpeningForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var title = document.getElementById('titlejobOpCreate').value.trim() || null;
+    var description = document.getElementById('descriptionjobOpCreate').value.trim() || null;
+    var ralFrom = document.getElementById('ralFromjobOpCreate').value.trim() || null;
+    var ralTo = document.getElementById('ralTojobOpCreate').value.trim() || null;
+    var isOpen = Boolean(document.getElementById('isOpenjobOpCreate').value) || null;
+    var empTypeId = parseInt(document.getElementById('empTypeIdjobOpCreate').value) || null;
+    var workSchedId = parseInt(document.getElementById('workSchedIdjobOpCreate').value) || null;
+    var cityId = parseInt(document.getElementById('cityIdjobOpCreate').value) || null;
+    var closingDate = String(document.getElementById('closingDatejobOpCreate').value) || null;
+    
+    // PRENDI LE SKILL SELEZIONATE
+    var skillsSelect = document.getElementById('skillsjobOpCreate');
+    var skills = [];
+
+    for (var i = 0; i < skillsSelect.options.length; i++) {
+        var option = skillsSelect.options[i];
+        if (option.selected) {
+            skills.push(parseInt(option.value));
+        }
     }
 
-    // -------- JOBS (caricamento) --------
-    async function loadJobs() {
-      try {
-        const res = await fetch('servlet/jobopenings');
-        if (!res.ok) throw new Error('Errore fetch jobopenings: ' + res.status);
-        const json = await res.json();
-        jobs = (json.data || []).map(j => ({
-          id: j.id,
-          title: j.title,
-          description: j.description,
-          isOpen: j.isOpen === true || j.status === 'Aperto' || j.status === 'OPEN',
-          status: j.status || (j.isOpen ? 'Aperto' : 'Chiuso'),
-          empTypeId: j.empTypeId || null,
-          category: j.category || null,
-          cityId: j.cityId || j.CITYID || null,
-          cityName: j.cityName || j.city || '',
-          contractId: j.contractId || j.CONTRACTID || null,
-          contractName: j.contractName || j.contract || '',
-          ralFrom: j.ralFrom || j.RALFROM || null,
-          ralTo: j.ralTo || j.RALTO || null,
-          closingDate: j.closingDate || j.CLOSINGDATE || null,
-          candidates: j.candidates || []
-        }));
-      } catch (err) {
-        console.error('Errore loadJobs:', err);
-        jobs = [];
-      }
+
+    var payload = {
+        title,
+        description,
+        ralFrom,
+        ralTo,
+        isOpen,
+        empTypeId,
+        workSchedId,
+        cityId,
+        closingDate,
+        skills
+    };
+
+    try {
+        var res = await fetch('servlet/jobopenings/create', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        var json = await res.json();
+
+        if (!json.success) throw new Error(json.message || "Creazione posizione lavorativa fallita");
+
+        alert("Posizione lavorativa creata con successo!");
+
+        location.reload();
+
+    } catch (err) {
+        console.error("Errore creazione posizione lavorativa:", err);
+        alert("Errore: " + err.message);
+    }
+});
+
+// DOM READY
+document.addEventListener("DOMContentLoaded", async () => {
+    await Promise.all([
+        loadSkills(),
+        loadCities(),
+        loadEmpTypes(),
+        loadWorkSched(),
+    ]);
+
+    //await loadJobs();
+
+    //updateJobsCount();
+});
+
+//CONSENTO SELEZIONE MULTIPLA CON UN SEMPLICE CLICK SX NELLA SELECT DELLE SKILLS NELLA CREAZIONE DELLA JOB OP:
+const skillsSelect = document.getElementById('skillsjobOpCreate');
+
+skillsSelect.addEventListener('mousedown', function(e) {
+    e.preventDefault(); // previene la selezione standard
+
+    const option = e.target;
+    if (option.tagName == 'OPTION') {
+        option.selected = !option.selected; // toggle selezione
     }
 
-    // Inizializzazione pagina
-    async function init() {
-      await Promise.allSettled([loadEmptypes(), loadCities(), loadJobs()]);
-      renderJobs();
-    }
-
-    init();
-
+    // opzionale: triggera il change event se necessario
+    const event = new Event('change', { bubbles: true });
+    skillsSelect.dispatchEvent(event);
+});
