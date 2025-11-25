@@ -1,4 +1,4 @@
-package it.zucchetti.packages.servlet.users;
+package it.zucchetti.packages.servlet.jobApplications;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,10 +21,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+//TODO: aggiungere filtro per jobOpeningId e togliere il filtro per userId (ora al suo posto usiamo JobApplicationMe)
 
-
-@WebServlet("/servlet/users")
-public class UserIndex extends HttpServlet {
+@WebServlet("/servlet/jobapplications/me")
+public class jobApplicationMe extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,30 +47,61 @@ public class UserIndex extends HttpServlet {
 
             statement = connection.createStatement();
 
-            resultSet = statement.executeQuery("SELECT * FROM Users");
+            String requestedJobOpeningId = request.getParameter("jobOpeningId");
 
-            // Costruisco il JSON con Gson
+            String userIdParam = request.getParameter("userId");
+
+            String query = "SELECT * FROM APPLICATIONS";
+
+            if (userIdParam != null) {
+                query += " WHERE USERID = '" + userIdParam + "'";
+            }
+
+            if (requestedJobOpeningId != null) {
+                query += " WHERE JOBOPENINGID = '" + requestedJobOpeningId + "'";
+            }
+
+            //TODO: se inseriti entrambi i parametri allora ritorno errore e altre possibili condizioni
+
+            resultSet = statement.executeQuery(query);
+            
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
             jsonResponse.addProperty("message", "Servlet correttamente eseguita");
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("userId", resultSet.getInt("userId"));
-                skillObj.addProperty("roleId", resultSet.getString("roleId"));
-                skillObj.addProperty("email", resultSet.getString("email"));
-                skillObj.addProperty("firstName", resultSet.getString("firstName"));
-                skillObj.addProperty("lastName", resultSet.getString("lastName"));
-                skillObj.addProperty("birthDate", resultSet.getString("birthDate"));
-                skillObj.addProperty("address", resultSet.getString("address"));
-                skillObj.addProperty("cityId", resultSet.getString("cityId"));
-                skillObj.addProperty("regionId", resultSet.getString("regionId"));
-                skillObj.addProperty("countryId", resultSet.getString("countryId"));
-                skillObj.addProperty("latitude", resultSet.getString("latitude"));
-                skillObj.addProperty("longitude", resultSet.getString("longitude"));
-                skillObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
-                dataArray.add(skillObj);
+                JsonObject applicationObj = new JsonObject();
+                int applicationId = resultSet.getInt("APPLICATIONID");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("applicationId", null);
+                } else {
+                    applicationObj.addProperty("applicationId", applicationId);
+                }
+
+                int userId = resultSet.getInt("USERID");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("userId", null);
+                } else {
+                    applicationObj.addProperty("userId", userId);
+                }
+
+                int jobOpeningId = resultSet.getInt("JOBOPENINGID");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("jobOpeningId", null);
+                } else {
+                    applicationObj.addProperty("jobOpeningId", jobOpeningId);
+                }
+
+                double totalScore = resultSet.getDouble("TOTALSCORE");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("totalScore", null);
+                } else {
+                    applicationObj.addProperty("totalScore", totalScore);
+                }
+                applicationObj.addProperty("createdAt", resultSet.getString("CREATEDAT"));
+                applicationObj.addProperty("letter", resultSet.getString("LETTER"));
+                dataArray.add(applicationObj);
             }
 
             jsonResponse.add("data", dataArray);

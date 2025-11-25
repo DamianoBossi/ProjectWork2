@@ -21,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+//TODO: aggiungere filtro per jobOpeningId e togliere il filtro per userId (ora al suo posto usiamo JobApplicationMe)
+
 @WebServlet("/servlet/jobapplications")
 public class JobApplicationsIndex extends HttpServlet {
 

@@ -23,8 +23,8 @@ import java.sql.Statement;
 
 
 
-@WebServlet("/servlet/users")
-public class UserIndex extends HttpServlet {
+@WebServlet("/servlet/users/me")
+public class UserMe extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

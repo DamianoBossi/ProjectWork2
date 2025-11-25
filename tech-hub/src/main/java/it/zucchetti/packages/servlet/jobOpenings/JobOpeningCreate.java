@@ -34,7 +34,7 @@ public class JobOpeningCreate extends HttpServlet {
 
     private static String errorMessage = ""; //TODO: fixa! non è thread safe!
 
-    /*private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int workschedId, int cityId, String closingDate) {
+    /*private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int workSchedId, int cityId, String closingDate) {
         return true; //TODO
     }*/
 
@@ -106,7 +106,7 @@ public class JobOpeningCreate extends HttpServlet {
         //uso di Boolean (wrapper di boolean)
         Boolean isOpen = obj.has("isOpen") && !obj.get("isOpen").isJsonNull()? obj.get("isOpen").getAsBoolean() : null; //mi aspetto che la richiesta qui mi invi un booleano true/false
         Integer empTypeId = obj.has("empTypeId") && !obj.get("empTypeId").isJsonNull()? obj.get("empTypeId").getAsInt() : null;
-        Integer workschedId = obj.has("workschedId") && !obj.get("workschedId").isJsonNull()? obj.get("workschedId").getAsInt() : null;
+        Integer workSchedId = obj.has("workSchedId") && !obj.get("workSchedId").isJsonNull()? obj.get("workSchedId").getAsInt() : null;
         Integer cityId = obj.has("cityId") && !obj.get("cityId").isJsonNull()? obj.get("cityId").getAsInt() : null;
 
         //TODO: calcolo latitude e longitude
@@ -130,7 +130,7 @@ public class JobOpeningCreate extends HttpServlet {
             jobOpeningSkills = new int[0];
         }
 
-        /*if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workschedId, cityId, closingDate)) {
+        /*if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workSchedId, cityId, closingDate)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage + "\"}");
             try {
@@ -155,7 +155,7 @@ public class JobOpeningCreate extends HttpServlet {
                 + (ralTo != null ? ralTo : "NULL") + ", "
                 + (isOpen ? 1 : 0) + ", "
                 + empTypeId + ", "
-                + workschedId + ", "
+                + workSchedId + ", "
                 + cityId + ", "
                 + latitude + ", "
                 + longitude + ", "
