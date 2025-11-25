@@ -510,6 +510,28 @@ function checkUserLogged() {
 }
 
 // =====================================================
+// LOGOUT
+// =====================================================
+
+
+if (document.getElementById("logout-btn")) {
+    document.getElementById("logout-btn").onclick = async () => {
+        try {
+            const res = await fetch('servlet/logout', {
+                method: "POST"
+            });
+            if (res.ok) {
+                window.location.href = "prova.html";
+            }
+        } catch (e) {
+            console.error("Errore logout:", e);
+            alert("Errore durante il logout: " + e.message);
+        }
+    };
+} 
+
+
+// =====================================================
 // REGISTER FORM (countryId, regionId, cityId, address, skills[])
 // =====================================================
 async function handleRegisterSubmit(e) {
@@ -673,7 +695,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadSkills(),
         loadJobSkills(),
         loadCities(),
-        loadRegions()
+        loadRegions(),
+        checkUserLogged()
     ]);
 
     await loadJobs();
