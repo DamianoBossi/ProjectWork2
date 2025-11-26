@@ -5,6 +5,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -20,8 +21,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-//TODO: aggiungere filtro per jobOpeningId e togliere il filtro per userId (ora al suo posto usiamo JobApplicationMe)
 
 @WebServlet("/servlet/jobapplications/me")
 public class jobApplicationMe extends HttpServlet {
@@ -47,21 +46,24 @@ public class jobApplicationMe extends HttpServlet {
 
             statement = connection.createStatement();
 
-            String requestedJobOpeningId = request.getParameter("jobOpeningId");
+            HttpSession currentSession = request.getSession(false);
 
-            String userIdParam = request.getParameter("userId");
+            //TODO: se non esiste una sessione corrente ritornare apposito errore!
 
-            String query = "SELECT * FROM APPLICATIONS";
+            String email= (String) currentSession.getAttribute("username");
 
-            if (userIdParam != null) {
-                query += " WHERE USERID = '" + userIdParam + "'";
-            }
+            String userIdQuery = "SELECT USERID FROM USERS WHERE EMAIL = '" + email + "'";
 
-            if (requestedJobOpeningId != null) {
-                query += " WHERE JOBOPENINGID = '" + requestedJobOpeningId + "'";
-            }
+            resultSet = statement.executeQuery(userIdQuery);
 
-            //TODO: se inseriti entrambi i parametri allora ritorno errore e altre possibili condizioni
+            if (!resultSet.next()) { /*TODO: gestire errore*/ } //restituite meno di una tupla dalla query
+
+            int sessionUserId = resultSet.getInt("USERID");
+
+            if (resultSet.next()) { /*TODO: gestire errore*/ } //restituite più di una tupla dalla query
+
+            String query = "SELECT * FROM APPLICATIONS WHERE USERID = " + sessionUserId;
+            //TODO: controlla se ci sono altre possibili condizioni in cui lanciare errore
 
             resultSet = statement.executeQuery(query);
             

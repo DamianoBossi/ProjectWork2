@@ -21,8 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//TODO: aggiungere filtro per jobOpeningId e togliere il filtro per userId (ora al suo posto usiamo JobApplicationMe)
-
 @WebServlet("/servlet/jobapplications")
 public class JobApplicationsIndex extends HttpServlet {
 
@@ -49,19 +47,13 @@ public class JobApplicationsIndex extends HttpServlet {
 
             String requestedJobOpeningId = request.getParameter("jobOpeningId");
 
-            String userIdParam = request.getParameter("userId");
-
             String query = "SELECT * FROM APPLICATIONS";
-
-            if (userIdParam != null) {
-                query += " WHERE USERID = '" + userIdParam + "'";
-            }
 
             if (requestedJobOpeningId != null) {
                 query += " WHERE JOBOPENINGID = '" + requestedJobOpeningId + "'";
             }
 
-            //TODO: se inseriti entrambi i parametri allora ritorno errore e altre possibili condizioni
+            //TODO: possibili condizioni e errori da lanciare in certi casi (pensaci)
 
             resultSet = statement.executeQuery(query);
             

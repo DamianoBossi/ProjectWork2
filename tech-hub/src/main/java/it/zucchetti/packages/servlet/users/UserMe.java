@@ -5,6 +5,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -20,8 +21,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-
 
 @WebServlet("/servlet/users/me")
 public class UserMe extends HttpServlet {
@@ -47,7 +46,13 @@ public class UserMe extends HttpServlet {
 
             statement = connection.createStatement();
 
-            resultSet = statement.executeQuery("SELECT * FROM Users");
+            HttpSession currentSession = request.getSession(false);
+
+            //TODO: se non esiste una sessione corrente ritornare apposito errore!
+
+            String username = (String) currentSession.getAttribute("username");
+
+            resultSet = statement.executeQuery("SELECT * FROM USERS WHERE EMAIL = '" + username + "'");
 
             // Costruisco il JSON con Gson
             JsonObject jsonResponse = new JsonObject();
@@ -55,23 +60,26 @@ public class UserMe extends HttpServlet {
             jsonResponse.addProperty("message", "Servlet correttamente eseguita");
 
             JsonArray dataArray = new JsonArray();
-            while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("userId", resultSet.getInt("userId"));
-                skillObj.addProperty("roleId", resultSet.getString("roleId"));
-                skillObj.addProperty("email", resultSet.getString("email"));
-                skillObj.addProperty("firstName", resultSet.getString("firstName"));
-                skillObj.addProperty("lastName", resultSet.getString("lastName"));
-                skillObj.addProperty("birthDate", resultSet.getString("birthDate"));
-                skillObj.addProperty("address", resultSet.getString("address"));
-                skillObj.addProperty("cityId", resultSet.getString("cityId"));
-                skillObj.addProperty("regionId", resultSet.getString("regionId"));
-                skillObj.addProperty("countryId", resultSet.getString("countryId"));
-                skillObj.addProperty("latitude", resultSet.getString("latitude"));
-                skillObj.addProperty("longitude", resultSet.getString("longitude"));
-                skillObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
-                dataArray.add(skillObj);
-            }
+
+            if (!resultSet.next()) { /*TODO: gestire errore*/ } //restituite meno di una tupla dalla query
+            
+            JsonObject skillObj = new JsonObject();
+            skillObj.addProperty("userId", resultSet.getInt("userId"));
+            skillObj.addProperty("roleId", resultSet.getString("roleId"));
+            skillObj.addProperty("email", resultSet.getString("email"));
+            skillObj.addProperty("firstName", resultSet.getString("firstName"));
+            skillObj.addProperty("lastName", resultSet.getString("lastName"));
+            skillObj.addProperty("birthDate", resultSet.getString("birthDate"));
+            skillObj.addProperty("address", resultSet.getString("address"));
+            skillObj.addProperty("cityId", resultSet.getString("cityId"));
+            skillObj.addProperty("regionId", resultSet.getString("regionId"));
+            skillObj.addProperty("countryId", resultSet.getString("countryId"));
+            skillObj.addProperty("latitude", resultSet.getString("latitude"));
+            skillObj.addProperty("longitude", resultSet.getString("longitude"));
+            skillObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
+            dataArray.add(skillObj);
+            
+            if (resultSet.next()) { /*TODO: gestire errore*/ } //restituite più di una tupla dalla query
 
             jsonResponse.add("data", dataArray);
 
