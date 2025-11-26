@@ -58,20 +58,20 @@ public class JobOpeningShow extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("jobOpeningId", resultSet.getInt("jobOpeningId"));
-                skillObj.addProperty("title", resultSet.getString("title"));
-                skillObj.addProperty("description", resultSet.getString("description"));
-                skillObj.addProperty("ralFrom", resultSet.getString("ralFrom"));
-                skillObj.addProperty("ralTo", resultSet.getString("ralTo"));
-                skillObj.addProperty("isOpen", resultSet.getString("isOpen"));
-                skillObj.addProperty("emptypeId", resultSet.getString("emptypeId"));
-                skillObj.addProperty("workSchedId", resultSet.getString("workSchedId"));
-                skillObj.addProperty("cityId", resultSet.getString("cityId"));
-                skillObj.addProperty("latitude", resultSet.getString("latitude"));
-                skillObj.addProperty("longitude", resultSet.getString("longitude"));
-                skillObj.addProperty("closingDate", resultSet.getString("closingDate"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("jobOpeningId", resultSet.getInt("jobOpeningId"));
+                jsonObj.addProperty("title", resultSet.getString("title"));
+                jsonObj.addProperty("description", resultSet.getString("description"));
+                jsonObj.addProperty("ralFrom", resultSet.getString("ralFrom"));
+                jsonObj.addProperty("ralTo", resultSet.getString("ralTo"));
+                jsonObj.addProperty("isOpen", resultSet.getString("isOpen"));
+                jsonObj.addProperty("emptypeId", resultSet.getString("emptypeId"));
+                jsonObj.addProperty("workSchedId", resultSet.getString("workSchedId"));
+                jsonObj.addProperty("cityId", resultSet.getString("cityId"));
+                jsonObj.addProperty("latitude", resultSet.getString("latitude"));
+                jsonObj.addProperty("longitude", resultSet.getString("longitude"));
+                jsonObj.addProperty("closingDate", resultSet.getString("closingDate"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);

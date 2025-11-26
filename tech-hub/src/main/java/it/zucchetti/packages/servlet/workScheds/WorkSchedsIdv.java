@@ -53,10 +53,10 @@ public class WorkSchedsIdv extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("workSchedId", resultSet.getInt("workSchedId"));
-                skillObj.addProperty("name", resultSet.getString("name"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("workSchedId", resultSet.getInt("workSchedId"));
+                jsonObj.addProperty("name", resultSet.getString("name"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);

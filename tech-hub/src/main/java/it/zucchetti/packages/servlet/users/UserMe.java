@@ -63,21 +63,21 @@ public class UserMe extends HttpServlet {
 
             if (!resultSet.next()) { /*TODO: gestire errore*/ } //restituite meno di una tupla dalla query
             
-            JsonObject skillObj = new JsonObject();
-            skillObj.addProperty("userId", resultSet.getInt("userId"));
-            skillObj.addProperty("roleId", resultSet.getString("roleId"));
-            skillObj.addProperty("email", resultSet.getString("email"));
-            skillObj.addProperty("firstName", resultSet.getString("firstName"));
-            skillObj.addProperty("lastName", resultSet.getString("lastName"));
-            skillObj.addProperty("birthDate", resultSet.getString("birthDate"));
-            skillObj.addProperty("address", resultSet.getString("address"));
-            skillObj.addProperty("cityId", resultSet.getString("cityId"));
-            skillObj.addProperty("regionId", resultSet.getString("regionId"));
-            skillObj.addProperty("countryId", resultSet.getString("countryId"));
-            skillObj.addProperty("latitude", resultSet.getString("latitude"));
-            skillObj.addProperty("longitude", resultSet.getString("longitude"));
-            skillObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
-            dataArray.add(skillObj);
+            JsonObject jsonObj = new JsonObject();
+            jsonObj.addProperty("userId", resultSet.getInt("userId"));
+            jsonObj.addProperty("roleId", resultSet.getString("roleId"));
+            jsonObj.addProperty("email", resultSet.getString("email"));
+            jsonObj.addProperty("firstName", resultSet.getString("firstName"));
+            jsonObj.addProperty("lastName", resultSet.getString("lastName"));
+            jsonObj.addProperty("birthDate", resultSet.getString("birthDate"));
+            jsonObj.addProperty("address", resultSet.getString("address"));
+            jsonObj.addProperty("cityId", resultSet.getString("cityId"));
+            jsonObj.addProperty("regionId", resultSet.getString("regionId"));
+            jsonObj.addProperty("countryId", resultSet.getString("countryId"));
+            jsonObj.addProperty("latitude", resultSet.getString("latitude"));
+            jsonObj.addProperty("longitude", resultSet.getString("longitude"));
+            jsonObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
+            dataArray.add(jsonObj);
             
             if (resultSet.next()) { /*TODO: gestire errore*/ } //restituite più di una tupla dalla query
 

@@ -52,10 +52,10 @@ public class SkillIndex extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("skillId", resultSet.getInt("skillId"));
-                skillObj.addProperty("name", resultSet.getString("name"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("skillId", resultSet.getInt("skillId"));
+                jsonObj.addProperty("name", resultSet.getString("name"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);

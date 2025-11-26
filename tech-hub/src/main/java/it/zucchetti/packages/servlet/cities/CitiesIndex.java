@@ -51,11 +51,11 @@ public class CitiesIndex extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("cityId", resultSet.getInt("cityId"));
-                skillObj.addProperty("name", resultSet.getString("name"));
-                skillObj.addProperty("regionId", resultSet.getString("regionId"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("cityId", resultSet.getInt("cityId"));
+                jsonObj.addProperty("name", resultSet.getString("name"));
+                jsonObj.addProperty("regionId", resultSet.getString("regionId"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);
