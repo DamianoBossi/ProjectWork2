@@ -34,6 +34,8 @@ public class UserMe extends HttpServlet {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
+        Statement statement2 = null;
+        ResultSet resultSet2 = null;
 
         PrintWriter out = response.getWriter();
         Gson gson = new Gson();
@@ -64,7 +66,8 @@ public class UserMe extends HttpServlet {
             if (!resultSet.next()) { /*TODO: gestire errore*/ } //restituite meno di una tupla dalla query
             
             JsonObject jsonObj = new JsonObject();
-            jsonObj.addProperty("userId", resultSet.getInt("userId"));
+            String currentUserId = resultSet.getString("userId");
+            jsonObj.addProperty("userId", currentUserId);
             jsonObj.addProperty("roleId", resultSet.getString("roleId"));
             jsonObj.addProperty("email", resultSet.getString("email"));
             jsonObj.addProperty("firstName", resultSet.getString("firstName"));
@@ -77,10 +80,21 @@ public class UserMe extends HttpServlet {
             jsonObj.addProperty("latitude", resultSet.getString("latitude"));
             jsonObj.addProperty("longitude", resultSet.getString("longitude"));
             jsonObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
-            dataArray.add(jsonObj);
             
             if (resultSet.next()) { /*TODO: gestire errore*/ } //restituite più di una tupla dalla query
+            
+            statement2 = connection.createStatement();
+            resultSet2 = statement2.executeQuery("SELECT * FROM USERSSKILLS WHERE USERID = " + currentUserId);
+            
+            JsonArray skillsArray = new JsonArray();
+            
+            while (resultSet2.next()) {
+                skillsArray.add(resultSet2.getString("SKILLID"));
+            }
+            
+            jsonObj.add("skills", skillsArray);
 
+            dataArray.add(jsonObj);
             jsonResponse.add("data", dataArray);
 
             response.setStatus(HttpServletResponse.SC_OK);
@@ -101,6 +115,10 @@ public class UserMe extends HttpServlet {
                     resultSet.close();
                 if (statement != null)
                     statement.close();
+                if (resultSet2 != null)
+                    resultSet2.close();
+                if (statement2 != null)
+                    statement2.close();
                 if (connection != null)
                     connection.close();
             } catch (SQLException e) {

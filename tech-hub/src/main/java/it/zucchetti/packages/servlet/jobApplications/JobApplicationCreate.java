@@ -25,6 +25,8 @@ import java.sql.Statement;
 /*TODO: cambiare tipi delle var e degli oggetti che pongo uguali alle cose che mi arrivano dal json di richiesta (x controllo se null o meno, se va bene o meno) (magari metterli 
 tutti a String in modo che posso verificare che siano null e in modo che il frontend possa mandarmeli null)*/
 
+//TODO: aggiungi titolo di studio che viene dato dalla request (su di esso si basa il punteggio dell'utente, ma non lo clacolo io, mi arriva già fatto lo score nella request)
+
 @WebServlet("/servlet/jobapplications/create")
 public class JobApplicationCreate extends HttpServlet {
 
@@ -93,7 +95,6 @@ public class JobApplicationCreate extends HttpServlet {
         String jsonString = sb.toString();
 
         JsonObject obj = JsonParser.parseString(jsonString).getAsJsonObject();
-
 
         String email = (String) currentSession.getAttribute("username");
 
