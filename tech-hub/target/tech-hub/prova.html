@@ -213,27 +213,29 @@
       <div class="d-flex align-items-center gap-2">
         <div class="text-muted" id="jobsCount">0 opportunità trovate</div>
 
-        <div id="login-buttons" >
-          <button id="login-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" data-bs-toggle="modal"
-            data-bs-target="#loginModal" aria-label="Accedi">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Accedi
+       <div id="login-buttons" class="d-flex gap-2">
+        <button id="login-btn" type="button" class="btn btn-primary btn-sm btn-icon" data-bs-toggle="modal"
+         data-bs-target="#loginModal" aria-label="Accedi">
+         <i class="bi bi-person-fill me-1"></i> Accedi
+        </button>
+
+         <button id="reg-btn" type="button" class="btn btn-primary btn-sm btn-icon" data-bs-toggle="modal"
+           data-bs-target="#registerModal" aria-label="Registrati">
+           <i class="bi bi-person-plus me-1"></i> Registrati
           </button>
-  
-          <button id="reg-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" data-bs-toggle="modal"
-            data-bs-target="#registerModal" aria-label="Registrati">
-            <i class="bi bi-person-plus me-1"></i> Registrati
+
+        <a id="profile-btn" href="profilo.html" class="btn btn-primary btn-sm btn-icon" aria-label="Profilo">
+         <i class="bi bi-person me-1"></i> Profilo
+         </a>
+
+        <a id="candidature-btn" href="candidature.html" class="btn btn-primary btn-sm btn-icon" aria-label="Le mie candidature">
+         <i class="bi bi-card-list me-1"></i> Le mie candidature
+        </a>
+
+        <button id="logout-btn" type="button" class="btn btn-danger btn-sm btn-icon" aria-label="Logout">
+          <i class="bi bi-box-arrow-right me-1"></i> Logout
           </button>
-
-           <a id="profile-btn" href="profilo.html" class="btn btn-outline-primary btn-sm align-items-center" aria-label="Profilo">
-           <i class="bi bi-person me-1"></i> Profilo
-            </a>
-
-
-
-          <btn id="logout-btn" type="button" class="btn btn-outline-primary btn-sm align-items-center" aria-label="Logout">
-            <i class="fa-solid fa-right-from-bracket"></i>Logout
-          </btn>
-        </div>
+            </div>
       </div>
     </div>
 
