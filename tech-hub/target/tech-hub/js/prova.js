@@ -19,8 +19,9 @@ cards.forEach(card => observer.observe(card));
 const countriesMap = new Map(); // countryId -> { name }
 const regionsMap = new Map(); // regionId  -> { name, countryId }
 const citiesMap = new Map(); // cityId    -> { name, regionId }
-const emptypesMap = new Map(); // emptypeId -> name
+const empTypesMap = new Map(); // emptypeId -> name
 const skillsMap = new Map(); // skillId   -> name
+const workSchedMap = new Map(); // workSchedId -> name 
 
 let allJobs = [];               // tutti i job
 let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
@@ -158,14 +159,14 @@ async function loadCities(regionId) {
 
 
 // -------- EMPLOYMENT TYPES --------
-async function loadEmptypes() {
+async function loadEmpTypes() {
     try {
         const res = await fetch('servlet/emptypes');
         const json = await res.json();
         const types = json.data || [];
 
-        emptypesMap.clear();
-        types.forEach(t => emptypesMap.set(t.empTypeId, t.name));
+        empTypesMap.clear();
+        types.forEach(t => empTypesMap.set(t.empTypeId, t.name));
 
         const filterContract = document.getElementById('filterContract');
         if (filterContract) {
@@ -179,9 +180,51 @@ async function loadEmptypes() {
         }
 
     } catch (err) {
-        console.error("Errore loadEmptypes:", err);
+        console.error("Errore loadEmpTypes:", err);
     }
 }
+
+//WORKSCHED 
+async function loadWorkSched() {
+    try {
+        var res = await fetch(`servlet/workscheds`);
+        var json = await res.json();
+        var data = json.data || [];
+
+        workSchedMap.clear();
+
+        //popolo la mappa degli orari di lavoro
+        data.forEach(function(c) {
+            workSchedMap.set(String(c.workSchedId), {
+                name: c.name
+            });
+        });
+
+        //popolo la lista degli orari di lavoro della creazione della job opening
+        var workSchedjobOpCreate = document.getElementById("workSchedIdjobOpCreate");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.workSchedId;
+            opt.textContent = c.name;
+            workSchedjobOpCreate.appendChild(opt);
+        });
+
+        //popolo la lista degli orari di lavoro del filtro
+        var filterWorkSched = document.getElementById("filterWorkSched");
+
+        data.forEach(function(c) {
+            var opt = document.createElement("option");
+            opt.value = c.workSchedId;
+            opt.textContent = c.name;
+            filterWorkSched.appendChild(opt);
+        });
+
+    } catch (e) {
+        console.error("Errore loadWorkSched:", e);
+    }
+}
+
 
 
 
@@ -264,13 +307,14 @@ async function loadJobs() {
 
 
 
+
 // =============================================================
 // RENDER CARD LAVORO
 // =============================================================
 function cardJob(job) {
 
     const cityName = citiesMap.get(String(job.cityId)) || 'N/D';
-    const emptypeName = emptypesMap.get(job.empTypeId) || 'N/D';
+    const emptypeName = empTypesMap.get(job.empTypeId) || 'N/D';
 
     const jobId = String(job.jobOpeningId);
 
@@ -286,7 +330,7 @@ function cardJob(job) {
             data-contract="${job.empTypeId}"
             data-skills="${skillIds.join(',')}">
 
-          <div class="card h-100 p-4">
+        <div class="card h-100 p-4 job-clickable" onclick="openJobDetails('${job.jobOpeningId}')"> 
 
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="mb-1">${job.title}</h5>
@@ -305,13 +349,15 @@ function cardJob(job) {
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-auto">
-              <div class="small text-muted">
-                <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
-              </div>
+                
+                <div class="small text-muted">
+                    <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
+                </div>
 
-              <button class="btn btn-sm btn-primary" onclick="openApplyModal('${job.title}')">
-                Candidati
-              </button>
+                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
+                    Candidati
+                </button>
+
             </div>
 
           </div>
@@ -319,6 +365,124 @@ function cardJob(job) {
     `;
 }
 
+
+// =====================================================
+// MODALE DETTAGLI JOBS 
+// =====================================================
+function openJobDetails(jobId) {
+
+    const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
+    if (!job) return;
+
+    const city = citiesMap.get(String(job.cityId));
+    const contract = empTypesMap.get(job.empTypeId);
+
+    const skillIds = jobSkillsMap.get(jobId) || [];
+    const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
+    const workSchedName = workSchedMap.get(String(job.workSchedId))
+    ? workSchedMap.get(String(job.workSchedId)).name
+    : "N/D";
+
+    document.getElementById("jobDetailTitle").textContent = job.title;
+    document.getElementById("jobDetailDescription").textContent = job.description;
+    document.getElementById("jobDetailCity").textContent = city ? city.name : "N/D";
+    document.getElementById("jobDetailContract").textContent = contract || "N/D";
+    document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
+    document.getElementById("jobDetailWorkSched").textContent = workSchedName;
+
+
+    const ul = document.getElementById("jobDetailSkills");
+    ul.innerHTML = "";
+    skillNames.forEach(s => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.textContent = s;
+        ul.appendChild(li);
+    });
+
+    document.getElementById("jobDetailApplyBtn").onclick = () => {
+        openApplyModal(job.jobOpeningId);
+    };
+
+    const modal = new bootstrap.Modal(document.getElementById("jobDetailModal"));
+    modal.show();
+}
+
+
+// =====================================================
+// APERTURA MODALE DA LOGGATO O DA REGISTRATO 
+// =====================================================
+async function openApplyModal(jobId) {
+    // controllo login
+    const logged = await checkUserLogged();
+
+    if (!logged) { //SE NON LOGGATO LO MANDO ALLA REGISTRAZIONE
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('registerModal')
+        ).show();
+        return;
+    }
+
+    //SE LOGGATO GLI APRO IL MODALE DA LOGGATO
+    const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
+    document.getElementById("applyJobId").value = jobId;
+    document.getElementById("applyJobTitle").textContent = job.title;
+
+    bootstrap.Modal.getOrCreateInstance(
+        document.getElementById('applyModal')
+    ).show();
+}
+
+
+
+// =====================================================
+// SUBMIT APPLY FORM 
+// =====================================================
+if (document.getElementById("applyForm")) {
+
+    document.getElementById("applyForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const jobId = document.getElementById("applyJobId").value;
+        const score = document.getElementById("applyStudio").value; 
+        const lettera = document.getElementById("applyLettera").value; 
+
+        if (!score || !lettera) {
+            alert("Compila tutti i campi!");
+            return;
+        }
+
+        const payload = {
+            jobOpeningId: parseInt(jobId, 10),
+            score: parseInt(score, 10),
+            letter: lettera
+        };
+
+        try {
+            const res = await fetch("servlet/jobapplications/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const json = await res.json();
+
+            if (!json.success) {
+                throw new Error(json.message || "Errore nell'invio candidatura");
+            }
+
+            alert("Candidatura inviata con successo!");
+
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById("applyModal")
+            ).hide();
+
+        } catch (err) {
+            console.error("Errore candidatura:", err);
+            alert("Errore: " + err.message);
+        }
+    });
+}
 
 
 // =============================================================
@@ -492,22 +656,26 @@ if (addSkillBtn) {
 // CHECK USER LOGGED
 // =====================================================
 
-function checkUserLogged() {
-    fetch('servlet/sessionStatus')
-        .then(res => res.json())
-        .then(json => {
-            if (json.message.isLogged) {
-                document.getElementById("login-buttons-home").style.display = "none";
-                document.getElementById("login-buttons").style.display = "none";
-                document.getElementById("profile-btn").style.display = "block";
-                document.getElementById("logout-btn").style.display = "block";
-                document.getElementById("reg-btn").style.display = "none";
-                document.getElementById("login-btn").style.display = "none";
-                
-            }
-               })
-       
+async function checkUserLogged() {
+    try {
+        const res = await fetch('servlet/sessionStatus');
+        const json = await res.json();
+        return json?.message?.isLogged === true;
+    } catch (e) {
+        console.error("Errore checkUserLogged:", e);
+        return false;
+    }
 }
+
+function hideButtons(){
+    document.getElementById("login-buttons-home").style.display = "none";
+    document.getElementById("login-buttons").style.display = "none";
+    document.getElementById("profile-btn").style.display = "block";
+    document.getElementById("logout-btn").style.display = "block";
+    document.getElementById("reg-btn").style.display = "none";
+    document.getElementById("login-btn").style.display = "none";
+}
+
 
 // =====================================================
 // LOGOUT
@@ -653,7 +821,7 @@ async function handleLogin(e) {
         localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
         bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
-        checkUserLogged();
+        hideButtons();
 
 
     } catch (e) {
@@ -691,15 +859,19 @@ window.showHomePage = function () {
 document.addEventListener("DOMContentLoaded", async () => {
     await Promise.all([
         loadCountries(),
-        loadEmptypes(),
+        loadEmpTypes(),
         loadSkills(),
+        loadWorkSched(),   
         loadJobSkills(),
         loadCities(),
         loadRegions(),
-        checkUserLogged()
     ]);
-
+ 
     await loadJobs();
-
+ 
+    if (await checkUserLogged()) {
+        hideButtons();
+    }
+ 
     updateJobsCount();
 });
