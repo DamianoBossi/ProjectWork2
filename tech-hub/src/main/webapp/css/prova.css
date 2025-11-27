@@ -324,6 +324,12 @@
       display: none;
     }
 
+    #candidature-btn{
+      display: none;
+    }
+
+  
+
     btn.why-heading-small{
       cursor: pointer;
     }
@@ -428,3 +434,40 @@
     .skills-box .btn + .btn-check + .btn {
       margin-left: 0;
     }
+    
+/* parte profilo */
+
+    .navbar-brand img {
+      display: block;
+      max-height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+
+
+        /* Stile per il messaggio di logout */
+    .logout-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #0d6efd;
+      color: #fff;
+      padding: 20px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      font-size: 1.2rem;
+      text-align: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .logout-message.show {
+      opacity: 1;
+    }
+
+
+
+
+
