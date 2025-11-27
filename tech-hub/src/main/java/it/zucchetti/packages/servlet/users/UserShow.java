@@ -35,6 +35,8 @@ public class UserShow extends HttpServlet {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
+        Statement statement2 = null;
+        ResultSet resultSet2 = null;
 
         PrintWriter out = response.getWriter();
         Gson gson = new Gson();
@@ -49,32 +51,44 @@ public class UserShow extends HttpServlet {
 
             resultSet = statement.executeQuery("SELECT * FROM users WHERE userid = " + id);
 
-            response.setStatus(HttpServletResponse.SC_OK);
-
             // Costruisco il JSON con Gson
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
             jsonResponse.addProperty("message", "Servlet correttamente eseguita");
 
             JsonArray dataArray = new JsonArray();
-            while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("userId", resultSet.getInt("userId"));
-                skillObj.addProperty("roleId", resultSet.getString("roleId"));
-                skillObj.addProperty("email", resultSet.getString("email"));
-                skillObj.addProperty("firstName", resultSet.getString("firstName"));
-                skillObj.addProperty("lastName", resultSet.getString("lastName"));
-                skillObj.addProperty("birthDate", resultSet.getString("birthDate"));
-                skillObj.addProperty("address", resultSet.getString("address"));
-                skillObj.addProperty("cityId", resultSet.getString("cityId"));
-                skillObj.addProperty("regionId", resultSet.getString("regionId"));
-                skillObj.addProperty("countryId", resultSet.getString("countryId"));
-                skillObj.addProperty("latitude", resultSet.getString("latitude"));
-                skillObj.addProperty("longitude", resultSet.getString("longitude"));
-                skillObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
-                dataArray.add(skillObj);
-            }
 
+            if (!resultSet.next()) { /*TODO: gestire errore*/ } //restituite meno di una tupla dalla query
+
+            JsonObject jsonObj = new JsonObject();
+            jsonObj.addProperty("userId", id);
+            jsonObj.addProperty("roleId", resultSet.getString("roleId"));
+            jsonObj.addProperty("email", resultSet.getString("email"));
+            jsonObj.addProperty("firstName", resultSet.getString("firstName"));
+            jsonObj.addProperty("lastName", resultSet.getString("lastName"));
+            jsonObj.addProperty("birthDate", resultSet.getString("birthDate"));
+            jsonObj.addProperty("address", resultSet.getString("address"));
+            jsonObj.addProperty("cityId", resultSet.getString("cityId"));
+            jsonObj.addProperty("regionId", resultSet.getString("regionId"));
+            jsonObj.addProperty("countryId", resultSet.getString("countryId"));
+            jsonObj.addProperty("latitude", resultSet.getString("latitude"));
+            jsonObj.addProperty("longitude", resultSet.getString("longitude"));
+            jsonObj.addProperty("cvFilePath", resultSet.getString("cvFilePath"));
+            
+            if (resultSet.next()) { /*TODO: gestire errore*/ } //restituite più di una tupla dalla query
+
+            statement2 = connection.createStatement();
+            resultSet2 = statement2.executeQuery("SELECT * FROM USERSSKILLS WHERE USERID = " + id);
+            
+            JsonArray skillsArray = new JsonArray();
+            
+            while (resultSet2.next()) {
+                skillsArray.add(resultSet2.getString("SKILLID"));
+            }
+            
+            jsonObj.add("skills", skillsArray);
+
+            dataArray.add(jsonObj);
             jsonResponse.add("data", dataArray);
 
             response.setStatus(HttpServletResponse.SC_OK);
@@ -95,6 +109,10 @@ public class UserShow extends HttpServlet {
                     resultSet.close();
                 if (statement != null)
                     statement.close();
+                if (resultSet2 != null)
+                    resultSet2.close();
+                if (statement2 != null)
+                    statement2.close();
                 if (connection != null)
                     connection.close();
             } catch (SQLException e) {

@@ -52,10 +52,10 @@ public class EmpTypesIndex extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("empTypeId", resultSet.getInt("empTypeId"));
-                skillObj.addProperty("name", resultSet.getString("name"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("empTypeId", resultSet.getInt("empTypeId"));
+                jsonObj.addProperty("name", resultSet.getString("name"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);
