@@ -339,8 +339,21 @@
       border-bottom: none;
     }
 
+    .modal-header .btn-close{
+      margin: 0;
+    }
+
     .modal-title{
       color: white;
+    }
+
+    #login-from-register {
+      cursor: pointer;
+    }
+
+    .modal-subtitle {
+      color: white;
+      margin-bottom: 0;
     }
 
     .candidate-list li {

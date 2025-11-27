@@ -136,6 +136,7 @@ async function loadCities(regionId) {
         });
 
         if (regionId) citySel.disabled = false;
+        debugger
 
     } catch (e) {
         console.error("Errore loadCities:", e);
@@ -188,12 +189,12 @@ async function loadSkills() {
 document.addEventListener("DOMContentLoaded", async function () {
   await loadCountries();
 
-  document.getElementById("registerCountry").addEventListener("change", function () {
-    loadRegions(this.value);
+  document.getElementById("registerCountry").addEventListener("change", async function () {
+    await loadRegions(this.value);
   });
 
-  document.getElementById("registerRegion").addEventListener("change", function () {
-    loadCities(this.value);
+  document.getElementById("registerRegion").addEventListener("change", async function () {
+    await loadCities(this.value);
   });
 
   await loadSkills();
