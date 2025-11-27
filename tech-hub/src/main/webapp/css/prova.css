@@ -339,6 +339,10 @@
       border-bottom: none;
     }
 
+    .modal-title{
+      color: white;
+    }
+
     .candidate-list li {
       cursor: pointer;
       transition: background 0.2s;
@@ -361,6 +365,9 @@
     }
 
 
+    div#jobsGrid {          
+      min-width: 100%;
+    }
 
     
 /* parte profilo */
