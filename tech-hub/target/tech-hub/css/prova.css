@@ -349,7 +349,82 @@
       color: #6c757d;
     }
 
-    /*stile select delle skills nella creazione di un nuovo jobOpening*/
-    .custom-select-height {
-        height: 70px; 
+    /*stile buttons delle skill nella checkbox delle skill della creazione nuova pos lavorativa*/
+    #skillsContainer {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* label come button */
+    #skillsContainer .btn {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      min-width: 72px;
+      text-align: center;
+      display: inline-block;
+      cursor: pointer;
+      user-select: none;
+      background-image: none !important;
+      transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+    }
+
+    /* colore blu base */
+    #skillsContainer .btn.btn-primary {
+      background-color: #3083ff !important;
+      color: #fff !important;
+      border: none !important;
+      box-shadow: 0 6px 12px rgba(13,110,253,0.12);
+    }
+
+    /* hover: leggermente scuro */
+    #skillsContainer .btn.btn-primary:hover {
+      background-color: #1365df !important;
+      transform: translateY(-1px);
+    }
+
+    /* stato checked: selezionato */
+    #skillsContainer .btn-check:checked + label.btn,
+    #skillsContainer input[type="checkbox"].btn-check:checked + label.btn {
+      background-color: #105bd4 !important;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.28);
+      transform: translateY(0) scale(0.995);
+    }
+
+    /* focus outline accessibile */
+    #skillsContainer .btn-check:focus + label.btn,
+    #skillsContainer .btn-check:focus-visible + label.btn {
+      box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+      outline: none;
+    }
+
+    /* feedback al click (breve) */
+    #skillsContainer .btn:active {
+      transform: scale(0.97);
+    }
+
+    .skills-box {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      padding: 0.5rem 0.75rem;
+      height: auto; /* simula rows="4" */
+      background-color: #fff;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.03);
+    }
+
+    .skills-box .btn {
+      margin: 0;
+      padding: 0.375rem 0.75rem;
+      line-height: 1;
+      box-shadow: none;
+    }
+
+    .skills-box .btn + .btn,
+    .skills-box .btn + .btn-check + .btn {
+      margin-left: 0;
     }

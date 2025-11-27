@@ -3,11 +3,11 @@
 var allJobOpenings = [];
 
 //MAPPE GLOBALI
+//TODO: SE CI SONO ANCORA DUE SKILL MAP TOGLIERNE UNA!
 var skillsMap = new Map(); // skillId -> name 
 var citiesMap = new Map(); // cityId -> name 
 var empTypesMap = new Map(); // emptypeId -> name 
 var workSchedMap = new Map(); // workSchedId -> name 
-var skillsMap = new Map(); // jobOpeningId -> array di skillId
 
 //array JS con gli id delle skill inserite nel form
 var skillsList = [];
@@ -21,23 +21,34 @@ async function loadSkills() {
 
         skillsMap.clear();
 
-        //popolo la mappa delle skill   
         data.forEach(function(s) {
             skillsMap.set(s.skillId, { name: s.name });
         });
 
-        //popolo la lista di città della creazione della job opening
-        var skillsjobOpCreate = document.getElementById("skillsjobOpCreate");
+        var skillsjobOpCreate = document.getElementById("skillsContainer");
+        skillsjobOpCreate.innerHTML = "";
 
-        data.forEach(function(c) {
-            var opt = document.createElement("option");
-            opt.value = c.skillId;
-            opt.textContent = c.name;
-            skillsjobOpCreate.appendChild(opt);
+        data.forEach(function(s) {
+
+            var input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "btn-check";
+            input.id = "skillsjobOpCreate" + s.skillId;
+            input.name = "skillsjobOpCreate[]";
+            input.value = s.skillId;
+            input.autocomplete = "off";
+
+            var label = document.createElement("label");
+            label.className = "btn btn-primary";
+            label.htmlFor = input.id;
+            label.textContent = s.name;
+
+            skillsjobOpCreate.appendChild(input);
+            skillsjobOpCreate.appendChild(label);
         });
 
-        //popolo la lista delle skill del filtro
         var filterSkills = document.getElementById("filterSkills");
+        filterSkills.innerHTML = "";
 
         data.forEach(function(s) {
             var opt = document.createElement("option");
@@ -45,8 +56,9 @@ async function loadSkills() {
             opt.textContent = s.name;
             filterSkills.appendChild(opt);
         });
-    } catch (e) { 
-        console.error("Errore loadSkills:", e); 
+
+    } catch (e) {
+        console.error("Errore loadSkills:", e);
     }
 }
 
@@ -245,20 +257,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     //await loadJobs();
 
     //updateJobsCount();
-});
-
-//CONSENTO SELEZIONE MULTIPLA CON UN SEMPLICE CLICK SX NELLA SELECT DELLE SKILLS NELLA CREAZIONE DELLA JOB OP:
-const skillsSelect = document.getElementById('skillsjobOpCreate');
-
-skillsSelect.addEventListener('mousedown', function(e) {
-    e.preventDefault(); // previene la selezione standard
-
-    const option = e.target;
-    if (option.tagName == 'OPTION') {
-        option.selected = !option.selected; // toggle selezione
-    }
-
-    // opzionale: triggera il change event se necessario
-    const event = new Event('change', { bubbles: true });
-    skillsSelect.dispatchEvent(event);
 });

@@ -146,10 +146,14 @@
                             placeholder="Descrivi la posizione lavorativa, le responsabilità, i requisiti e le competenze..."></textarea>
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="skillsjobOpCreate" class="form-label">Seleziona skills</label>
-                        <select class="form-select custom-select-height" id="skillsjobOpCreate" name="skillsjobOpCreate[]" multiple> <!--TODO: deve essere vietato non inserire alcuna skill?-->
-                        </select>
+                    <div class="col-md-12">
+                        <label for="skillsjobOpCreate" class="form-label">Seleziona skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+                        <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="skillsjobOpCreate">   
+                            <!--<input type="checkbox" class="btn-check" id="skillsjobOpCreate1" autocomplete="off" name="skillsjobOpCreate[]" value="1"> 
+                            <label class="btn btn-primary" for="skillsjobOpCreate1">HTML</label>
+                            <input type="checkbox" class="btn-check" id="skillsjobOpCreate2" autocomplete="off"  name="skillsjobOpCreate[]" value="2"> 
+                            <label class="btn btn-primary" for="skillsjobOpCreate2">CSS</label>-->
+                        </div> 
                     </div>
 
                     <div class="col-md-4 d-flex flex-column justify-content-center">
@@ -164,13 +168,14 @@
                             <option value="0">Chiuso</option>
                         </select>
                     </div>
+
+                    <div class="col-md-4 d-flex justify-content-center align-items-center">
+                        <button type="submit" class="btn btn-primary btn-lg btn-icon">
+                            <i class="bi bi-plus-circle"></i> Crea Annuncio
+                        </button>
+                    </div>
                 </div>
 
-                <div class="mt-4 text-center">
-                    <button type="submit" class="btn btn-primary btn-lg btn-icon">
-                        <i class="bi bi-plus-circle"></i> Crea Annuncio
-                    </button>
-                </div>
             </form>
         </div>
     </div>
