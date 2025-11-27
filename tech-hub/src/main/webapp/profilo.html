@@ -55,24 +55,32 @@
         </div>
       </div>
 
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <label for="profileCountry" class="form-label">Paese</label>
-          <input type="text" class="form-control" id="profileCountry" required>
-        </div>
-        <div class="col-md-6">
-          <label for="profileRegion" class="form-label">Regione</label>
-          <input type="text" class="form-control" id="profileRegion" required>
-        </div>
-      </div>
+       <!-- COUNTRY -->
+              <div class="col-md-6">
+                <label for="registerCountry" class="form-label">Paese</label>
+                <select id="registerCountry" class="form-select" required>
+                  <option value="">Seleziona paese</option>
+                </select>
+              </div>
 
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <label for="profileCity" class="form-label">Città</label>
-          <input type="text" class="form-control" id="profileCity" required>
-        </div>
-        <div class="col-md-6">
-          <label for="profileAddress" class="form-label">Indirizzo</label>
+              <!-- REGION -->
+              <div class="col-md-6">
+                <label for="registerRegion" class="form-label">Regione</label>
+                <select id="registerRegion" class="form-select" disabled required>
+                  <option value="">Seleziona regione</option>
+                </select>
+              </div>
+
+              <!-- CITY -->
+              <div class="col-md-6">
+                <label for="registerCity" class="form-label">Città</label>
+                <select id="registerCity" class="form-select" disabled required>
+                  <option value="">Seleziona città</option>
+                </select>
+              </div>
+          <div class="col-md-6">
+          
+            <label for="profileAddress" class="form-label">Indirizzo</label>
           <input type="text" class="form-control" id="profileAddress" required>
         </div>
       </div>
