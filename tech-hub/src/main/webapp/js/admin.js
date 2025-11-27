@@ -21,28 +21,40 @@ async function loadSkills() {
         skillsMap.clear();
 
         //popolo la mappa delle skill   
-        data.forEach(function(s) {
+        skills.forEach(function(s) {
             skillsMap.set(s.skillId, { name: s.name });
         });
 
         var skillsJobOpCreate = document.getElementById("skillsContainer");
         skillsJobOpCreate.innerHTML = "";
 
-        data.forEach(function(c) {
-            var opt = document.createElement("option");
-            opt.value = c.skillId;
-            opt.textContent = c.name;
-            skillsjobOpCreate.appendChild(opt);
+        skills.forEach(function(s) {
+ 
+            var input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "btn-check";
+            input.id = "skillsJobOpCreate" + s.skillId;
+            input.name = "skillsJobOpCreate[]";
+            input.value = s.skillId;
+            input.autocomplete = "off";
+ 
+            var label = document.createElement("label");
+            label.className = "btn btn-primary";
+            label.htmlFor = input.id;
+            label.textContent = s.name;
+ 
+            skillsJobOpCreate.appendChild(input);
+            skillsJobOpCreate.appendChild(label);
         });
 
         //popolo la lista delle skill del filtro
-        var filterSkills = document.getElementById("filterSkills");
+        var filterSkill = document.getElementById("filterSkill");
 
-        data.forEach(function(s) {
+        skills.forEach(function(s) {
             var opt = document.createElement("option");
             opt.value = s.skillId;
             opt.textContent = s.name;
-            filterSkills.appendChild(opt);
+            filterSkill.appendChild(opt);
         });
     } catch (e) { 
         console.error("Errore loadSkills:", e); 

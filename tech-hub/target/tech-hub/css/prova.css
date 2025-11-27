@@ -382,6 +382,9 @@
 
     div#jobsGrid {          
       min-width: 100%;
+    }
+
+
     /* colore blu base */
     #skillsContainer .btn.btn-primary {
       background-color: #3083ff !important;
