@@ -393,7 +393,7 @@
     /* stato checked: selezionato */
     #skillsContainer .btn-check:checked + label.btn,
     #skillsContainer input[type="checkbox"].btn-check:checked + label.btn {
-      background-color: #105bd4 !important;
+      background-color: #0d52c2 !important;
       box-shadow: inset 0 2px 8px rgba(0,0,0,0.28);
       transform: translateY(0) scale(0.995);
     }

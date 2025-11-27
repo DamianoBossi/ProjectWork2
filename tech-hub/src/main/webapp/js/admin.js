@@ -3,8 +3,6 @@
 var allJobOpenings = [];
 
 //MAPPE GLOBALI
-//TODO: SE CI SONO ANCORA DUE SKILL MAP TOGLIERNE UNA!
-var skillsMap = new Map(); // skillId -> name 
 var citiesMap = new Map(); // cityId -> name 
 var empTypesMap = new Map(); // emptypeId -> name 
 var workSchedMap = new Map(); // workSchedId -> name 
@@ -26,16 +24,16 @@ async function loadSkills() {
             skillsMap.set(s.skillId, { name: s.name });
         });
 
-        var skillsjobOpCreate = document.getElementById("skillsContainer");
-        skillsjobOpCreate.innerHTML = "";
+        var skillsJobOpCreate = document.getElementById("skillsContainer");
+        skillsJobOpCreate.innerHTML = "";
 
         data.forEach(function(s) {
 
             var input = document.createElement("input");
             input.type = "checkbox";
             input.className = "btn-check";
-            input.id = "skillsjobOpCreate" + s.skillId;
-            input.name = "skillsjobOpCreate[]";
+            input.id = "skillsJobOpCreate" + s.skillId;
+            input.name = "skillsJobOpCreate[]";
             input.value = s.skillId;
             input.autocomplete = "off";
 
@@ -44,12 +42,11 @@ async function loadSkills() {
             label.htmlFor = input.id;
             label.textContent = s.name;
 
-            skillsjobOpCreate.appendChild(input);
-            skillsjobOpCreate.appendChild(label);
+            skillsJobOpCreate.appendChild(input);
+            skillsJobOpCreate.appendChild(label);
         });
 
         var filterSkills = document.getElementById("filterSkills");
-        filterSkills.innerHTML = "";
 
         data.forEach(function(s) {
             var opt = document.createElement("option");
@@ -330,23 +327,20 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     var description = document.getElementById('descriptionjobOpCreate').value.trim() || null;
     var ralFrom = document.getElementById('ralFromjobOpCreate').value.trim() || null;
     var ralTo = document.getElementById('ralTojobOpCreate').value.trim() || null;
-    var isOpen = Boolean(document.getElementById('isOpenjobOpCreate').value) || null;
+    var isOpenRaw = document.getElementById('isOpenjobOpCreate').value;
+    var isOpen = isOpenRaw == "1" ? true : false;
     var empTypeId = parseInt(document.getElementById('empTypeIdjobOpCreate').value) || null;
     var workSchedId = parseInt(document.getElementById('workSchedIdjobOpCreate').value) || null;
     var cityId = parseInt(document.getElementById('cityIdjobOpCreate').value) || null;
     var closingDate = String(document.getElementById('closingDatejobOpCreate').value) || null;
     
     // PRENDI LE SKILL SELEZIONATE
-    var skillsSelect = document.getElementById('skillsjobOpCreate');
+    var checkedSkills = document.querySelectorAll('input[name="skillsJobOpCreate[]"]:checked');
     var skills = [];
 
-    for (var i = 0; i < skillsSelect.options.length; i++) {
-        var option = skillsSelect.options[i];
-        if (option.selected) {
-            skills.push(parseInt(option.value));
-        }
+    for (var i = 0; i < checkedSkills.length; i++) {
+        skills.push(parseInt(checkedSkills[i].value));
     }
-
 
     var payload = {
         title,

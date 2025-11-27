@@ -26,7 +26,7 @@
         <!-- SEZIONE FILTRI -->
         <div class="card p-3 mb-4 filter-bar">
             <div class="row g-2 align-items-center">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="filterText" class="form-label mb-1">Cerca una posizione in TechHub Italia</label>
                     <input id="filterText" class="form-control" type="text" placeholder="Inserisci testo da cercare...">
                 </div>
@@ -49,7 +49,7 @@
                     </select>
                 </div>
                 <!--filtro per empTypeId-->
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <label for="filterEmpType" class="form-label mb-1">Contratto</label>
                     <select id="filterEmpType" class="form-select">
                         <option value="">Tutte</option>
@@ -74,9 +74,10 @@
                         <!--TODO: prendere dal back end-->
                     </select>
                 </div>
-                <div id="resetFiltersDiv" class="col-md-2 d-flex justify-content-center">
+                <!--TODO: se avanza tempo implementare il reset-->
+                <!--<div id="resetFiltersDiv" class="col-md-2 d-flex justify-content-center">
                     <button id="resetFilters" type="button" class="btn btn-primary btn-lg btn-icon mt-3">Reset</button>
-                </div>
+                </div>-->
             </div>
         
         
@@ -162,12 +163,12 @@
                     </div>
 
                     <div class="col-md-12">
-                        <label for="skillsjobOpCreate" class="form-label">Seleziona skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
-                        <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="skillsjobOpCreate">   
-                            <!--<input type="checkbox" class="btn-check" id="skillsjobOpCreate1" autocomplete="off" name="skillsjobOpCreate[]" value="1"> 
-                            <label class="btn btn-primary" for="skillsjobOpCreate1">HTML</label>
-                            <input type="checkbox" class="btn-check" id="skillsjobOpCreate2" autocomplete="off"  name="skillsjobOpCreate[]" value="2"> 
-                            <label class="btn btn-primary" for="skillsjobOpCreate2">CSS</label>-->
+                        <label for="skillsJobOpCreate" class="form-label">Seleziona skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+                        <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="skillsJobOpCreate">   
+                            <!--<input type="checkbox" class="btn-check" id="skillsJobOpCreate1" autocomplete="off" name="skillsJobOpCreate[]" value="1"> 
+                            <label class="btn btn-primary" for="skillsJobOpCreate1">HTML</label>
+                            <input type="checkbox" class="btn-check" id="skillsJobOpCreate2" autocomplete="off"  name="skillsJobOpCreate[]" value="2"> 
+                            <label class="btn btn-primary" for="skillsJobOpCreate2">CSS</label>-->
                         </div> 
                     </div>
 
@@ -190,7 +191,6 @@
                         </button>
                     </div>
                 </div>
-
             </form>
         </div>
     </div>
