@@ -696,6 +696,8 @@ function hideButtons(){
     document.getElementById("logout-btn").style.display = "block";
     document.getElementById("reg-btn").style.display = "none";
     document.getElementById("login-btn").style.display = "none";
+    document.getElementById("candidature-btn").style.display = "block";
+
 }
 
 
