@@ -19,11 +19,7 @@ async function loadSkills() {
         var skills = json.data || [];
 
         skillsMap.clear();
-
-        //popolo la mappa delle skill   
-        skills.forEach(function(s) {
-            skillsMap.set(s.skillId, { name: s.name });
-        });
+        skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
 
         var skillsJobOpCreate = document.getElementById("skillsContainer");
         skillsJobOpCreate.innerHTML = "";
@@ -261,7 +257,7 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-    debugger;
+    debugger
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
