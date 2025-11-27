@@ -194,7 +194,7 @@ async function loadWorkSched() {
         workSchedMap.clear();
 
         //popolo la mappa degli orari di lavoro
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             workSchedMap.set(String(c.workSchedId), {
                 name: c.name
             });
@@ -203,7 +203,7 @@ async function loadWorkSched() {
         //popolo la lista degli orari di lavoro della creazione della job opening
         var workSchedjobOpCreate = document.getElementById("workSchedIdjobOpCreate");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.workSchedId;
             opt.textContent = c.name;
@@ -213,7 +213,7 @@ async function loadWorkSched() {
         //popolo la lista degli orari di lavoro del filtro
         var filterWorkSched = document.getElementById("filterWorkSched");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.workSchedId;
             opt.textContent = c.name;
@@ -380,8 +380,8 @@ function openJobDetails(jobId) {
     const skillIds = jobSkillsMap.get(jobId) || [];
     const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
     const workSchedName = workSchedMap.get(String(job.workSchedId))
-    ? workSchedMap.get(String(job.workSchedId)).name
-    : "N/D";
+        ? workSchedMap.get(String(job.workSchedId)).name
+        : "N/D";
 
     document.getElementById("jobDetailTitle").textContent = job.title;
     document.getElementById("jobDetailDescription").textContent = job.description;
@@ -390,15 +390,24 @@ function openJobDetails(jobId) {
     document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
     document.getElementById("jobDetailWorkSched").textContent = workSchedName;
 
+    const skillsWrapper = document.getElementById("skillsWrapper");
+    const container = document.getElementById("jobDetailSkills");
 
-    const ul = document.getElementById("jobDetailSkills");
-    ul.innerHTML = "";
+    container.innerHTML = "";
+
     skillNames.forEach(s => {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.textContent = s;
-        ul.appendChild(li);
+        const pill = document.createElement("span");
+        pill.className = "badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2";
+        pill.textContent = s;
+        container.appendChild(pill);
     });
+
+    if (skillNames.length === 0) {
+        skillsWrapper.style.display = "none";
+    } else {
+        skillsWrapper.style.display = "block";
+    }
+
 
     document.getElementById("jobDetailApplyBtn").onclick = () => {
         openApplyModal(job.jobOpeningId);
@@ -444,8 +453,8 @@ if (document.getElementById("applyForm")) {
         e.preventDefault();
 
         const jobId = document.getElementById("applyJobId").value;
-        const score = document.getElementById("applyStudio").value; 
-        const lettera = document.getElementById("applyLettera").value; 
+        const score = document.getElementById("applyStudio").value;
+        const lettera = document.getElementById("applyLettera").value;
 
         if (!score || !lettera) {
             alert("Compila tutti i campi!");
@@ -610,19 +619,6 @@ function updateJobsCount() {
     if (el) el.textContent = `${visible} opportunità trovate`;
 }
 
-
-
-// =============================================================
-// MODALE CANDIDATURA APPLICAZIONE
-// =============================================================
-function openApplyModal(role) {
-    const modalEl = document.getElementById('registerModal');
-    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
-    else alert("Candidati per: " + role);
-}
-
-
-
 // =============================================================
 // SKILL MANAGER (NO TOUCH)
 // =============================================================
@@ -678,8 +674,8 @@ async function checkAdminLogged() {
     try {
         const res = await fetch('servlet/sessionStatus');
         const json = await res.json();
-        if(json?.message?.isLogged && json?.message?.role == 'admin'){
-        return true;
+        if (json?.message?.isLogged && json?.message?.role == 'admin') {
+            return true;
         } else {
             return false;
         }
@@ -689,7 +685,7 @@ async function checkAdminLogged() {
     }
 }
 
-function hideButtons(){
+function hideButtons() {
     document.getElementById("login-buttons-home").style.display = "none";
     document.getElementById("login-buttons").style.display = "none";
     document.getElementById("profile-btn").style.display = "block";
@@ -720,7 +716,7 @@ if (document.getElementById("logout-btn")) {
             alert("Errore durante il logout: " + e.message);
         }
     };
-} 
+}
 
 
 // =====================================================
@@ -896,15 +892,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadCountries(),
         loadEmpTypes(),
         loadSkills(),
-        loadWorkSched(),   
+        loadWorkSched(),
         loadJobSkills(),
         loadCities(),
         loadRegions(),
     ]);
- 
-    await loadJobs();
- 
 
- 
+    await loadJobs();
+
+
+
     updateJobsCount();
 });
