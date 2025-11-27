@@ -51,10 +51,10 @@ public class RolesIndex extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("roleid", resultSet.getInt("roleid"));
-                skillObj.addProperty("name", resultSet.getString("name"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("roleid", resultSet.getInt("roleid"));
+                jsonObj.addProperty("name", resultSet.getString("name"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);

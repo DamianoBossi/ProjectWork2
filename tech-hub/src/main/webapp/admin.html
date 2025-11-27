@@ -13,97 +13,95 @@
 <body class="admin-area">
     <div class="container my-5">
 
-        <h1 class="text-center text-primary mb-4">
-            <i class="bi bi-shield-lock me-2"></i>Admin - Gestione Posizioni
-        </h1>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="text-center text-primary mb-4">
+                <i class="bi bi-shield-lock me-2"></i>Dashboard gestione annunci
+            </h1>
 
-        <!--TORNA ALLA PAGINA PRINCIPALE-->
-        <div class="text-end mb-4">
-            <a href="prova.html" class="btn btn-primary btn-lg btn-icon">
-                <i class="bi bi-arrow-left-circle"></i> Torna alla pagina principale
-            </a>
+            <div class="btn-container d-flex gap-2" >
+                <div class="text-end mb-4">
+                    <button id="create-btn" type="button" class="btn btn-primary btn-sm btn-icon d-block" aria-label="Create Job">
+                        <i class="bi bi-plus-circle me-2"></i> Nuovo Annuncio
+                    </button>
+                </div>
+                
+                <div class="text-end mb-4">
+                    <button id="logout-btn" type="button" class="btn btn-danger btn-sm btn-icon d-block" aria-label="Logout">
+                        <i class="bi bi-box-arrow-right me-1"></i> Logout
+                    </button>
+                </div>
+            </div>
         </div>
+
+
+
         <!-- SEZIONE FILTRI -->
-        <div class="card p-3 mb-4 filter-bar">
-            <div class="row g-2 align-items-center">
+            <div class="row g-2 mb-4">
                 <div class="col-md-3">
-                    <label for="filterText" class="form-label mb-1">Cerca una posizione in TechHub Italia</label>
-                    <input id="filterText" class="form-control" type="text" placeholder="Inserisci testo da cercare...">
+                    <input type="text" id="jobSearch" class="form-control" placeholder="Cerca una posizione..."
+                        onkeyup="filterJobs()">  
                 </div>
         
                 <!--TODO: permettere selezione multipla per ciascun filtro in cui ha senso se avanza tempo-->
         
                 <div class="col-md-2">
-                    <label for="filterSkills" class="form-label">Seleziona skills</label>
-                    <select id="filterSkills" class="form-select">
-                        <option value="">Tutte</option>
-                        <!--TODO: ricevere da back end-->
-                    </select>
+                    <select id="filterSkill" class="form-select" onchange="filterJobs()">
+                        <option value="">Skill (Tutte)</option>
+                    </select>      
                 </div>
         
                 <div class="col-md-2">
-                    <label for="filterCity" class="form-label mb-1">Sede</label>
-                    <select id="filterCity" class="form-select">
-                        <option value="">Tutte</option>
-                        <!--TODO: prendere dal back end-->
-                    </select>
+                    <select id="filterCity" class="form-select" onchange="filterJobs()">
+                        <option value="">Sede (Tutte)</option>
+                    </select>      
                 </div>
+
                 <!--filtro per empTypeId-->
-                <div class="col-md-1">
-                    <label for="filterEmpType" class="form-label mb-1">Contratto</label>
-                    <select id="filterEmpType" class="form-select">
-                        <option value="">Tutte</option>
-                        <!--TODO: prendere dal back end-->
+                <div class="col-md-2">
+                    <select id="filterEmpType" class="form-select" onchange="filterJobs()">
+                        <option value="">Contratto (Tutti)</option>
+                    </select>      
+                </div>
+
+                <div class="col-md-2">
+                    <select id="filterWorkSched" class="form-select" onchange="filterJobs()">
+                        <option value="">Orari (Tutti)</option>
                     </select>
                 </div>
-                <!--filtro per workSchedId-->
+
                 <div class="col-md-1">
-                    <label for="filterWorkSched" class="form-label mb-1">Orario</label>
-                    <select id="filterWorkSched" class="form-select">
-                        <option value="">Tutti</option>
-                        <!--TODO: prendere dal back end-->
+                    <select id="filterIsOpen" class="form-select" onchange="filterJobs()">
+                        <option value="">Stato</option>
+                        <option value="1">Aperta</option>
+                        <option value="0">Chiusa</option>
                     </select>
-                </div>
-                <!--filtro per isOpen-->
-                <div class="col-md-1">
-                    <label for="filterIsOpen" class="form-label mb-1">Stato</label>
-                    <select id="filterIsOpen" class="form-select">
-                        <option value="">Tutti</option>
-                        <option value="1">Aperto</option>
-                        <option value="0">Chiuso</option>
-                        <!--TODO: prendere dal back end-->
-                    </select>
-                </div>
-                <div id="resetFiltersDiv" class="col-md-2 d-flex justify-content-center">
-                    <button id="resetFilters" type="button" class="btn btn-primary btn-lg btn-icon mt-3">Reset</button>
                 </div>
             </div>
-        
-        
+
+
+         <!-- BOTTONE RESET FILTRI DA IMPLEMENTARE
+            <div id="resetFiltersDiv" class="col-md-2 d-flex justify-content-center">
+                <button id="resetFilters" type="button" class="btn btn-primary btn-lg btn-icon mt-3">Reset</button>
+            </div>
         </div>
-        
+  -->
         <!--SEZIONE ANNUNCI ESISTENTI -->
 
-            <div id="jobSection" class="d-flex align-items-center justify-content-between mb-4">
-      
-        
-                <div class="card p-4 shadow-sm mb-5">
-                    <div class="mb-4 text-center text-primary">
-                        <h4 class="mb-4 text-center text-primary">
-                            <i class="bi bi-card-list me-2"></i>
-                            Annunci Esistenti
-                        </h4>
-                        <span class="text-muted" id="jobsCount"> opportunità trovate</span>
-                        <div class="d-flex align-items-center gap-2">
-                            <div id="jobsGrid" class="row g-4"></div>
-                        </div>
-                    </div>
-                    <div id="jobOpeningsList" class="accordion"></div>
-                </div>
-        
-            </div>
 
-            
+        <div class="mb-4 text-primary">
+            <div class="d-flex justify-content-between" >
+                <h4 class="mb-4 text-center text-primary">
+                    <i class="bi bi-card-list me-2"></i>
+                    Annunci Esistenti
+                </h4>
+                <span class="text-muted" id="jobsCount"> opportunità trovate</span>
+            </div>
+            <div id="jobSection" class="d-flex align-items-center gap-2">
+                <div id="jobsGrid" class="row g-4"></div>
+            </div>
+        </div>
+
+    
      
         
         <!-- SEZIONE CREAZIONE NUOVO ANNUNCIO -->
@@ -147,12 +145,12 @@
 
                     <div class="col-md-4">
                         <label for="ralFromjobOpCreate" class="form-label">RAL minima</label>
-                        <input type="number" class="form-control" id="ralFromjobOpCreate" name="ralFromjobOpCreate" placeholder="Es. 1200">
+                        <input type="number" class="form-control" id="ralFromjobOpCreate" name="ralFromjobOpCreate" placeholder="Es. 250000">
                     </div>
 
                     <div class="col-md-4">
                         <label for="ralTojobOpCreate" class="form-label">RAL massima</label>
-                        <input type="number" class="form-control" id="ralTojobOpCreate" name="ralTojobOpCreate" placeholder="Es. 1500">
+                        <input type="number" class="form-control" id="ralTojobOpCreate" name="ralTojobOpCreate" placeholder="Es.50000">
                     </div>
 
                     <div class="col-12">
@@ -161,10 +159,14 @@
                             placeholder="Descrivi la posizione lavorativa, le responsabilità, i requisiti e le competenze..."></textarea>
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="skillsjobOpCreate" class="form-label">Seleziona skills</label>
-                        <select class="form-select custom-select-height" id="skillsjobOpCreate" name="skillsjobOpCreate[]" multiple> <!--TODO: deve essere vietato non inserire alcuna skill?-->
-                        </select>
+                    <div class="col-md-12">
+                        <label for="skillsJobOpCreate" class="form-label">Seleziona skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+                        <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="skillsJobOpCreate">   
+                            <!--<input type="checkbox" class="btn-check" id="skillsJobOpCreate1" autocomplete="off" name="skillsJobOpCreate[]" value="1"> 
+                            <label class="btn btn-primary" for="skillsJobOpCreate1">HTML</label>
+                            <input type="checkbox" class="btn-check" id="skillsJobOpCreate2" autocomplete="off"  name="skillsJobOpCreate[]" value="2"> 
+                            <label class="btn btn-primary" for="skillsJobOpCreate2">CSS</label>-->
+                        </div> 
                     </div>
 
                     <div class="col-md-4 d-flex flex-column justify-content-center">
@@ -175,20 +177,98 @@
                     <div class="col-md-4 d-flex flex-column justify-content-center">
                         <label for="isOpenjobOpCreate" class="form-label">Stato Annuncio*</label>
                         <select class="form-select" id="isOpenjobOpCreate" name="isOpenjobOpCreate" required>
-                            <option value="1">Aperto</option>
-                            <option value="0">Chiuso</option>
+                            <option value="true">Aperto</option>
+                            <option value="false">Chiuso</option>
                         </select>
                     </div>
-                </div>
 
-                <div class="mt-4 text-center">
-                    <button type="submit" class="btn btn-primary btn-lg btn-icon">
-                        <i class="bi bi-plus-circle"></i> Crea Annuncio
-                    </button>
+                    <div class="col-md-4 d-flex justify-content-center align-items-center">
+                        <button type="submit" class="btn btn-primary btn-lg btn-icon">
+                            <i class="bi bi-plus-circle"></i> Crea Annuncio
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
+
+    <!-- MODALE DETTAGLI JOBS -->
+    <div class="modal fade" id="jobDetailModal" tabindex="-1" aria-labelledby="jobDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+    
+                <div class="modal-header text-white" style="background: var(--bs-primary);">
+                    <h5 class="modal-title fw-semibold" id="jobDetailLabel">Dettagli posizione</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Chiudi"></button>
+                </div>
+    
+                <div class="modal-body p-4">
+    
+                    <h3 id="jobDetailTitle" class="fw-bold mb-3 text-primary"></h3>
+    
+                    <div class="mb-3">
+                        <h6 class="fw-semibold mb-1">Descrizione</h6>
+                        <p id="jobDetailDescription" class="text-muted"></p>
+                    </div>
+    
+                    <div class="row g-3">
+    
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded bg-light">
+                                <h6 class="fw-semibold mb-1"><i class="bi bi-geo-alt-fill text-primary"></i> Sede</h6>
+                                <span id="jobDetailCity" class="text-muted"></span>
+                            </div>
+                        </div>
+    
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded bg-light">
+                                <h6 class="fw-semibold mb-1"><i class="bi bi-briefcase-fill text-primary"></i> Contratto
+                                </h6>
+                                <span id="jobDetailContract" class="text-muted"></span>
+                            </div>
+                        </div>
+    
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded bg-light">
+                                <h6 class="fw-semibold mb-1"><i class="bi bi-wallet-fill text-primary"></i> RAL</h6>
+                                <span id="jobDetailRal" class="text-muted"></span>
+                            </div>
+                        </div>
+    
+                    </div>
+    
+                    <div class="mt-4">
+                        <h6 class="fw-semibold mb-2">Competenze richieste</h6>
+                        <ul id="jobDetailSkills" class="list-group"></ul>
+                    </div>
+    
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-semibold mb-1">
+                                <i class="bi bi-clock-fill text-primary"></i> Orario
+                            </h6>
+                            <span id="jobDetailWorkSched" class="text-muted"></span>
+                        </div>
+                    </div>
+    
+    
+                </div>
+    
+                <div class="modal-footer d-flex justify-content-between">
+    
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Chiudi
+                    </button>
+    
+                    <button class="btn btn-primary fw-semibold" id="jobDetailApplyBtn">
+                        Candidati
+                    </button>
+    
+                </div>
+            </div>
+        </div>
     </div>
+  
 
     <!-- MODALE CANDIDATI e CLASSIFICA -->
     <!--TODO!-->

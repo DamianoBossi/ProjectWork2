@@ -19,7 +19,7 @@ cards.forEach(card => observer.observe(card));
 const countriesMap = new Map(); // countryId -> { name }
 const regionsMap = new Map(); // regionId  -> { name, countryId }
 const citiesMap = new Map(); // cityId    -> { name, regionId }
-const empTypesMap = new Map(); // emptypeId -> name
+const empTypesMap = new Map(); // empTypeId -> name
 const skillsMap = new Map(); // skillId   -> name
 const workSchedMap = new Map(); // workSchedId -> name 
 
@@ -322,7 +322,7 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-
+    debugger
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
@@ -491,6 +491,9 @@ if (document.getElementById("applyForm")) {
 function renderJobs(list) {
     const grid = document.getElementById('jobsGrid');
     if (!grid) return;
+
+    // TOLGO ANNUNCI CHIUSI
+    list = list.filter(job => job.isOpen == "1");
 
     grid.innerHTML = list.map(job => cardJob(job)).join("");
     updateJobsCount();
@@ -661,6 +664,25 @@ async function checkUserLogged() {
         const res = await fetch('servlet/sessionStatus');
         const json = await res.json();
         return json?.message?.isLogged === true;
+    } catch (e) {
+        console.error("Errore checkUserLogged:", e);
+        return false;
+    }
+}
+
+// =====================================================
+// CHECK ADMIN LOGGED
+// =====================================================
+
+async function checkAdminLogged() {
+    try {
+        const res = await fetch('servlet/sessionStatus');
+        const json = await res.json();
+        if(json?.message?.isLogged && json?.message?.role == 'admin'){
+        return true;
+        } else {
+            return false;
+        }
     } catch (e) {
         console.error("Errore checkUserLogged:", e);
         return false;
@@ -859,6 +881,17 @@ window.showHomePage = function () {
 // DOM READY
 // =============================================================
 document.addEventListener("DOMContentLoaded", async () => {
+
+    if (await checkUserLogged()) {
+        hideButtons();
+    }
+
+    if (await checkAdminLogged()) {
+        window.location.href = "admin.html";
+        return;
+    }
+
+    debugger;
     await Promise.all([
         loadCountries(),
         loadEmpTypes(),
@@ -871,9 +904,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  
     await loadJobs();
  
-    if (await checkUserLogged()) {
-        hideButtons();
-    }
+
  
     updateJobsCount();
 });

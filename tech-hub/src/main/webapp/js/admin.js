@@ -3,7 +3,6 @@
 var allJobOpenings = [];
 
 //MAPPE GLOBALI
-var skillsMap = new Map(); // skillId -> name 
 var citiesMap = new Map(); // cityId -> name 
 var empTypesMap = new Map(); // emptypeId -> name 
 var workSchedMap = new Map(); // workSchedId -> name 
@@ -12,15 +11,12 @@ var skillsMap = new Map(); // skillId   -> name
 let allJobs = [];               // tutti i job
 let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
 
-//array JS con gli id delle skill inserite nel form
-var skillsList = [];
-
 //SKILLS
 async function loadSkills() {
     try {
         var res = await fetch(`servlet/skills`);
         var json = await res.json();
-        var data = json.data || [];
+        var skills = json.data || [];
 
         skillsMap.clear();
 
@@ -29,8 +25,8 @@ async function loadSkills() {
             skillsMap.set(s.skillId, { name: s.name });
         });
 
-        //popolo la lista di città della creazione della job opening
-        var skillsjobOpCreate = document.getElementById("skillsjobOpCreate");
+        var skillsJobOpCreate = document.getElementById("skillsContainer");
+        skillsJobOpCreate.innerHTML = "";
 
         data.forEach(function(c) {
             var opt = document.createElement("option");
@@ -104,11 +100,7 @@ async function loadEmpTypes() {
         empTypesMap.clear();
 
         //popolo la mappa dei tipi di contratto
-        data.forEach(function(c) {
-            empTypesMap.set(c.empTypeId, {
-                name: c.name
-            });
-        });
+        data.forEach(t => empTypesMap.set(t.empTypeId, t.name));
 
         //popolo la lista di città della creazione della job opening
         var empTypejobOpCreate = document.getElementById("empTypeIdjobOpCreate");
@@ -248,7 +240,7 @@ function updateJobsCount() {
 // =============================================================
 function cardJob(job) {
 
-    const cityName = citiesMap.get(String(job.cityId)) || 'N/D';
+    const cityName = citiesMap.get(parseInt(job.cityId)) || 'N/D';
     const emptypeName = empTypesMap.get(job.empTypeId) || 'N/D';
 
     const jobId = String(job.jobOpeningId);
@@ -257,19 +249,21 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-
+    debugger;
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
             data-city="${job.cityId}"
             data-contract="${job.empTypeId}"
-            data-skills="${skillIds.join(',')}">
+            data-skills="${skillIds.join(',')}"
+            data-worksched="${job.workSchedId}"
+            data-isopen="${job.isOpen}">
 
-          <div class="card h-100 p-4">
+          <div class="card h-100 p-4 job-clickable" onclick="openJobDetails('${job.jobOpeningId}')">
 
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="mb-1">${job.title}</h5>
-              <span class="badge rounded-pill bg-light text-primary small">${emptypeName.name}</span>
+              <span class="badge rounded-pill bg-light text-primary small">${emptypeName}</span>
             </div>
 
             <div class="text-muted small mb-2">
@@ -288,14 +282,58 @@ function cardJob(job) {
                 <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
               </div>
 
-              <button class="btn btn-sm btn-primary" onclick="openApplyModal('${job.title}')">
-                Candidati
+              <button class="btn btn-sm btn-primary" onclick="">
+                Apri/Chiudi Posizione
               </button>
             </div>
 
           </div>
         </div>
     `;
+}
+
+
+
+// =====================================================
+// MODALE DETTAGLI JOBS 
+// =====================================================
+function openJobDetails(jobId) {
+
+    const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
+    if (!job) return;
+
+    const city = citiesMap.get(parseInt(job.cityId));
+    const contract = empTypesMap.get(job.empTypeId);
+
+    const skillIds = jobSkillsMap.get(jobId) || [];
+    const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
+    const workSchedName = workSchedMap.get(String(job.workSchedId))
+    ? workSchedMap.get(String(job.workSchedId)).name
+    : "N/D";
+
+    document.getElementById("jobDetailTitle").textContent = job.title;
+    document.getElementById("jobDetailDescription").textContent = job.description;
+    document.getElementById("jobDetailCity").textContent = city ? city.name : "N/D";
+    document.getElementById("jobDetailContract").textContent = contract || "N/D";
+    document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
+    document.getElementById("jobDetailWorkSched").textContent = workSchedName;
+
+
+    const ul = document.getElementById("jobDetailSkills");
+    ul.innerHTML = "";
+    skillNames.forEach(s => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.textContent = s;
+        ul.appendChild(li);
+    });
+
+    document.getElementById("jobDetailApplyBtn").onclick = () => {
+        openApplyModal(job.jobOpeningId);
+    };
+
+    const modal = new bootstrap.Modal(document.getElementById("jobDetailModal"));
+    modal.show();
 }
 
 
@@ -310,6 +348,56 @@ function renderJobs(list) {
     grid.innerHTML = list.map(job => cardJob(job)).join("");
     updateJobsCount();
 }
+
+
+// =====================================================
+// FILTRI JOBS
+// =====================================================
+function filterJobs() {
+    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+    const fSkill = document.getElementById('filterSkill')?.value || '';
+    const fCity = document.getElementById('filterCity')?.value || '';
+    const fContract = document.getElementById('filterEmpType')?.value || '';
+    const fWorkSched = document.getElementById('filterWorkSched')?.value || '';
+    const fOpen = document.getElementById('filterIsOpen')?.value || '';
+
+    const cards = document.querySelectorAll('.job-card');
+
+    cards.forEach(card => {
+        const title = card.querySelector('h5').textContent.toLowerCase();
+        const city = card.dataset.city || '';
+        const contract = card.dataset.contract || '';
+        const skills = card.dataset.skills
+            ? card.dataset.skills.split(',').filter(s => s)
+            : [];
+        const workSched = card.dataset.worksched || '';
+        const isOpen = card.dataset.isopen || '';
+
+        const matchSearch = search ? (title.includes(search) || card.textContent.toLowerCase().includes(search)) : true;
+        const matchCity = fCity ? (city === fCity) : true;
+        const matchContract = fContract ? (contract === fContract) : true;
+        const matchSkill = fSkill ? skills.includes(fSkill) : true;
+        const matchWorkSched = fWorkSched ? (workSched === fWorkSched) : true;
+        const matchIsOpen = fOpen ? (isOpen === fOpen) : true;
+
+        if (matchSearch && matchCity && matchContract && matchSkill && matchWorkSched && matchIsOpen) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    updateJobsCount();
+}
+
+// HANDLER BOTTONE CREA NUOVO ANNUNCIO 
+document.getElementById('create-btn').addEventListener('click', function () {
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+    });
+});
+
 
 
 //CREAZIONE NUOVO ANNUNCIO 
@@ -327,16 +415,12 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     var closingDate = String(document.getElementById('closingDatejobOpCreate').value) || null;
     
     // PRENDI LE SKILL SELEZIONATE
-    var skillsSelect = document.getElementById('skillsjobOpCreate');
+    var checkedSkills = document.querySelectorAll('input[name="skillsJobOpCreate[]"]:checked');
     var skills = [];
 
-    for (var i = 0; i < skillsSelect.options.length; i++) {
-        var option = skillsSelect.options[i];
-        if (option.selected) {
-            skills.push(parseInt(option.value));
-        }
+    for (var i = 0; i < checkedSkills.length; i++) {
+        skills.push(parseInt(checkedSkills[i].value));
     }
-
 
     var payload = {
         title,
@@ -372,8 +456,58 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     }
 });
 
+
+
+// =====================================================
+// CHECK ADMIN LOGGED
+// =====================================================
+
+async function checkAdminLogged() {
+    try {
+        const res = await fetch('servlet/sessionStatus');
+        const json = await res.json();
+        if(json?.message?.isLogged && json?.message?.role == 'admin'){
+        return true;
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error("Errore checkUserLogged:", e);
+        return false;
+    }
+}
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+
+if (document.getElementById("logout-btn")) {
+    document.getElementById("logout-btn").onclick = async () => {
+        try {
+            const res = await fetch('servlet/logout', {
+                method: "POST"
+            });
+            if (res.ok) {
+                window.location.href = "prova.html";
+            }
+        } catch (e) {
+            console.error("Errore logout:", e);
+            alert("Errore durante il logout: " + e.message);
+        }
+    };
+} 
+
+
 // DOM READY
 document.addEventListener("DOMContentLoaded", async () => {
+
+    if (!(await checkAdminLogged())) {
+        window.location.href = "prova.html";
+        return;
+    }
+
     await Promise.all([
         loadSkills(),
         loadCities(),
@@ -384,21 +518,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadJobs();
 
-    updateJobsCount();
-});
-
-//CONSENTO SELEZIONE MULTIPLA CON UN SEMPLICE CLICK SX NELLA SELECT DELLE SKILLS NELLA CREAZIONE DELLA JOB OP:
-const skillsSelect = document.getElementById('skillsjobOpCreate');
-
-skillsSelect.addEventListener('mousedown', function(e) {
-    e.preventDefault(); // previene la selezione standard
-
-    const option = e.target;
-    if (option.tagName == 'OPTION') {
-        option.selected = !option.selected; // toggle selezione
-    }
-
-    // opzionale: triggera il change event se necessario
-    const event = new Event('change', { bubbles: true });
-    skillsSelect.dispatchEvent(event);
+    //updateJobsCount();
 });

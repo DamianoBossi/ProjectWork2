@@ -51,10 +51,10 @@ public class JobOpeningsSkillsIndex extends HttpServlet {
 
             JsonArray dataArray = new JsonArray();
             while (resultSet.next()) {
-                JsonObject skillObj = new JsonObject();
-                skillObj.addProperty("jobOpeningId", resultSet.getInt("jobOpeningId"));
-                skillObj.addProperty("skillId", resultSet.getString("skillId"));
-                dataArray.add(skillObj);
+                JsonObject jsonObj = new JsonObject();
+                jsonObj.addProperty("jobOpeningId", resultSet.getInt("jobOpeningId"));
+                jsonObj.addProperty("skillId", resultSet.getString("skillId"));
+                dataArray.add(jsonObj);
             }
 
             jsonResponse.add("data", dataArray);
