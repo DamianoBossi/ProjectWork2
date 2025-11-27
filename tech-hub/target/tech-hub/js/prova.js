@@ -322,7 +322,7 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-    debugger
+     
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
@@ -410,7 +410,7 @@ function openJobDetails(jobId) {
 
 
 // =====================================================
-// APERTURA MODALE DA LOGGATO O DA REGISTRATO 
+// APERTURA MODALE CANDIDATURA DA LOGGATO O DA REGISTRATO 
 // =====================================================
 async function openApplyModal(jobId) {
     // controllo login
@@ -420,8 +420,16 @@ async function openApplyModal(jobId) {
         bootstrap.Modal.getOrCreateInstance(
             document.getElementById('registerModal')
         ).show();
+
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('jobDetailModal')).hide();
+
         return;
     }
+
+    bootstrap.Modal.getOrCreateInstance(
+        document.getElementById('jobDetailModal')).hide();
+
 
     //SE LOGGATO GLI APRO IL MODALE DA LOGGATO
     const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
@@ -546,18 +554,6 @@ function updateJobsCount() {
 }
 
 
-// =====================================================
-// MODALE CANDIDATURA APPLICAZIONE
-// =====================================================
-function openApplyModal(role) {
-    const modalEl = document.getElementById('registerModal');
-    if (modalEl) {
-        bootstrap.Modal.getOrCreateInstance(modalEl).show();
-    } else {
-        alert("Candidati per: " + role);
-    }
-}
-
 
 // =====================================================
 // GESTIONE SKILLS 
@@ -609,18 +605,6 @@ function updateJobsCount() {
     const el = document.getElementById('jobsCount');
     if (el) el.textContent = `${visible} opportunità trovate`;
 }
-
-
-
-// =============================================================
-// MODALE CANDIDATURA APPLICAZIONE
-// =============================================================
-function openApplyModal(role) {
-    const modalEl = document.getElementById('registerModal');
-    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
-    else alert("Candidati per: " + role);
-}
-
 
 
 // =============================================================
@@ -799,6 +783,20 @@ if (document.getElementById("registerForm")) {
     registerForm.addEventListener("submit", handleRegisterSubmit);
 }
 
+const loginFromRegister = document.getElementById("login-from-register");
+
+if (loginFromRegister) {
+    loginFromRegister.addEventListener("click", () => {
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('registerModal')
+        ).hide();
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('loginModal')
+        ).show();
+    });
+}
+
+
 
 //Country on change
 if (document.getElementById("registerCountry")) {
@@ -891,7 +889,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    debugger;
+     ;
     await Promise.all([
         loadCountries(),
         loadEmpTypes(),
