@@ -770,6 +770,38 @@ async function handleRegisterSubmit(e) {
             window.location.href = json.redirect;
         }
 
+
+        
+            try {
+                const res = await fetch("servlet/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+        
+                const json = await res.json();
+        
+                if (!json.success) throw new Error(json.message || "Credenziali errate");
+        
+                if (json.redirect) {
+                    window.location.href = json.redirect;
+                }
+        
+                localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+                bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
+        
+                hideButtons();
+        
+        
+            } catch (e) {
+                console.error("Errore login:", e);
+                alert(e.message);
+            }
+
+
+
+
+
         registerForm.reset();
         skillsList.length = 0;
         const ul = document.getElementById("skillsList");
