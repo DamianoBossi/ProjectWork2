@@ -1,11 +1,3 @@
-// =====================================================
-// LOGOUT
-// =====================================================
-document.getElementById("logoutBtn").addEventListener("click", function () {
-  localStorage.removeItem("user");
-  sessionStorage.removeItem("user");
-  window.location.href = "prova.html";
-});
 
 const countriesMap = new Map(); // countryId -> { name }
 const regionsMap = new Map(); // regionId  -> { name, countryId }
@@ -147,6 +139,28 @@ async function loadCities(regionId) {
         console.error("Errore loadCities:", e);
     }
 }
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+
+if (document.getElementById("logout-btn")) {
+    document.getElementById("logout-btn").onclick = async () => {
+        try {
+            const res = await fetch('servlet/logout', {
+                method: "POST"
+            });
+            if (res.ok) {
+                window.location.href = "prova.html";
+            }
+        } catch (e) {
+            console.error("Errore logout:", e);
+            alert("Errore durante il logout: " + e.message);
+        }
+    };
+} 
+
 
 
 // =====================================================
