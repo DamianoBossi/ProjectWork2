@@ -81,23 +81,29 @@
           <div class="col-md-6">
           
             <label for="profileAddress" class="form-label">Indirizzo</label>
-          <input type="text" class="form-control" id="profileAddress" required>
-        </div>
+            <input type="text" class="form-control" id="profileAddress" required>
+          </div>
+
+          <div class="col-md-12">
+              <label for="skillsProfile" class="form-label">Le tue skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+              <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="skillsProfile">   
+                    <!--<input type="checkbox" class="btn-check" id="skillsProfile1" autocomplete="off" name="skillsProfile[]" value="1"> 
+                    <label class="btn btn-primary" for="skillsProfile1">HTML</label>
+                    <input type="checkbox" class="btn-check" id="skillsProfile2" autocomplete="off"  name="skillsProfile[]" value="2"> 
+                    <label class="btn btn-primary" for="skillsProfile2">CSS</label>-->
+              </div> 
+          </div>
+
+          <div class="mb-3">
+            <label for="profileCv" class="form-label">CV (PDF/DOC)</label>
+            <input type="file" class="form-control" id="profileCv" accept=".pdf,.doc,.docx">
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-sm btn-icon">
+            <i class="bi bi-save me-2"></i>Salva Modifiche
+          </button>
       </div>
 
-      <div class="mb-3">
-        <label for="profileSkills" class="form-label">Skills (separate da virgola)</label>
-        <input type="text" class="form-control" id="profileSkills" placeholder="React, Node.js, SQL">
-      </div>
-
-      <div class="mb-3">
-        <label for="profileCv" class="form-label">CV (PDF/DOC)</label>
-        <input type="file" class="form-control" id="profileCv" accept=".pdf,.doc,.docx">
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-sm btn-icon">
-        <i class="bi bi-save me-2"></i>Salva Modifiche
-      </button>
     </form>
   </div>
 

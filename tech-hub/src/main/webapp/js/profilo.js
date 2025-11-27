@@ -16,9 +16,6 @@ const workSchedMap = new Map(); // workSchedId -> name
 let allJobs = [];               // tutti i job
 let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
 
-// array JS con i nomi delle skill inserite nel form
-const skillsList = [];
-
 
 // -------- COUNTRIES --------
 async function loadCountries() {
@@ -42,8 +39,6 @@ async function loadCountries() {
             opt.textContent = c.name;
             sel.appendChild(opt);
         });
-
-debugger;
 
     } catch (e) {
         console.error("Errore loadCountries:", e);
@@ -147,6 +142,45 @@ async function loadCities(regionId) {
     }
 }
 
+//SKILLS
+async function loadSkills() {
+    try {
+        var res = await fetch(`servlet/skills`);
+        var json = await res.json();
+        var skills = json.data || [];
+
+        skillsMap.clear();
+
+        //popolo la mappa delle skill   
+        skills.forEach(function(s) {
+            skillsMap.set(s.skillId, { name: s.name });
+        });
+
+        var skillsProfile = document.getElementById("skillsContainer");
+        skillsProfile.innerHTML = "";
+
+        skills.forEach(function(s) {
+ 
+            var input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "btn-check";
+            input.id = "skillsProfile" + s.skillId;
+            input.name = "skillsProfile[]";
+            input.value = s.skillId;
+            input.autocomplete = "off";
+ 
+            var label = document.createElement("label");
+            label.className = "btn btn-primary";
+            label.htmlFor = input.id;
+            label.textContent = s.name;
+ 
+            skillsProfile.appendChild(input);
+            skillsProfile.appendChild(label);
+        });
+    } catch (e) { 
+        console.error("Errore loadSkills:", e); 
+    }
+}
 
 // =====================================================
 // EVENT LISTENER SU COUNTRY E REGION   da chat
@@ -161,4 +195,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   document.getElementById("registerRegion").addEventListener("change", function () {
     loadCities(this.value);
   });
+
+  await loadSkills();
 });

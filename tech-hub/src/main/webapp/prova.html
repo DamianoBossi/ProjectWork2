@@ -497,25 +497,14 @@
               </div>
             </div>
 
-            <hr class="my-3">
-
-            <!-- 1 SOLO ARRAY SKILLS -->
-            <div class="row g-3">
-              <div class="col-md-8">
-                <label class="form-label">Skills</label>
-                <input type="text" id="skillInput" class="form-control"
-                  placeholder="Esempio: React, Comunicazione, SQL">
-              </div>
-              <div class="col-md-4 d-flex align-items-end">
-                <button class="btn btn-outline-secondary w-100" type="button" id="addSkillBtn">
-                  Aggiungi Skill
-                </button>
-              </div>
-
-              <div class="col-12">
-                <ul id="skillsList" class="list-group"></ul>
-                <small class="text-muted">Clicca su una skill per rimuoverla.</small>
-              </div>
+            <div class="col-md-12">
+                <label for="skillsRegistration" class="form-label">Seleziona le tue skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+                <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="skillsRegistration">   
+                      <!--<input type="checkbox" class="btn-check" id="skillsRegistration1" autocomplete="off" name="skillsRegistration[]" value="1"> 
+                      <label class="btn btn-primary" for="skillsRegistration1">HTML</label>
+                      <input type="checkbox" class="btn-check" id="skillsRegistration2" autocomplete="off"  name="skillsRegistration[]" value="2"> 
+                      <label class="btn btn-primary" for="skillsRegistration2">CSS</label>-->
+                </div> 
             </div>
 
             <div class="mt-4 d-grid">
