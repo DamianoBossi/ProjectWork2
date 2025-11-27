@@ -477,6 +477,22 @@
     }
 
 
+/* parte candidature */ 
 
+.filter-bar {
+  margin-top: 20px;
+}
+
+.filter-bar .form-control,
+.filter-bar .form-select {
+  height: 45px;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .filter-bar > div {
+    margin-bottom: 10px;
+  }
+}
 
 
