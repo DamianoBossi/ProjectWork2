@@ -142,11 +142,11 @@
         </div>
       </div>
     </div>
-    
+
     <!-- WHY SECTION -->
     <section class="why-section">
       <div class="container text-center">
-        <btn onclick="showJobsPage()"; class="why-heading-small">Lavora Con Noi</btn>
+        <btn onclick="showJobsPage()" ; class="why-heading-small">Lavora Con Noi</btn>
         <h2 class="why-title">Perché Scegliere TechHub Italia</h2>
         <p class="why-subtitle mx-auto">
           Offriamo un ambiente di lavoro stimolante dove puoi crescere professionalmente e fare davvero la differenza.
@@ -213,37 +213,38 @@
       <div class="d-flex align-items-center gap-2">
         <div class="text-muted" id="jobsCount">0 opportunità trovate</div>
 
-       <div id="login-buttons" class="d-flex gap-2">
-        <button id="login-btn" type="button" class="btn btn-primary btn-sm btn-icon" data-bs-toggle="modal"
-         data-bs-target="#loginModal" aria-label="Accedi">
-         <i class="bi bi-person-fill me-1"></i> Accedi
-        </button>
-
-         <button id="reg-btn" type="button" class="btn btn-primary btn-sm btn-icon" data-bs-toggle="modal"
-           data-bs-target="#registerModal" aria-label="Registrati">
-           <i class="bi bi-person-plus me-1"></i> Registrati
+        <div id="login-buttons" class="d-flex gap-2">
+          <button id="login-btn" type="button" class="btn btn-primary btn-sm btn-icon" data-bs-toggle="modal"
+            data-bs-target="#loginModal" aria-label="Accedi">
+            <i class="bi bi-person-fill me-1"></i> Accedi
           </button>
 
-        <a id="profile-btn" href="profilo.html" class="btn btn-primary btn-sm btn-icon" aria-label="Profilo">
-         <i class="bi bi-person me-1"></i> Profilo
-         </a>
+          <button id="reg-btn" type="button" class="btn btn-primary btn-sm btn-icon" data-bs-toggle="modal"
+            data-bs-target="#registerModal" aria-label="Registrati">
+            <i class="bi bi-person-plus me-1"></i> Registrati
+          </button>
 
-        <a id="candidature-btn" href="candidature.html" class="btn btn-primary btn-sm btn-icon" aria-label="Le mie candidature">
-         <i class="bi bi-card-list me-1"></i> Le mie candidature
-        </a>
+          <a id="profile-btn" href="profilo.html" class="btn btn-primary btn-sm btn-icon" aria-label="Profilo">
+            <i class="bi bi-person me-1"></i> Profilo
+          </a>
 
-        <button id="logout-btn" type="button" class="btn btn-danger btn-sm btn-icon" aria-label="Logout">
-          <i class="bi bi-box-arrow-right me-1"></i> Logout
-        </button>
+          <a id="candidature-btn" href="candidature.html" class="btn btn-primary btn-sm btn-icon"
+            aria-label="Le mie candidature">
+            <i class="bi bi-card-list me-1"></i> Le mie candidature
+          </a>
+
+          <button id="logout-btn" type="button" class="btn btn-danger btn-sm btn-icon" aria-label="Logout">
+            <i class="bi bi-box-arrow-right me-1"></i> Logout
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
     <!-- FILTRI -->
     <div class="row mb-4 g-2">
       <div class="col-md-4">
-        <input type="text" id="jobSearch" class="form-control"
-          placeholder="Cerca una posizione in TechHub Italia" onkeyup="filterJobs()">
+        <input type="text" id="jobSearch" class="form-control" placeholder="Cerca una posizione in TechHub Italia"
+          onkeyup="filterJobs()">
       </div>
 
       <div class="col-md-3">
@@ -276,22 +277,22 @@
   <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-  
+
         <div class="modal-header text-white" style="background: var(--bs-primary);">
           <h5 class="modal-title fw-semibold" id="applyModalLabel">Invia Candidatura</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
         </div>
-  
+
         <div class="modal-body p-4">
           <form id="applyForm">
-  
+
             <!-- IMPORTANTE: PER IL JOB ID -->
             <input type="hidden" id="applyJobId">
-  
+
             <div class="mb-3">
               <h4 id="applyJobTitle" class="text-primary fw-bold"></h4>
             </div>
-  
+
             <div class="mb-3">
               <label class="form-label fw-semibold">Titolo di studio</label>
               <select class="form-select" id="applyStudio" required>
@@ -304,100 +305,100 @@
                 <option value="6">Dottorato</option>
               </select>
             </div>
-  
-  
+
+
             <div class="mb-3">
               <label class="form-label fw-semibold">Lettera di presentazione</label>
               <textarea class="form-control" id="applyLettera" rows="6" required></textarea>
             </div>
-  
+
             <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
               Invia candidatura
             </button>
-  
+
           </form>
         </div>
-  
+
       </div>
     </div>
   </div>
-  
-  
-  
+
+
+
   <!-- MODALE DETTAGLI JOBS -->
   <div class="modal fade" id="jobDetailModal" tabindex="-1" aria-labelledby="jobDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-  
+
         <div class="modal-header text-white" style="background: var(--bs-primary);">
           <h5 class="modal-title fw-semibold" id="jobDetailLabel">Dettagli posizione</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
         </div>
-  
-        <div class="modal-body p-4">
-  
-          <h3 id="jobDetailTitle" class="fw-bold mb-3 text-primary"></h3>
-  
-          <div class="mb-3">
-            <h6 class="fw-semibold mb-1">Descrizione</h6>
-            <p id="jobDetailDescription" class="text-muted"></p>
-          </div>
-  
-          <div class="row g-3">
-  
-            <div class="col-md-4">
-              <div class="p-3 border rounded bg-light">
-                <h6 class="fw-semibold mb-1"><i class="bi bi-geo-alt-fill text-primary"></i> Sede</h6>
-                <span id="jobDetailCity" class="text-muted"></span>
-              </div>
+
+        <!-- RIGA INFO PRINCIPALI -->
+        <div class="row g-3 row-cols-1 row-cols-md-4 mt-3">
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1">
+                <i class="bi bi-geo-alt-fill text-primary"></i> Sede
+              </h6>
+              <span id="jobDetailCity" class="text-muted"></span>
             </div>
-  
-            <div class="col-md-4">
-              <div class="p-3 border rounded bg-light">
-                <h6 class="fw-semibold mb-1"><i class="bi bi-briefcase-fill text-primary"></i> Contratto</h6>
-                <span id="jobDetailContract" class="text-muted"></span>
-              </div>
-            </div>
-  
-            <div class="col-md-4">
-              <div class="p-3 border rounded bg-light">
-                <h6 class="fw-semibold mb-1"><i class="bi bi-wallet-fill text-primary"></i> RAL</h6>
-                <span id="jobDetailRal" class="text-muted"></span>
-              </div>
-            </div>
-  
           </div>
-  
-          <div class="mt-4">
-            <h6 class="fw-semibold mb-2">Competenze richieste</h6>
-            <ul id="jobDetailSkills" class="list-group"></ul>
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1">
+                <i class="bi bi-briefcase-fill text-primary"></i> Contratto
+              </h6>
+              <span id="jobDetailContract" class="text-muted"></span>
+            </div>
           </div>
-  
-          <div class="col-md-4">
-            <div class="p-3 border rounded bg-light">
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1">
+                <i class="bi bi-wallet-fill text-primary"></i> RAL
+              </h6>
+              <span id="jobDetailRal" class="text-muted"></span>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
               <h6 class="fw-semibold mb-1">
                 <i class="bi bi-clock-fill text-primary"></i> Orario
               </h6>
               <span id="jobDetailWorkSched" class="text-muted"></span>
             </div>
           </div>
-  
-  
+
         </div>
-  
-        <div class="modal-footer d-flex justify-content-between">
-  
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            Chiudi
-          </button>
-  
-          <button class="btn btn-primary fw-semibold" id="jobDetailApplyBtn">
-            Candidati
-          </button>
-  
+
+
+        <div id="skillsWrapper" class="mt-4">
+          <h6 class="fw-semibold mb-2">Competenze richieste</h6>
+          <div id="jobDetailSkills" class="d-flex flex-wrap gap-2"></div>
         </div>
+
+
+
+      </div>
+
+      <div class="modal-footer d-flex justify-content-between">
+
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Chiudi
+        </button>
+
+        <button class="btn btn-primary fw-semibold" id="jobDetailApplyBtn">
+          Candidati
+        </button>
+
       </div>
     </div>
+  </div>
   </div>
 
 
@@ -481,7 +482,8 @@
               <!-- ADDRESS (simple string) -->
               <div class="col-12">
                 <label for="registerAddress" class="form-label">Indirizzo</label>
-                <input type="text" class="form-control" id="registerAddress" placeholder="Via, numero, interno" required>
+                <input type="text" class="form-control" id="registerAddress" placeholder="Via, numero, interno"
+                  required>
               </div>
 
               <div class="col-12">

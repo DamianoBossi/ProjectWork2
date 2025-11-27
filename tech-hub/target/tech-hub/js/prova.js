@@ -226,8 +226,6 @@ async function loadWorkSched() {
 }
 
 
-
-
 // -------- SKILLS --------
 async function loadSkills() {
     try {
