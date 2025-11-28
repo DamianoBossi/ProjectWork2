@@ -236,6 +236,32 @@ async function loadSkills() {
         skillsMap.clear();
         skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
 
+
+        // PILLS DELLE SKILLS NELLA REGISTRAZIONE
+        var skillsRegistration = document.getElementById("skillsContainer");
+        skillsRegistration.innerHTML = "";
+ 
+        skills.forEach(function(s) {
+ 
+            var input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "btn-check";
+            input.id = "skillsRegistration" + s.skillId;
+            input.name = "skillsRegistration[]";
+            input.value = s.skillId;
+            input.autocomplete = "off";
+ 
+            var label = document.createElement("label");
+            label.className = "btn btn-primary";
+            label.htmlFor = input.id;
+            label.textContent = s.name;
+ 
+            skillsRegistration.appendChild(input);
+            skillsRegistration.appendChild(label);
+        });
+
+
+
         // filtro skill
         const filterSkill = document.getElementById('filterSkill');
         if (filterSkill) {
@@ -731,15 +757,15 @@ async function handleRegisterSubmit(e) {
     const cityId = registerCity.value || "";
     const address = registerAddress.value.trim();
 
-    // mappo skillsList (nomi) -> ids basandomi su SKILLS
-    const lowerInserted = skillsList.map(s => s.toLowerCase());
-    const skillIds = [];
-    for (const [id, name] of skillsMap.entries()) {
-        if (lowerInserted.includes(name.toLowerCase())) {
-            skillIds.push(parseInt(id, 10));
-        }
+ 
+    // PRENDI LE SKILL SELEZIONATE
+    var checkedSkills = document.querySelectorAll('input[name="skillsRegistration[]"]:checked');
+    var skills = [];
+ 
+    for (var i = 0; i < checkedSkills.length; i++) {
+        skills.push(parseInt(checkedSkills[i].value));
     }
-
+ 
     const payload = {
         firstName,
         lastName,
@@ -750,7 +776,7 @@ async function handleRegisterSubmit(e) {
         regionId: regionId ? parseInt(regionId, 10) : null,
         cityId: cityId ? parseInt(cityId, 10) : null,
         address,
-        skills: skillIds
+        skills: skills
     };
 
     try {

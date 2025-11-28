@@ -292,7 +292,7 @@ function cardJob(job) {
               </div>
 
               <div class="btn-container d-flex gap-2 ms-auto" >
-                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="">
+                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="event.stopPropagation(); toggleJobStatus('${jobId}')">
                 ${job.isOpen == '1' ? 'Chiudi posizione' : 'Apri posizione'}
                 </button>
 
@@ -451,6 +451,24 @@ async function loadRanking(jobId) {
         console.error("Errore ranking:", err);
     }
 }
+
+
+// =============================================================
+// APRI/CHIUDI POSIZIONE LAVORATIVA
+// =============================================================
+
+function toggleJobStatus(jobId) {
+    fetch(`servlet/jobopenings/update?jobOpeningId=${jobId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadJobs();
+        } else {
+            alert('Errore durante aggiornamento posizione lavorativa: ' + data.message);
+        }
+    });
+}
+
 
 
 

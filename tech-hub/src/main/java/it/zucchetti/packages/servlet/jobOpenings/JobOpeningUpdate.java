@@ -16,7 +16,7 @@ import it.zucchetti.packages.jdbc.JDBCConnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -31,7 +31,6 @@ public class JobOpeningUpdate extends HttpServlet {
 
         Connection connection = null;
         Statement statement = null;
-        ResultSet resultSet = null;
 
         PrintWriter out = response.getWriter();
         Gson gson = new Gson();
@@ -46,10 +45,10 @@ public class JobOpeningUpdate extends HttpServlet {
 
             String requestedJobOpeningId = request.getParameter("jobOpeningId");
 
-            String query = "UPDATE JOBOPENINGS SET ISOPEN = CASE WHEN ISOPEN=1 THEN 0 ELSE 1 END WHERE JOBOPENINGID = '"
-                    + requestedJobOpeningId + "'";
-
-            int rowsAffected = statement.executeUpdate(query);
+            String query = "UPDATE JOBOPENINGS SET ISOPEN = CASE WHEN ISOPEN=1 THEN 0 ELSE 1 END WHERE JOBOPENINGID = ?";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, Integer.parseInt(requestedJobOpeningId)); // se è numerico
+            int rowsAffected = ps.executeUpdate();
 
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
@@ -63,7 +62,7 @@ public class JobOpeningUpdate extends HttpServlet {
             out.write(gson.toJson(errorResponse("Errore: driver JDBC non trovato.")));
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write(gson.toJson(errorResponse("Errore: errore SQL.")));
+            out.write(gson.toJson(errorResponse(e.getMessage())));
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write(gson.toJson(errorResponse("Errore: errore inaspettato.")));
