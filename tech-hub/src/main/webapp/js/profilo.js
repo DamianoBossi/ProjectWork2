@@ -9,7 +9,9 @@ var myLastName = "";
 var myEmail = "";
 var myBirthDate = "";
 var myCountry = 0;
+var oldCountry = myCountry;
 var myRegion = 0;
+var oldRegion = myRegion;
 var myCity = 0;
 var myAddress = "";
 var mySkills = [];
@@ -17,39 +19,20 @@ var mySkills = [];
 
 async function initializeProfile() {
     try {
-        const res = await fetch('servlet/user/me');
+        const res = await fetch('servlet/users/me');
         const json = await res.json();
-        const data = json.data || [];
-
-        //TODO: per i prox if era meglio forse lanciare errore
-        const firstNameSel = document.getElementById("profileCountry");
-        if (!firstNameSel) return;
-        const lastNameSel = document.getElementById("profileCountry");
-        if (!lastNameSel) return;
-        const emailSel = document.getElementById("profileCountry");
-        if (!emailSel) return;
-        const birthDateSel = document.getElementById("profileCountry");
-        if (!birthDateSel) return;
-        const countrySel = document.getElementById("profileCountry");
-        if (!countrySel) return;
-        const regionSel = document.getElementById("profileCountry");
-        if (!regionSel) return;
-        const citySel = document.getElementById("profileCountry");
-        if (!citySel) return;
-        const addressSel = document.getElementById("profileCountry");
-        if (!addressSel) return;
-        const skillsSel = document.getElementById("profileCountry");
-        if (!skillsSel) return;
-        /*TODO: const cvSel = document.getElementById("profileCountry");
-        if (!cvSel) return;*/
+        const dataRaw = json.data || [];
+        const data = dataRaw[0];
 
         myFirstName = data.firstName;
-        myLastName = data.firstName;
+        myLastName = data.lastName;
         myEmail = data.email;
         myBirthDate = data.birthDate;
-        myCountry = data.country;
-        myRegion = data.region;
-        myCity = data.city;
+        myCountry = data.countryId;
+        oldCountry = myCountry;
+        myRegion = data.regionId;
+        oldRegion = myRegion;
+        myCity = data.cityId;
         myAddress = data.address;
         mySkills = data.skills;
     } catch (e) {
@@ -67,7 +50,6 @@ async function loadCountries() {
         countriesMap.clear();
 
         const sel = document.getElementById("profileCountry");
-        if (!sel) return;
 
         data.forEach(c => {
             countriesMap.set(String(c.countryId), c.name);
@@ -87,16 +69,16 @@ async function loadCountries() {
 }
 
 // -------- REGIONS --------
-async function loadRegions(countryId) {
+async function loadRegions() {
 
     const sel = document.getElementById("profileRegion");
-    const citySel = document.getElementById("profileCity");
 
     try {
         const res = await fetch(`servlet/regions`);
         const json = await res.json();
         const data = json.data || [];
 
+        sel.innerHTML = "";
         regionsMap.clear();
 
         data.forEach(r => {
@@ -106,17 +88,28 @@ async function loadRegions(countryId) {
             });
         });
 
+        var optVuota = document.createElement("option");
+        optVuota.id = "regOptVuota";
+        optVuota.value = "";
+        optVuota.disabled = true;
+        optVuota.selected = true;
+        optVuota.textContent = "Seleziona una regione";
+
+        sel.appendChild(optVuota);
+
         data.forEach(r => {
-            if (String(r.countryId) === String(countryId)) {
+            if (String(r.countryId) == String(myCountry)) {
                 const opt = document.createElement("option");
-                if (r.regionId == myRegion) {
-                    opt.selected = true
-                }
                 opt.value = r.regionId;
                 opt.textContent = r.name;
+                if (r.regionId == myRegion && myCountry == oldCountry) {
+                    opt.selected = true
+                }
                 sel.appendChild(opt);
             }
         });
+
+        oldCountry = myCountry;
 
     } catch (e) {
         console.error("Errore loadRegions:", e);
@@ -132,6 +125,7 @@ async function loadCities(regionId) {
         const data = json.data || [];
 
         const citySel = document.getElementById("profileCity");
+        citySel.innerHTML = "";
 
         citiesMap.clear();
 
@@ -173,16 +167,16 @@ async function loadSkills() {
             skillsMap.set(s.skillId, { name: s.name });
         });
 
-        var skillsProfile = document.getElementById("skillsContainer");
-        skillsProfile.innerHTML = "";
+        var profileSkills = document.getElementById("skillsContainer");
+        profileSkills.innerHTML = "";
 
         skills.forEach(function(s) {
  
             var input = document.createElement("input");
             input.type = "checkbox";
             input.className = "btn-check";
-            input.id = "skillsProfile" + s.skillId;
-            input.name = "skillsProfile[]";
+            input.id = "profileSkills" + s.skillId;
+            input.name = "profileSkills[]";
             input.value = s.skillId;
             input.autocomplete = "off";
  
@@ -191,8 +185,8 @@ async function loadSkills() {
             label.htmlFor = input.id;
             label.textContent = s.name;
  
-            skillsProfile.appendChild(input);
-            skillsProfile.appendChild(label);
+            profileSkills.appendChild(input);
+            profileSkills.appendChild(label);
         });
     } catch (e) { 
         console.error("Errore loadSkills:", e); 
@@ -225,25 +219,27 @@ if (document.getElementById("logout-btn")) {
 // EVENT LISTENER SU COUNTRY E REGION
 // =====================================================
 document.addEventListener("DOMContentLoaded", async function () {
-    await loadCountries();
-    var countrySelect = document.getElementById("profileCountry");
-    await loadRegions(countrySelect.value);
-    var regionSelect = document.getElementById("profileRegion");
-    await loadCities(regionSelect.value);
+    await initializeProfile();
 
+    await loadCountries();
+    await loadRegions();
+    await loadCities(myRegion);
     await loadSkills();
 
     document.getElementById("profileCountry").addEventListener("change", async function () {
-        countrySelect = document.getElementById("profileCountry");
-        myCountry = countrySelect.value;
-        await loadRegions(myCountry);
+        var newCountrySelect = document.getElementById("profileCountry");
+        myCountry = newCountrySelect.value;
+        await loadRegions();
     });
 
     document.getElementById("profileRegion").addEventListener("change", async function () {
-        regionSelect = document.getElementById("profileRegion");
-        myRegion = regionSelect.value;
+        //if (/*cambiato sel regione in altro*/) //allora rimuovo l'opt sel regione (sta roba devo farla anche per city)
+        var newRegionSelect = document.getElementById("profileRegion");
+        myRegion = newRegionSelect.value;
         await loadCities(myRegion);
     });
+
+
 });
 
 //TODO: quando invierò le modifiche ricordarsi di fare controllo che ci siano state effettivamente modifiche
