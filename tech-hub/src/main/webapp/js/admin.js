@@ -358,6 +358,8 @@ function openJobDetails(jobId) {
 
     */
     const modal = new bootstrap.Modal(document.getElementById("jobDetailModal"));
+    const modalEl = document.getElementById('jobDeleteModal');
+    modalEl.setAttribute('data-job-id', jobId);
     modal.show();
 }
 
@@ -367,7 +369,17 @@ function openJobDetails(jobId) {
 // MODALE CONFERMA CANCELLAZIONE JOB
 // =============================================================
 
+document.getElementById('jobDeleteDetailBtn').addEventListener('click', function () {
+    const modalEl = document.getElementById('jobDeleteModal');
+    const jobId = modalEl.getAttribute('data-job-id');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('jobDetailModal')).hide();
+    openDeleteModal(jobId);
+});
+
+
+
 function openDeleteModal(jobId) {
+    debugger
     const modalEl = document.getElementById('jobDeleteModal');
     modalEl.setAttribute('data-job-id', jobId);
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
@@ -386,6 +398,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function (
 // CANCELLAZIONE JOB
 // =============================================================
 function deleteJob(jobId) {
+debugger
 
     fetch(`servlet/jobopenings/${jobId}`, {
         method: 'DELETE'
