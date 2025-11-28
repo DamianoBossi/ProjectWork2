@@ -286,13 +286,18 @@ function cardJob(job) {
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-auto">
-              <div class="small text-muted">
+              <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
                 <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
               </div>
 
-              <button class="btn btn-sm btn-primary" onclick="">
-                Apri/Chiudi Posizione
-              </button>
+              <div class="btn-container d-flex gap-2 ms-auto" >
+                <button class="btn btn-sm btn-primary" onclick="">
+                    Apri/Chiudi Posizione
+                </button>
+
+                <button class="btn btn-sm btn-danger fw-semibold" id="jobDeleteBtn"  onclick="event.stopPropagation(); openDeleteModal('${jobId}')">Elimina
+                </button>
+              </div>
             </div>
 
           </div>
@@ -326,23 +331,91 @@ function openJobDetails(jobId) {
     document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
     document.getElementById("jobDetailWorkSched").textContent = workSchedName;
 
+    const skillsWrapper = document.getElementById("skillsWrapper");
+    const container = document.getElementById("jobDetailSkills");
 
-    const ul = document.getElementById("jobDetailSkills");
-    ul.innerHTML = "";
+    container.innerHTML = "";
+
     skillNames.forEach(s => {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.textContent = s;
-        ul.appendChild(li);
+        const pill = document.createElement("span");
+        pill.className = "badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2";
+        pill.textContent = s;
+        container.appendChild(pill);
     });
 
+    if (skillNames.length === 0) {
+        skillsWrapper.style.display = "none";
+    } else {
+        skillsWrapper.style.display = "block";
+    }
+
+
+
+    /*
     document.getElementById("jobDetailApplyBtn").onclick = () => {
         openApplyModal(job.jobOpeningId);
     };
 
+    */
     const modal = new bootstrap.Modal(document.getElementById("jobDetailModal"));
+    const modalEl = document.getElementById('jobDeleteModal');
+    modalEl.setAttribute('data-job-id', jobId);
     modal.show();
 }
+
+
+
+// =============================================================
+// MODALE CONFERMA CANCELLAZIONE JOB
+// =============================================================
+
+document.getElementById('jobDeleteDetailBtn').addEventListener('click', function () {
+    const modalEl = document.getElementById('jobDeleteModal');
+    const jobId = modalEl.getAttribute('data-job-id');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('jobDetailModal')).hide();
+    openDeleteModal(jobId);
+});
+
+
+
+function openDeleteModal(jobId) {
+    debugger
+    const modalEl = document.getElementById('jobDeleteModal');
+    modalEl.setAttribute('data-job-id', jobId);
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+    const modalEl = document.getElementById('jobDeleteModal');
+    const jobId = modalEl.getAttribute('data-job-id'); 
+    deleteJob(jobId);
+});
+
+
+
+// =============================================================
+// CANCELLAZIONE JOB
+// =============================================================
+function deleteJob(jobId) {
+debugger
+
+    fetch(`servlet/jobopenings/${jobId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Posizione lavorativa eliminata con successo.');
+            location.reload();
+        } else {
+            alert('Errore durante l\'eliminazione della posizione lavorativa: ' + data.message);
+        }
+    });
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('jobDeleteModal')).hide();
+}
+
 
 
 
