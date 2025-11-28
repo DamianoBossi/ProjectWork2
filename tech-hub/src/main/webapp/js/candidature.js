@@ -1,220 +1,227 @@
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", function () {
-      localStorage.removeItem("user");
-      sessionStorage.removeItem("user");
-      window.location.href = "prova.html";
-    });
-
-    
 // =====================================================
 // MAPPE GLOBALI
 // =====================================================
-const countriesMap = new Map(); // countryId -> { name }
-const regionsMap = new Map(); // regionId  -> { name, countryId }
-const citiesMap = new Map(); // cityId    -> { name, regionId }
-const empTypesMap = new Map(); // empTypeId -> name
-const skillsMap = new Map(); // skillId   -> name
-const workSchedMap = new Map(); // workSchedId -> name 
+const countriesMap = new Map();
+const regionsMap = new Map();
+const citiesMap = new Map();
+const empTypesMap = new Map();
+const skillsMap = new Map();
+const workSchedMap = new Map();
 
-let allJobs = [];               // tutti i job
-let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
-
-// array JS con i nomi delle skill inserite nel form
-const skillsList = [];
-
-
-
-    // -------- SKILLS --------
-async function loadSkills() {
-    try {
-        const res = await fetch('servlet/skills');
-        const json = await res.json();
-        const skills = json.data || [];
-
-        skillsMap.clear();
-        skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
-
-        // filtro skill
-        const filterSkill = document.getElementById('filterSkill');
-        if (filterSkill) {
-            filterSkill.innerHTML = '<option value="">Skill (Tutte)</option>';
-            skills.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.skillId;
-                opt.textContent = s.name;
-                filterSkill.appendChild(opt);
-            });
-        }
-
-    } catch (err) {
-        console.error("Errore loadSkills:", err);
-    }
-}
-
+let allJobs = [];
+let jobSkillsMap = new Map();
 
 // =====================================================
-// GESTIONE SKILLS 
+// SKILLS, CONTRACT, CITY, JOBS
 // =====================================================
-function addSkill() {
-    const input = document.getElementById("skillInput");
-    const value = input.value.trim();
-    if (!value) return;
-
-    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
-    const fSkill = document.getElementById('filterSkill')?.value || '';
-    const fCity = document.getElementById('filterCity')?.value || '';
-    const fContract = document.getElementById('filterContract')?.value || '';
-
-    const cards = document.querySelectorAll('.job-card');
-
-    cards.forEach(card => {
-
-        const title = card.querySelector('h5').textContent.toLowerCase();
-        const city = card.dataset.city;
-        const contract = card.dataset.contract;
-        const skills = card.dataset.skills.split(',');
-
-        const matchSearch = search ? title.includes(search) : true;
-        const matchCity = fCity ? (city === fCity) : true;
-        const matchContract = fContract ? (contract === fContract) : true;
-
-        // skill: un job può avere più skill → se la skill scelta è nei suoi skill
-        const matchSkill = fSkill ? skills.includes(fSkill) : true;
-
-        if (matchSearch && matchCity && matchContract && matchSkill) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
+async function loadMaps() {
+  try {
+    // Skills
+    let res = await fetch('servlet/skills');
+    let json = await res.json();
+    const skills = json.data || [];
+    skillsMap.clear();
+    skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
+    const filterSkill = document.getElementById('filterSkill');
+    skills.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.skillId;
+      opt.textContent = s.name;
+      filterSkill.appendChild(opt);
     });
 
-    updateJobsCount();
-}
-
-
-// =====================================================
-// GESTIONE SKILLS 
-// =====================================================
-function addSkill() {
-    const input = document.getElementById("skillInput");
-    const value = input.value.trim();
-    if (!value) return;
-
-    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
-    const fSkill = document.getElementById('filterSkill')?.value || '';
-    const fCity = document.getElementById('filterCity')?.value || '';
-    const fContract = document.getElementById('filterContract')?.value || '';
-
-    const cards = document.querySelectorAll('.job-card');
-
-    cards.forEach(card => {
-
-        const title = card.querySelector('h5').textContent.toLowerCase();
-        const city = card.dataset.city;
-        const contract = card.dataset.contract;
-        const skills = card.dataset.skills.split(',');
-
-        const matchSearch = search ? title.includes(search) : true;
-        const matchCity = fCity ? (city === fCity) : true;
-        const matchContract = fContract ? (contract === fContract) : true;
-
-        // skill: un job può avere più skill → se la skill scelta è nei suoi skill
-        const matchSkill = fSkill ? skills.includes(fSkill) : true;
-
-        if (matchSearch && matchCity && matchContract && matchSkill) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
+    // Employment types
+    res = await fetch('servlet/emptypes');
+    json = await res.json();
+    const types = json.data || [];
+    empTypesMap.clear();
+    types.forEach(t => empTypesMap.set(String(t.empTypeId), t.name));
+    const filterContract = document.getElementById('filterContract');
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.empTypeId;
+      opt.textContent = t.name;
+      filterContract.appendChild(opt);
     });
 
-    updateJobsCount();
+    // Cities
+    res = await fetch('servlet/cities');
+    json = await res.json();
+    const cities = json.data || [];
+    citiesMap.clear();
+    cities.forEach(c => citiesMap.set(String(c.cityId), { name: c.name }));
+    const filterCity = document.getElementById('filterCity');
+    cities.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.cityId;
+      opt.textContent = c.name;
+      filterCity.appendChild(opt);
+    });
+
+    // Job skills
+    res = await fetch('servlet/jobopeningsskills');
+    json = await res.json();
+    const jobSkills = json.data || [];
+    jobSkillsMap.clear();
+    jobSkills.forEach(entry => {
+      const jobId = String(entry.jobOpeningId);
+      const skillId = String(entry.skillId);
+      if (!jobSkillsMap.has(jobId)) jobSkillsMap.set(jobId, []);
+      jobSkillsMap.get(jobId).push(skillId);
+    });
+
+  } catch (e) {
+    console.error("Errore loadMaps:", e);
+  }
 }
 
-
-// -------- CITIES --------
-async function loadCities(regionId) {
-    try {
-        const res = await fetch(`servlet/cities`);
-        const json = await res.json();
-        const data = json.data || [];
-
-        const citySel = document.getElementById("registerCity");
-
-        citySel.innerHTML = `<option value="">Seleziona città</option>`;
-        citySel.disabled = true;
-
-        citiesMap.clear();
-
-        data.forEach(c => {
-            citiesMap.set(String(c.cityId), {
-                name: c.name,
-                regionId: String(c.regionId)
-            });
-        });
-
-        data.forEach(c => {
-            if (String(c.regionId) === String(regionId)) {
-                const opt = document.createElement("option");
-                opt.value = c.cityId;
-                opt.textContent = c.name;
-                citySel.appendChild(opt);
-            }
-        });
-
-        // filtri jobs
-        const filterCity = document.getElementById("filterCity");
-        if (!filterCity) return;
-
-        filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
-        data.forEach(c => {
-            const opt = document.createElement("option");
-            opt.value = c.cityId;
-            opt.textContent = c.name;
-            filterCity.appendChild(opt);
-        });
-
-        if (regionId) citySel.disabled = false;
-
-    } catch (e) {
-        console.error("Errore loadCities:", e);
-    }
+// =====================================================
+// LOAD JOBS
+// =====================================================
+async function loadJobs() {
+  try {
+    const res = await fetch('servlet/jobopenings');
+    const json = await res.json();
+    allJobs = json.data || [];
+    renderJobs(allJobs);
+  } catch (e) {
+    console.error("Errore loadJobs:", e);
+  }
 }
 
+// =====================================================
+// CARD JOB
+// =====================================================
+function cardJob(job) {
+  const city = citiesMap.get(String(job.cityId)) || 'N/D';
+  const contract = empTypesMap.get(job.empTypeId) || 'N/D';
+  const jobId = String(job.jobOpeningId);
+  const skillIds = jobSkillsMap.get(jobId) || [];
+  const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
 
-//EMPTYPES
-async function loadEmpTypes() {
-    try {
-        var res = await fetch(`servlet/emptypes`);
-        var json = await res.json();
-        var data = json.data || [];
+  return `
+    <div class="col-md-6 col-lg-4 job-card mb-3"
+        data-id="${jobId}"
+        data-city="${job.cityId}"
+        data-contract="${job.empTypeId}"
+        data-skills="${skillIds.join(',')}">
 
-        empTypesMap.clear();
-
-        //popolo la mappa dei tipi di contratto
-        data.forEach(t => empTypesMap.set(t.empTypeId, t.name));
-
-        //popolo la lista di città della creazione della job opening
-        var empTypejobOpCreate = document.getElementById("empTypeIdjobOpCreate");
-
-        data.forEach(function(c) {
-            var opt = document.createElement("option");
-            opt.value = c.empTypeId;
-            opt.textContent = c.name;
-            empTypejobOpCreate.appendChild(opt);
-        });
-
-        //popolo la lista dei tipi di contratto del filtro
-        var filterEmpType = document.getElementById("filterEmpType");
-
-        data.forEach(function(c) {
-            var opt = document.createElement("option");
-            opt.value = c.empTypeId;
-            opt.textContent = c.name;
-            filterEmpType.appendChild(opt);
-        });
-
-    } catch (e) {
-        console.error("Errore loadEmpTypes:", e);
-    }
+        <div class="card h-100 p-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="mb-1">${job.title}</h5>
+            <span class="badge rounded-pill bg-light text-primary small">${contract}</span>
+          </div>
+          <div class="text-muted small mb-2">
+            <i class="bi bi-geo-alt"></i> ${city.name || city}
+          </div>
+          <p class="mb-2 text-muted small">${job.description || ""}</p>
+          <div class="small mb-2">
+            <strong>Competenze:</strong> ${skillNames.length ? skillNames.join(", ") : "Nessuna specificata"}
+          </div>
+        </div>
+    </div>
+  `;
 }
+
+// =====================================================
+// RENDER JOBS
+// =====================================================
+function renderJobs(list) {
+  const grid = document.getElementById('jobsGrid');
+  if (!grid) return;
+  list = list.filter(job => job.isOpen == "1"); // solo aperti
+  grid.innerHTML = list.map(j => cardJob(j)).join("");
+  updateJobsCount();
+}
+
+// =====================================================
+// FILTRI JOBS
+// =====================================================
+function filterJobs() {
+  const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+  const fSkill = document.getElementById('filterSkill')?.value || '';
+  const fCity = document.getElementById('filterCity')?.value || '';
+  const fContract = document.getElementById('filterContract')?.value || '';
+
+  const cards = document.querySelectorAll('.job-card');
+  cards.forEach(card => {
+    const title = card.querySelector('h5').textContent.toLowerCase();
+    const city = card.dataset.city || '';
+    const contract = card.dataset.contract || '';
+    const skills = card.dataset.skills ? card.dataset.skills.split(',').filter(s => s) : [];
+
+    const matchSearch = search ? title.includes(search) : true;
+    const matchCity = fCity ? city === fCity : true;
+    const matchContract = fContract ? contract === fContract : true;
+    const matchSkill = fSkill ? skills.includes(fSkill) : true;
+
+    card.style.display = (matchSearch && matchCity && matchContract && matchSkill) ? "" : "none";
+  });
+
+  updateJobsCount();
+}
+
+// =====================================================
+// CONTATORE
+// =====================================================
+function updateJobsCount() {
+  const cards = document.querySelectorAll('.job-card');
+  const visible = [...cards].filter(c => c.style.display !== 'none').length;
+  const el = document.getElementById('jobsCount');
+  if (el) el.textContent = `${visible} opportunità trovate`;
+}
+
+// =====================================================
+// LOGOUT
+// =====================================================
+document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+  try {
+    const res = await fetch('servlet/logout', { method: 'POST' });
+    if (res.ok) window.location.href = 'prova.html';
+  } catch (e) {
+    console.error("Errore logout:", e);
+  }
+});
+
+// =====================================================
+// INIT JOBS PAGE
+// Questa funzione inizializza la pagina "Posizioni Aperte":
+// - carica mappe (skills, città, contratti)
+// - carica tutte le offerte di lavoro
+// - collega i filtri alla funzione filterJobs()
+// =====================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadMaps();
+  await loadJobs();
+
+  ['jobSearch', 'filterSkill', 'filterContract', 'filterCity'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', filterJobs);
+  });
+});
+
+
+
+
+
+/* nomi cambianti perché prova.js--> gestisce le posizioni aperte (job openings). Tutte le variabili, mappe e funzioni sono legate ai job
+Nel JS di candidature--> invece gestisci le candidature (le persone che hanno fatto domanda). Quindi devi avere mappe, array e funzioni dedicate:
+
+prova.js
+
+allJobs
+jobSkillsMap
+loadJobs()
+renderJobs()
+filterJobs()
+
+candidature.js
+
+allCandidatures
+candSkillsMap
+loadCandidatures()
+renderCandidatures()
+filterCandidatures()
+
+*/
