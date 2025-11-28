@@ -5,6 +5,8 @@
       /* Colori primari (usati nei gradienti) */
       --color-primary-start: #4f46e5; /* Indigo 600 */
       --color-primary-end: #06b6d4;   /* Cyan 500 */
+      --color-danger-start: #ef4444;  /* Red 500 */
+      --color-danger-end: #f97316;    /* Orange 500 */
       /* Colori di testo e sfondo */
       --color-text-dark: #0b1020;
       --color-text-body: #1e293b;
@@ -57,6 +59,23 @@
     
     .btn-link:hover {
         opacity: 0.8;
+    }
+
+    .btn-danger {
+      /* Usa le variabili per il gradiente e aggiungi una transizione */
+      background: linear-gradient(90deg, var(--color-danger-start), var(--color-danger-end));
+      border: none;
+      transition: var(--transition-base);
+      box-shadow: 0 4px 10px rgba(229, 70, 70, 0.3);
+      /* Ombra basata sul colore primario */
+    }
+
+    .btn-danger:hover {
+      /* Inverte o modifica leggermente il gradiente e solleva il pulsante */
+      background: linear-gradient(90deg, var(--color-danger-end), var(--color-danger-start));
+      transform: translateY(-2px);
+      /* Effetto sollevamento */
+      box-shadow: 0 8px 15px rgba(212, 6, 40, 0.4);
     }
 
     /* Card standard (statistiche e servizi) */
@@ -337,6 +356,10 @@
       background-color: #0d6efd;
       color: white;
       border-bottom: none;
+    }
+
+    .modal-header.modal-header-danger {
+      background-color: #dc3545 !important;
     }
 
     .modal-header .btn-close{

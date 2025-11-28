@@ -348,11 +348,11 @@ function cardJob(job) {
 
             <div class="d-flex justify-content-between align-items-center mt-auto">
                 
-                <div class="small text-muted">
+                <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
                     <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
                 </div>
 
-                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
+                <button class="btn btn-sm btn-primary ms-auto" onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
                     Candidati
                 </button>
 
@@ -772,34 +772,31 @@ async function handleRegisterSubmit(e) {
 
 
         
-            try {
-                const res = await fetch("servlet/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-        
-                const json = await res.json();
-        
-                if (!json.success) throw new Error(json.message || "Credenziali errate");
-        
-                if (json.redirect) {
-                    window.location.href = json.redirect;
-                }
-        
-                localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
-                bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
-        
-                hideButtons();
-        
-        
-            } catch (e) {
-                console.error("Errore login:", e);
-                alert(e.message);
+        try {
+            const res = await fetch("servlet/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+    
+            const json = await res.json();
+    
+            if (!json.success) throw new Error(json.message || "Credenziali errate");
+    
+            if (json.redirect) {
+                window.location.href = json.redirect;
             }
-
-
-
+    
+            localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
+    
+            hideButtons();
+    
+    
+        } catch (e) {
+            console.error("Errore login:", e);
+            alert(e.message);
+        }
 
 
         registerForm.reset();
