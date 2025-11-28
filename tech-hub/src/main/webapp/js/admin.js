@@ -24,8 +24,8 @@ async function loadSkills() {
         var skillsJobOpCreate = document.getElementById("skillsContainer");
         skillsJobOpCreate.innerHTML = "";
 
-        skills.forEach(function(s) {
- 
+        skills.forEach(function (s) {
+
             var input = document.createElement("input");
             input.type = "checkbox";
             input.className = "btn-check";
@@ -33,12 +33,12 @@ async function loadSkills() {
             input.name = "skillsJobOpCreate[]";
             input.value = s.skillId;
             input.autocomplete = "off";
- 
+
             var label = document.createElement("label");
             label.className = "btn btn-primary";
             label.htmlFor = input.id;
             label.textContent = s.name;
- 
+
             skillsJobOpCreate.appendChild(input);
             skillsJobOpCreate.appendChild(label);
         });
@@ -46,14 +46,14 @@ async function loadSkills() {
         //popolo la lista delle skill del filtro
         var filterSkill = document.getElementById("filterSkill");
 
-        skills.forEach(function(s) {
+        skills.forEach(function (s) {
             var opt = document.createElement("option");
             opt.value = s.skillId;
             opt.textContent = s.name;
             filterSkill.appendChild(opt);
         });
-    } catch (e) { 
-        console.error("Errore loadSkills:", e); 
+    } catch (e) {
+        console.error("Errore loadSkills:", e);
     }
 }
 
@@ -67,7 +67,7 @@ async function loadCities() {
         citiesMap.clear();
 
         //popolo la mappa delle città
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             citiesMap.set(c.cityId, {
                 name: c.name
             });
@@ -76,7 +76,7 @@ async function loadCities() {
         //popolo la lista di città della creazione della job opening
         var cityjobOpCreate = document.getElementById("cityIdjobOpCreate");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.cityId;
             opt.textContent = c.name;
@@ -86,7 +86,7 @@ async function loadCities() {
         //popolo la lista di città del filtro delle città
         var filterCity = document.getElementById("filterCity");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.cityId;
             opt.textContent = c.name;
@@ -113,7 +113,7 @@ async function loadEmpTypes() {
         //popolo la lista di città della creazione della job opening
         var empTypejobOpCreate = document.getElementById("empTypeIdjobOpCreate");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.empTypeId;
             opt.textContent = c.name;
@@ -123,7 +123,7 @@ async function loadEmpTypes() {
         //popolo la lista dei tipi di contratto del filtro
         var filterEmpType = document.getElementById("filterEmpType");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.empTypeId;
             opt.textContent = c.name;
@@ -145,7 +145,7 @@ async function loadWorkSched() {
         workSchedMap.clear();
 
         //popolo la mappa degli orari di lavoro
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             workSchedMap.set(String(c.workSchedId), {
                 name: c.name
             });
@@ -154,7 +154,7 @@ async function loadWorkSched() {
         //popolo la lista degli orari di lavoro della creazione della job opening
         var workSchedjobOpCreate = document.getElementById("workSchedIdjobOpCreate");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.workSchedId;
             opt.textContent = c.name;
@@ -164,7 +164,7 @@ async function loadWorkSched() {
         //popolo la lista degli orari di lavoro del filtro
         var filterWorkSched = document.getElementById("filterWorkSched");
 
-        data.forEach(function(c) {
+        data.forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.workSchedId;
             opt.textContent = c.name;
@@ -278,7 +278,7 @@ function cardJob(job) {
               <i class="bi bi-geo-alt"></i> ${cityName.name}
             </div>
 
-            <p class="mb-3 text-muted small job-description">${job.description}</p>
+            <p class="mb-3 text-muted small">${job.description}</p>
 
             <div class="small mb-3">
               <strong>Competenze richieste:</strong>
@@ -291,8 +291,8 @@ function cardJob(job) {
               </div>
 
               <div class="btn-container d-flex gap-2 ms-auto" >
-                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="">
-                ${job.isOpen == '1' ? 'Chiudi posizione' : 'Apri posizione'}
+                <button class="btn btn-sm btn-primary" onclick="">
+                    Apri/Chiudi Posizione
                 </button>
 
                 <button class="btn btn-sm btn-danger fw-semibold" id="jobDeleteBtn"  onclick="event.stopPropagation(); openDeleteModal('${jobId}')">Elimina
@@ -321,8 +321,8 @@ function openJobDetails(jobId) {
     const skillIds = jobSkillsMap.get(jobId) || [];
     const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
     const workSchedName = workSchedMap.get(String(job.workSchedId))
-    ? workSchedMap.get(String(job.workSchedId)).name
-    : "N/D";
+        ? workSchedMap.get(String(job.workSchedId)).name
+        : "N/D";
 
     document.getElementById("jobDetailTitle").textContent = job.title;
     document.getElementById("jobDetailDescription").textContent = job.description;
@@ -349,7 +349,7 @@ function openJobDetails(jobId) {
         skillsWrapper.style.display = "block";
     }
 
-
+    loadRanking(jobId);
 
     /*
     document.getElementById("jobDetailApplyBtn").onclick = () => {
@@ -362,6 +362,91 @@ function openJobDetails(jobId) {
     modalEl.setAttribute('data-job-id', jobId);
     modal.show();
 }
+
+// =========================
+// CLASSIFICA CANDIDATI 
+// =========================
+async function loadRanking(jobId) {
+    try {
+        const res = await fetch(`servlet/jobapplications?jobOpeningId=${jobId}`);
+        const json = await res.json();
+
+        const list = json.data || [];
+
+        // ORDINA IN MANIERA DECRESCENTE
+        list.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+
+        const rankingDiv = document.getElementById("jobDetailRanking");
+        const podiumDiv = document.getElementById("jobDetailPodium");
+
+        rankingDiv.innerHTML = "";
+        podiumDiv.innerHTML = "";
+
+       //SE NON CI SONO CANDIDATI
+        if (list.length === 0) {
+            podiumDiv.innerHTML = `<p class="text-muted">Nessuna candidatura presente</p>`;
+            return;
+        }
+
+        const first = list[0];
+        const second = list[1];
+        const third = list[2];
+
+        podiumDiv.innerHTML = `
+            <div class="podium-container d-flex justify-content-center align-items-end gap-4">
+
+                <div class="podium-step podium-2 text-center">
+                    ${second ? `
+                        <div class="podium-rank rank-2">🥈</div>
+                        <div class="fw-bold">${second.firstName} ${second.lastName}</div>
+                        <div class="text-muted small">${second.cityName}</div>
+                        <div class="score">${second.totalScore}</div>
+                    ` : ""}
+                </div>
+
+                <div class="podium-step podium-1 text-center">
+                    ${first ? `
+                        <div class="podium-rank rank-1">🥇</div>
+                        <div class="fw-bold">${first.firstName} ${first.lastName}</div>
+                        <div class="text-muted small">${first.cityName}</div>
+                        <div class="score">${first.totalScore}</div>
+                    ` : ""}
+                </div>
+
+                <div class="podium-step podium-3 text-center">
+                    ${third ? `
+                        <div class="podium-rank rank-3">🥉</div>
+                        <div class="fw-bold">${third.firstName} ${third.lastName}</div>
+                        <div class="text-muted small">${third.cityName}</div>
+                        <div class="score">${third.totalScore}</div>
+                    ` : ""}
+                </div>
+
+            </div>
+        `;
+
+        //DAL QUARTO IN POI
+        list.forEach((app, index) => {
+            if (index < 3) return; 
+
+            rankingDiv.innerHTML += `
+                <div class="ranking-row d-flex align-items-center gap-3 p-2 border-bottom">
+                    <div class="rank-number">${index + 1}</div>
+                    <div>
+                        <strong>${app.firstName} ${app.lastName}</strong>
+                        <br><span class="text-muted">${app.cityName}</span>
+                    </div>
+                    <div class="ms-auto fw-bold text-primary">${app.totalScore}</div>
+                </div>
+            `;
+        });
+
+    } catch (err) {
+        console.error("Errore ranking:", err);
+    }
+}
+
+
 
 
 
@@ -388,7 +473,7 @@ function openDeleteModal(jobId) {
 
 document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
     const modalEl = document.getElementById('jobDeleteModal');
-    const jobId = modalEl.getAttribute('data-job-id'); 
+    const jobId = modalEl.getAttribute('data-job-id');
     deleteJob(jobId);
 });
 
@@ -398,20 +483,20 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function (
 // CANCELLAZIONE JOB
 // =============================================================
 function deleteJob(jobId) {
-debugger
+    debugger
 
     fetch(`servlet/jobopenings/${jobId}`, {
         method: 'DELETE'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Posizione lavorativa eliminata con successo.');
-            location.reload();
-        } else {
-            alert('Errore durante l\'eliminazione della posizione lavorativa: ' + data.message);
-        }
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Posizione lavorativa eliminata con successo.');
+                location.reload();
+            } else {
+                alert('Errore durante l\'eliminazione della posizione lavorativa: ' + data.message);
+            }
+        });
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('jobDeleteModal')).hide();
 }
@@ -489,12 +574,12 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     var description = document.getElementById('descriptionjobOpCreate').value.trim() || null;
     var ralFrom = document.getElementById('ralFromjobOpCreate').value.trim() || null;
     var ralTo = document.getElementById('ralTojobOpCreate').value.trim() || null;
-    var isOpen = document.getElementById('isOpenjobOpCreate').value === "true";
+    var isOpen = Boolean(document.getElementById('isOpenjobOpCreate').value) || null;
     var empTypeId = parseInt(document.getElementById('empTypeIdjobOpCreate').value) || null;
     var workSchedId = parseInt(document.getElementById('workSchedIdjobOpCreate').value) || null;
     var cityId = parseInt(document.getElementById('cityIdjobOpCreate').value) || null;
     var closingDate = String(document.getElementById('closingDatejobOpCreate').value) || null;
-    
+
     // PRENDI LE SKILL SELEZIONATE
     var checkedSkills = document.querySelectorAll('input[name="skillsJobOpCreate[]"]:checked');
     var skills = [];
@@ -547,8 +632,8 @@ async function checkAdminLogged() {
     try {
         const res = await fetch('servlet/sessionStatus');
         const json = await res.json();
-        if(json?.message?.isLogged && json?.message?.role == 'admin'){
-        return true;
+        if (json?.message?.isLogged && json?.message?.role == 'admin') {
+            return true;
         } else {
             return false;
         }
@@ -578,7 +663,7 @@ if (document.getElementById("logout-btn")) {
             alert("Errore durante il logout: " + e.message);
         }
     };
-} 
+}
 
 
 // DOM READY
