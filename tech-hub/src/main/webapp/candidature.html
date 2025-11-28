@@ -36,7 +36,7 @@
   </div>
 
   <!-- Barra Filtri -->
-  <div class="row mb-3">
+  <div class="row mb-3 g-2">
     <div class="col-md-3 mb-2">
       <input type="text" id="jobSearch" class="form-control" placeholder="Cerca le posizioni a cui ti sei candidato">
     </div>
@@ -58,7 +58,85 @@
   </div>
 
   <!-- Grid offerte -->
-  <div class="row" id="jobsGrid"></div>
+
+
+  <div id="jobSection" class="d-flex align-items-center gap-2">
+    <div id="jobsGrid" class="row g-4"></div>
+  </div>
+</div>
+
+
+
+<!-- MODALE DETTAGLI JOBS -->
+<div class="modal fade" id="jobDetailModal" tabindex="-1" aria-labelledby="jobDetailLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+
+      <div class="modal-header text-white" style="background: var(--bs-primary);">
+        <h5 class="modal-title fw-semibold" id="jobDetailLabel">Dettagli posizione</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+
+      <!-- QUI VA TITLE E DESCRIPTION -->
+      <div class="modal-body p-4">
+
+        <!-- TITOLO DELLA POSIZIONE -->
+        <h3 id="jobDetailTitle" class="fw-bold mb-3 text-primary"></h3>
+
+        <!-- RIGA INFO PRINCIPALI -->
+        <div class="row g-3 row-cols-1 row-cols-md-4 mb-4">
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1"><i class="bi bi-geo-alt-fill text-primary"></i> Sede</h6>
+              <span id="jobDetailCity" class="text-muted"></span>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1"><i class="bi bi-briefcase-fill text-primary"></i> Contratto</h6>
+              <span id="jobDetailContract" class="text-muted"></span>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1"><i class="bi bi-wallet-fill text-primary"></i> RAL</h6>
+              <span id="jobDetailRal" class="text-muted"></span>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="p-3 border rounded bg-light h-100">
+              <h6 class="fw-semibold mb-1"><i class="bi bi-clock-fill text-primary"></i> Orario</h6>
+              <span id="jobDetailWorkSched" class="text-muted"></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- DESCRIZIONE -->
+        <div class="mb-4">
+          <h6 class="fw-semibold mb-1">Descrizione</h6>
+          <p id="jobDetailDescription" class="text-muted"></p>
+        </div>
+
+        <!-- SKILLS -->
+        <div id="skillsWrapper" class="mt-4">
+          <h6 class="fw-semibold mb-2">Competenze richieste</h6>
+          <div id="jobDetailSkills" class="d-flex flex-wrap gap-2"></div>
+        </div>
+
+      </div> <!-- FINE .modal-body -->
+
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Chiudi</button>
+        <button class="btn btn-danger fw-semibold" id="applicationDeleteBtn">Ritira candidatura</button>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

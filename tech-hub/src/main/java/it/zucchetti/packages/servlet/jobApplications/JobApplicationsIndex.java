@@ -47,16 +47,16 @@ public class JobApplicationsIndex extends HttpServlet {
 
             String requestedJobOpeningId = request.getParameter("jobOpeningId");
 
-            String query = "SELECT * FROM APPLICATIONS";
+            String query = "SELECT a.*, u.USERID, u.FIRSTNAME, u.LASTNAME, c.NAME as CITYNAME FROM APPLICATIONS a join USERS u on a.USERID = u.USERID join CITIES c on u.CITYID = c.CITYID";
 
             if (requestedJobOpeningId != null) {
                 query += " WHERE JOBOPENINGID = '" + requestedJobOpeningId + "'";
             }
 
-            //TODO: possibili condizioni e errori da lanciare in certi casi (pensaci)
+            // TODO: possibili condizioni e errori da lanciare in certi casi (pensaci)
 
             resultSet = statement.executeQuery(query);
-            
+
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
             jsonResponse.addProperty("message", "Servlet correttamente eseguita");
@@ -76,6 +76,27 @@ public class JobApplicationsIndex extends HttpServlet {
                     applicationObj.add("userId", null);
                 } else {
                     applicationObj.addProperty("userId", userId);
+                }
+
+                String firstName = resultSet.getString("FIRSTNAME");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("firstName", null);
+                } else {
+                    applicationObj.addProperty("firstName", firstName);
+                }
+
+                String lastName = resultSet.getString("LASTNAME");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("lastName", null);
+                } else {
+                    applicationObj.addProperty("lastName", lastName);
+                }
+
+                String cityName = resultSet.getString("CITYNAME");
+                if (resultSet.wasNull()) {
+                    applicationObj.add("cityName", null);
+                } else {
+                    applicationObj.addProperty("cityName", cityName);
                 }
 
                 int jobOpeningId = resultSet.getInt("JOBOPENINGID");
