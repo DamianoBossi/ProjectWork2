@@ -313,6 +313,7 @@ async function loadJobs() {
         const res = await fetch('servlet/jobopenings');
         const json = await res.json();
         allJobs = json.data || [];
+        allJobs = allJobs.filter(job => job.isOpen == "1");
 
         // conta posizioni initiali
         const count = allJobs.length;
@@ -322,6 +323,7 @@ async function loadJobs() {
         if (card) card.textContent = count;
 
         // render cards
+
         renderJobs(allJobs);
 
     } catch (e) {
