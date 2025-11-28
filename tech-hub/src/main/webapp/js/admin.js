@@ -278,7 +278,7 @@ function cardJob(job) {
               <i class="bi bi-geo-alt"></i> ${cityName.name}
             </div>
 
-            <p class="mb-3 text-muted small">${job.description}</p>
+            <p class="mb-3 text-muted small job-description">${job.description}</p>
 
             <div class="small mb-3">
               <strong>Competenze richieste:</strong>
@@ -291,8 +291,8 @@ function cardJob(job) {
               </div>
 
               <div class="btn-container d-flex gap-2 ms-auto" >
-                <button class="btn btn-sm btn-primary" onclick="">
-                    Apri/Chiudi Posizione
+                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="">
+                ${job.isOpen == '1' ? 'Chiudi posizione' : 'Apri posizione'}
                 </button>
 
                 <button class="btn btn-sm btn-danger fw-semibold" id="jobDeleteBtn"  onclick="event.stopPropagation(); openDeleteModal('${jobId}')">Elimina
@@ -489,7 +489,7 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     var description = document.getElementById('descriptionjobOpCreate').value.trim() || null;
     var ralFrom = document.getElementById('ralFromjobOpCreate').value.trim() || null;
     var ralTo = document.getElementById('ralTojobOpCreate').value.trim() || null;
-    var isOpen = Boolean(document.getElementById('isOpenjobOpCreate').value) || null;
+    var isOpen = document.getElementById('isOpenjobOpCreate').value === "true";
     var empTypeId = parseInt(document.getElementById('empTypeIdjobOpCreate').value) || null;
     var workSchedId = parseInt(document.getElementById('workSchedIdjobOpCreate').value) || null;
     var cityId = parseInt(document.getElementById('cityIdjobOpCreate').value) || null;

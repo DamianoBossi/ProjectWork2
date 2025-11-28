@@ -339,7 +339,7 @@ function cardJob(job) {
               <i class="bi bi-geo-alt"></i> ${cityName.name}
             </div>
 
-            <p class="mb-3 text-muted small">${job.description}</p>
+            <p class="mb-3 text-muted small job-description">${job.description}</p>
 
             <div class="small mb-3">
               <strong>Competenze richieste:</strong>
