@@ -5,6 +5,12 @@
       /* Colori primari (usati nei gradienti) */
       --color-primary-start: #4f46e5; /* Indigo 600 */
       --color-primary-end: #06b6d4;   /* Cyan 500 */
+      --color-danger-start: #ef4444;  /* Red 500 */
+      --color-danger-end: #f97316;    /* Orange 500 */
+      --color-success-start: #22c55e; /* Green 500 */
+      --color-success-end: #10b981;   /* Emerald 500 */
+      --color-warning-start: #f59e0b; /* Amber 500 */
+      --color-warning-end: #fbbf24;   /* Yellow 500 */
       /* Colori di testo e sfondo */
       --color-text-dark: #0b1020;
       --color-text-body: #1e293b;
@@ -57,6 +63,50 @@
     
     .btn-link:hover {
         opacity: 0.8;
+    }
+
+    .btn-danger {
+      /* Usa le variabili per il gradiente e aggiungi una transizione */
+      background: linear-gradient(90deg, var(--color-danger-start), var(--color-danger-end));
+      border: none;
+      transition: var(--transition-base);
+      box-shadow: 0 4px 10px rgba(229, 70, 70, 0.3);
+      /* Ombra basata sul colore primario */
+    }
+
+    .btn-danger:hover {
+      /* Inverte o modifica leggermente il gradiente e solleva il pulsante */
+      background: linear-gradient(90deg, var(--color-danger-end), var(--color-danger-start));
+      transform: translateY(-2px);
+      /* Effetto sollevamento */
+      box-shadow: 0 8px 15px rgba(212, 6, 40, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(90deg, var(--color-success-start), var(--color-success-end));
+      border: none;
+      transition: var(--transition-base);
+      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(90deg, var(--color-success-end), var(--color-success-start));
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-warning {
+      background: linear-gradient(90deg, var(--color-warning-start), var(--color-warning-end));
+      color: white;
+      border: none;
+      transition: var(--transition-base);
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-warning:hover {
+      background: linear-gradient(90deg, var(--color-warning-end), var(--color-warning-start));
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(251, 191, 36, 0.4);
     }
 
     /* Card standard (statistiche e servizi) */
@@ -178,6 +228,22 @@
     /* ------------------------------------------------------------------- */
     /* 4. SEZIONE POSIZIONI APERTE (jobSection) */
     /* ------------------------------------------------------------------- */
+
+
+    .job-description {
+      height: 80px;
+      /* Altezza fissa */
+      overflow: hidden;
+      /* Nasconde il testo in eccesso */
+      text-overflow: ellipsis;
+      /* Mostra i tre puntini */
+      display: -webkit-box;
+      /* Per il multiline ellipsis */
+      -webkit-line-clamp: 3;
+      /* Numero di righe visibili */
+      -webkit-box-orient: vertical;
+      white-space: normal;
+    }
 
     #jobSection .card {
         padding: 1.5rem;
@@ -337,6 +403,10 @@
       background-color: #0d6efd;
       color: white;
       border-bottom: none;
+    }
+
+    .modal-header.modal-header-danger {
+      background-color: #dc3545 !important;
     }
 
     .modal-header .btn-close{

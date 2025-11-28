@@ -361,7 +361,7 @@ function cardJob(job) {
               <i class="bi bi-geo-alt"></i> ${cityName.name}
             </div>
 
-            <p class="mb-3 text-muted small">${job.description}</p>
+            <p class="mb-3 text-muted small job-description">${job.description}</p>
 
             <div class="small mb-3">
               <strong>Competenze richieste:</strong>
@@ -370,11 +370,11 @@ function cardJob(job) {
 
             <div class="d-flex justify-content-between align-items-center mt-auto">
                 
-                <div class="small text-muted">
+                <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
                     <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
                 </div>
 
-                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
+                <button class="btn btn-sm btn-primary ms-auto" onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
                     Candidati
                 </button>
 
