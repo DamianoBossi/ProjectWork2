@@ -292,7 +292,7 @@ function cardJob(job) {
               </div>
 
               <div class="btn-container d-flex gap-2 ms-auto" >
-                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="">
+                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="event.stopPropagation(); toggleJobStatus('${jobId}')">
                 ${job.isOpen == '1' ? 'Chiudi posizione' : 'Apri posizione'}
                 </button>
 
@@ -350,6 +350,7 @@ function openJobDetails(jobId) {
         skillsWrapper.style.display = "block";
     }
 
+    loadRanking(jobId);
 
 
     /*
@@ -363,6 +364,111 @@ function openJobDetails(jobId) {
     modalEl.setAttribute('data-job-id', jobId);
     modal.show();
 }
+
+
+
+
+
+// =========================
+// CLASSIFICA CANDIDATI 
+// =========================
+async function loadRanking(jobId) {
+    try {
+        const res = await fetch(`servlet/jobapplications?jobOpeningId=${jobId}`);
+        const json = await res.json();
+
+        const list = json.data || [];
+
+        // ORDINA IN MANIERA DECRESCENTE
+        list.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+
+        const rankingDiv = document.getElementById("jobDetailRanking");
+        const podiumDiv = document.getElementById("jobDetailPodium");
+
+        rankingDiv.innerHTML = "";
+        podiumDiv.innerHTML = "";
+
+        //SE NON CI SONO CANDIDATI
+        if (list.length === 0) {
+            podiumDiv.innerHTML = `<p class="text-muted">Nessuna candidatura presente</p>`;
+            return;
+        }
+
+        const first = list[0];
+        const second = list[1];
+        const third = list[2];
+
+        podiumDiv.innerHTML = `
+            <div class="podium-container d-flex justify-content-center align-items-end gap-4">
+
+                <div class="podium-step podium-2 text-center">
+                    ${second ? `
+                        <div class="podium-rank rank-2">🥈</div>
+                        <div class="fw-bold">${second.firstName} ${second.lastName}</div>
+                        <div class="text-muted small">${second.cityName}</div>
+                        <div class="score">${second.totalScore}</div>
+                    ` : ""}
+                </div>
+
+                <div class="podium-step podium-1 text-center">
+                    ${first ? `
+                        <div class="podium-rank rank-1">🥇</div>
+                        <div class="fw-bold">${first.firstName} ${first.lastName}</div>
+                        <div class="text-muted small">${first.cityName}</div>
+                        <div class="score">${first.totalScore}</div>
+                    ` : ""}
+                </div>
+
+                <div class="podium-step podium-3 text-center">
+                    ${third ? `
+                        <div class="podium-rank rank-3">🥉</div>
+                        <div class="fw-bold">${third.firstName} ${third.lastName}</div>
+                        <div class="text-muted small">${third.cityName}</div>
+                        <div class="score">${third.totalScore}</div>
+                    ` : ""}
+                </div>
+
+            </div>
+        `;
+
+        //DAL QUARTO IN POI
+        list.forEach((app, index) => {
+            if (index < 3) return;
+
+            rankingDiv.innerHTML += `
+                <div class="ranking-row d-flex align-items-center gap-3 p-2 border-bottom">
+                    <div class="rank-number">${index + 1}</div>
+                    <div>
+                        <strong>${app.firstName} ${app.lastName}</strong>
+                        <br><span class="text-muted">${app.cityName}</span>
+                    </div>
+                    <div class="ms-auto fw-bold text-primary">${app.totalScore}</div>
+                </div>
+            `;
+        });
+
+    } catch (err) {
+        console.error("Errore ranking:", err);
+    }
+}
+
+
+// =============================================================
+// APRI/CHIUDI POSIZIONE LAVORATIVA
+// =============================================================
+
+function toggleJobStatus(jobId) {
+    fetch(`servlet/jobopenings/update?jobOpeningId=${jobId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadJobs();
+        } else {
+            alert('Errore durante aggiornamento posizione lavorativa: ' + data.message);
+        }
+    });
+}
+
 
 
 

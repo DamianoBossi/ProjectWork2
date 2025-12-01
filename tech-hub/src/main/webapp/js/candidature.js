@@ -12,7 +12,7 @@ let allJobs = [];
 let jobSkillsMap = new Map();
 
 // =====================================================
-// SKILLS, CONTRACT, CITY, JOBS
+// SKILLS, EMPTYPES, CITY, JOBS, WORKSCHEDS
 // =====================================================
 async function loadMaps() {
   try {
@@ -35,7 +35,7 @@ async function loadMaps() {
     json = await res.json();
     const types = json.data || [];
     empTypesMap.clear();
-    types.forEach(t => empTypesMap.set(String(t.empTypeId), t.name));
+    types.forEach(t => empTypesMap.set(t.empTypeId, t.name));
     const filterContract = document.getElementById('filterContract');
     types.forEach(t => {
       const opt = document.createElement('option');
@@ -70,6 +70,26 @@ async function loadMaps() {
       jobSkillsMap.get(jobId).push(skillId);
     });
 
+
+    // Work Schedules
+
+
+
+    
+    //WORKSCHED 
+    res = await fetch(`servlet/workscheds`);
+    json = await res.json();
+    data = json.data || [];
+
+    workSchedMap.clear();
+
+    //popolo la mappa degli orari di lavoro
+    data.forEach(function (c) {
+        workSchedMap.set(String(c.workSchedId), {
+            name: c.name
+        });
+    });
+
   } catch (e) {
     console.error("Errore loadMaps:", e);
   }
@@ -98,7 +118,7 @@ function cardJob(job) {
   const jobId = String(job.jobOpeningId);
   const skillIds = jobSkillsMap.get(jobId) || [];
   const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
-
+  debugger
   return `
     <div class="col-md-6 col-lg-4 job-card mb-3"
         data-id="${jobId}"
@@ -106,7 +126,7 @@ function cardJob(job) {
         data-contract="${job.empTypeId}"
         data-skills="${skillIds.join(',')}">
 
-        <div class="card h-100 p-3">
+        <div class="card h-100 p-3 job-clickable" onclick="openJobDetails('${job.jobOpeningId}')">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="mb-1">${job.title}</h5>
             <span class="badge rounded-pill bg-light text-primary small">${contract}</span>
@@ -114,12 +134,19 @@ function cardJob(job) {
           <div class="text-muted small mb-2">
             <i class="bi bi-geo-alt"></i> ${city.name || city}
           </div>
-          <p class="mb-2 text-muted small">${job.description || ""}</p>
+          <p class="mb-2 text-muted small job-description">${job.description || ""}</p>
           <div class="small mb-2">
             <strong>Competenze:</strong> ${skillNames.length ? skillNames.join(", ") : "Nessuna specificata"}
           </div>
+
+          
+          <div class="d-flex justify-content-between align-items-center mt-auto">
+            <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
+                <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
   `;
 }
 
@@ -170,6 +197,61 @@ function updateJobsCount() {
   const el = document.getElementById('jobsCount');
   if (el) el.textContent = `${visible} opportunità trovate`;
 }
+
+
+
+
+// =====================================================
+// MODALE DETTAGLI JOBS 
+// =====================================================
+function openJobDetails(jobId) {
+
+    const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
+    if (!job) return;
+
+    const city = citiesMap.get(String(job.cityId));
+    const contract = empTypesMap.get(job.empTypeId);
+
+    const skillIds = jobSkillsMap.get(jobId) || [];
+    const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
+    const workSchedName = workSchedMap.get(String(job.workSchedId))
+        ? workSchedMap.get(String(job.workSchedId)).name
+        : "N/D";
+
+    document.getElementById("jobDetailTitle").textContent = job.title;
+    document.getElementById("jobDetailDescription").textContent = job.description;
+    document.getElementById("jobDetailCity").textContent = city ? city.name : "N/D";
+    document.getElementById("jobDetailContract").textContent = contract || "N/D";
+    document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
+    document.getElementById("jobDetailWorkSched").textContent = workSchedName;
+
+    const skillsWrapper = document.getElementById("skillsWrapper");
+    const container = document.getElementById("jobDetailSkills");
+
+    container.innerHTML = "";
+
+    skillNames.forEach(s => {
+        const pill = document.createElement("span");
+        pill.className = "badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2";
+        pill.textContent = s;
+        container.appendChild(pill);
+    });
+
+    if (skillNames.length === 0) {
+        skillsWrapper.style.display = "none";
+    } else {
+        skillsWrapper.style.display = "block";
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById("jobDetailModal"));
+    modal.show();
+}
+
+
+
+
+
+
 
 // =====================================================
 // LOGOUT

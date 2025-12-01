@@ -578,4 +578,58 @@
   }
 }
 
+/* podio classifica utenti per admin */
+
+.podium-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 30px;
+}
+
+.podium-step {
+  width: 140px;
+  padding: 15px 10px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.podium-1 {
+  height: 160px;
+  background: #ffe9a3;
+}
+
+.podium-2 {
+  height: 130px;
+  background: #e0e0e0;
+}
+
+.podium-3 {
+  height: 110px;
+  background: #f5d3b0;
+}
+
+.podium-rank {
+  font-size: 40px;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+.rank-number {
+  width: 35px;
+  height: 35px;
+  background: #0d6efd;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
 

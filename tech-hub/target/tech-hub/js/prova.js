@@ -236,9 +236,11 @@ async function loadSkills() {
         skillsMap.clear();
         skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
 
+
+        // PILLS DELLE SKILLS NELLA REGISTRAZIONE
         var skillsRegistration = document.getElementById("skillsContainer");
         skillsRegistration.innerHTML = "";
-
+ 
         skills.forEach(function(s) {
  
             var input = document.createElement("input");
@@ -257,6 +259,8 @@ async function loadSkills() {
             skillsRegistration.appendChild(input);
             skillsRegistration.appendChild(label);
         });
+
+
 
         // filtro skill
         const filterSkill = document.getElementById('filterSkill');
@@ -309,6 +313,7 @@ async function loadJobs() {
         const res = await fetch('servlet/jobopenings');
         const json = await res.json();
         allJobs = json.data || [];
+        allJobs = allJobs.filter(job => job.isOpen == "1");
 
         // conta posizioni initiali
         const count = allJobs.length;
@@ -318,6 +323,7 @@ async function loadJobs() {
         if (card) card.textContent = count;
 
         // render cards
+
         renderJobs(allJobs);
 
     } catch (e) {
@@ -342,7 +348,7 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-    
+     
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
@@ -584,6 +590,47 @@ function updateJobsCount() {
 
 
 
+// =====================================================
+// GESTIONE SKILLS 
+// =====================================================
+function addSkill() {
+    const input = document.getElementById("skillInput");
+    const value = input.value.trim();
+    if (!value) return;
+
+    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+    const fSkill = document.getElementById('filterSkill')?.value || '';
+    const fCity = document.getElementById('filterCity')?.value || '';
+    const fContract = document.getElementById('filterContract')?.value || '';
+
+    const cards = document.querySelectorAll('.job-card');
+
+    cards.forEach(card => {
+
+        const title = card.querySelector('h5').textContent.toLowerCase();
+        const city = card.dataset.city;
+        const contract = card.dataset.contract;
+        const skills = card.dataset.skills.split(',');
+
+        const matchSearch = search ? title.includes(search) : true;
+        const matchCity = fCity ? (city === fCity) : true;
+        const matchContract = fContract ? (contract === fContract) : true;
+
+        // skill: un job può avere più skill → se la skill scelta è nei suoi skill
+        const matchSkill = fSkill ? skills.includes(fSkill) : true;
+
+        if (matchSearch && matchCity && matchContract && matchSkill) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    updateJobsCount();
+}
+
+
+
 // =============================================================
 // UPDATE COUNTER
 // =============================================================
@@ -595,15 +642,31 @@ function updateJobsCount() {
 }
 
 
-
-
 // =============================================================
-// MODALE CANDIDATURA APPLICAZIONE
+// SKILL MANAGER (NO TOUCH)
 // =============================================================
-function openApplyModal(role) {
-    const modalEl = document.getElementById('registerModal');
-    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
-    else alert("Candidati per: " + role);
+function addSkill(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if (!val) return;
+
+    const ul = document.getElementById(listId);
+
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.textContent = val;
+
+    const closeIcon = document.createElement("span");
+    closeIcon.innerHTML = "&times;";
+    closeIcon.className = "ms-2 text-danger fw-bold";
+    closeIcon.style.cursor = "pointer";
+
+    closeIcon.onclick = () => li.remove();
+    li.onclick = () => li.remove();
+
+    li.appendChild(closeIcon);
+    ul.appendChild(li);
+    input.value = "";
 }
 
 const addSkillBtn = document.getElementById("addSkillBtn");
@@ -696,24 +759,15 @@ async function handleRegisterSubmit(e) {
     const cityId = registerCity.value || "";
     const address = registerAddress.value.trim();
 
-    /*
-    // mappo skillsList (nomi) -> ids basandomi su SKILLS
-    const lowerInserted = skillsList.map(s => s.toLowerCase());
-    const skillIds = [];
-    for (const [id, name] of skillsMap.entries()) {
-        if (lowerInserted.includes(name.toLowerCase())) {
-            skillIds.push(parseInt(id, 10));
-        }
-    }*/
-
+ 
     // PRENDI LE SKILL SELEZIONATE
     var checkedSkills = document.querySelectorAll('input[name="skillsRegistration[]"]:checked');
     var skills = [];
-
+ 
     for (var i = 0; i < checkedSkills.length; i++) {
         skills.push(parseInt(checkedSkills[i].value));
     }
-
+ 
     const payload = {
         firstName,
         lastName,
@@ -774,6 +828,9 @@ async function handleRegisterSubmit(e) {
 
 
         registerForm.reset();
+        skillsList.length = 0;
+        const ul = document.getElementById("skillsList");
+        if (ul) ul.innerHTML = "";
 
         const regModal = document.getElementById('registerModal');
         if (regModal) {
