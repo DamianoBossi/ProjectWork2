@@ -53,31 +53,28 @@
           <input type="email" class="form-control" id="profileEmail" required>
         </div>
         <div class="col-md-6">
-          <label for="profileDob" class="form-label">Data di nascita</label>
-          <input type="date" class="form-control" id="profileDob" required>
+          <label for="profileBirthDate" class="form-label">Data di nascita</label>
+          <input type="date" class="form-control" id="profileBirthDate" required>
         </div>
       </div>
 
       <!-- PAESE / REGIONE / CITTÀ -->
       <div class="row g-3 mb-3">
         <div class="col-md-4">
-          <label for="registerCountry" class="form-label">Paese</label>
-          <select id="registerCountry" class="form-select" required>
-            <option value="">Seleziona paese</option>
+          <label for="profileCountry" class="form-label">Paese</label>
+          <select id="profileCountry" class="form-select" required>
           </select>
         </div>
 
         <div class="col-md-4">
-          <label for="registerRegion" class="form-label">Regione</label>
-          <select id="registerRegion" class="form-select" disabled required>
-            <option value="">Seleziona regione</option>
+          <label for="profileRegion" class="form-label">Regione</label>
+          <select id="profileRegion" class="form-select" required>
           </select>
         </div>
 
         <div class="col-md-4">
-          <label for="registerCity" class="form-label">Città</label>
-          <select id="registerCity" class="form-select" disabled required>
-            <option value="">Seleziona città</option>
+          <label for="profileCity" class="form-label">Città</label>
+          <select id="profileCity" class="form-select" required>
           </select>
         </div>
       </div>
@@ -89,9 +86,14 @@
       </div>
 
       <!-- SKILLS -->
-      <div class="mb-3">
-        <label for="profileSkills" class="form-label">Skills (separate da virgola)</label>
-        <input type="text" class="form-control" id="profileSkills" placeholder="React, Node.js, SQL">
+      <div class="col-md-12 mb-3">
+          <label for="profileSkills" class="form-label">Le tue skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+          <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="profileSkills">   
+                <!--<input type="checkbox" class="btn-check" id="profileSkills1" autocomplete="off" name="profileSkills[]" value="1"> 
+                <label class="btn btn-primary" for="profileSkills1">HTML</label>
+                <input type="checkbox" class="btn-check" id="profileSkills2" autocomplete="off"  name="profileSkills[]" value="2"> 
+                <label class="btn btn-primary" for="profileSkills2">CSS</label>-->
+          </div>
       </div>
 
       <!-- CV -->
@@ -100,9 +102,12 @@
         <input type="file" class="form-control" id="profileCv" accept=".pdf,.doc,.docx">
       </div>
 
-      <button type="submit" class="btn btn-primary btn-sm btn-icon">
-        <i class="bi bi-save me-2"></i>Salva Modifiche
-      </button>
+      <!-- SUBMIT -->
+      <div class="mb-2 w-100 d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary btn-lg" style="font-size: 1rem; padding: 0.5rem 1.5rem;">
+          <i class="bi bi-plus-circle"></i> Salva Modifiche
+        </button>
+      </div>
     </form>
   </main>
 
