@@ -336,11 +336,12 @@
                 <div class="mt-4">
                 
                     <h5 class="fw-bold text-primary mb-3">Classifica Candidati</h5>
+                    <p id="jobDetailNoCandidates" class="text-muted d-none">Non ci sono candidati per questa posizione</p>
                     <div id="jobDetailPodium" class="my-4">
                     </div>
                 
                     <!-- LISTA DAL 4° POSTO IN POI -->
-                    <h6 class="fw-semibold mt-4">Tutti i candidati</h6>
+                    <h6 id="jobDetailAllCandidatesHeader" class="fw-semibold mt-4 d-none">Tutti i candidati</h6>
                     <div id="jobDetailRanking" class="list-group">
                     </div>
                 
@@ -392,9 +393,61 @@
 </div>
 
 
-    <!-- MODALE CANDIDATI e CLASSIFICA -->
-    <!--TODO!-->
+<!-- MODALE DETTAGLI CANDIDATO -->
+<div class="modal fade" id="candidateDetailModal" tabindex="-1" aria-labelledby="candidateDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
 
+            <div class="modal-header text-white" style="background: var(--bs-primary);">
+                <h5 class="modal-title fw-semibold" id="candidateDetailLabel">Dettagli candidato</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Chiudi"></button>
+            </div>
+
+            <div class="modal-body p-4">
+
+                <h3 id="candidateDetailName" class="fw-bold mb-3 text-primary"></h3>
+
+                <div class="row g-3 row-cols-1 row-cols-md-2 mb-4">
+
+                    <div class="col">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-semibold mb-1"><i class="bi bi-envelope-fill text-primary"></i> Email</h6>
+                            <span id="candidateDetailEmail" class="text-muted"></span>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-semibold mb-1"><i class="bi bi-geo-alt-fill text-primary"></i> Città</h6>
+                            <span id="candidateDetailCity" class="text-muted"></span>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-semibold mb-1"><i class="bi bi-calendar-event-fill text-primary"></i> Data di nascita</h6>
+                            <span id="candidateDetailBirthDate" class="text-muted"></span>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-semibold mb-1"><i class="bi bi-map-fill text-primary"></i> Indirizzo</h6>
+                            <span id="candidateDetailAddress" class="text-muted"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
     <!-- SCRIPTS -->

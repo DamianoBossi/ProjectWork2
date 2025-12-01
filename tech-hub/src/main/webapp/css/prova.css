@@ -595,6 +595,9 @@
 }
 
 .podium-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   width: 140px;
   padding: 15px 10px;
   border-radius: 12px;
@@ -603,22 +606,22 @@
 }
 
 .podium-1 {
-  height: 160px;
+  height: 200px;
   background: #ffe9a3;
 }
 
 .podium-2 {
-  height: 130px;
+  height: 165px;
   background: #e0e0e0;
 }
 
 .podium-3 {
-  height: 110px;
+  height: 150px;
   background: #f5d3b0;
 }
 
 .podium-rank {
-  font-size: 40px;
+  font-size: 30px;
 }
 
 .score {

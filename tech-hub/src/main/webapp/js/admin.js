@@ -375,6 +375,53 @@ function openJobDetails(jobId) {
 
 
 // =========================
+// MODALE DETTAGLI CANDIDATO
+// =========================
+async function openCandidateModal(jobId, position) {
+    const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
+    if (!job) return;
+
+    try {
+        const res = await fetch(`servlet/jobapplications?jobOpeningId=${jobId}`);
+        const json = await res.json();
+        let list = json.data || [];
+        
+        list.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+        const candidate = list[position - 1];
+        
+        if (!candidate) return;
+
+        // Fetch dettagli utente da UserShow
+        const userRes = await fetch(`servlet/users/${candidate.userId}`);
+        const userData = await userRes.json();
+        const user = userData.data[0] || {};
+
+        // Popolo la modale con i dati del candidato
+        document.getElementById('candidateDetailName').textContent = `${user.firstName} ${user.lastName}`;
+        document.getElementById('candidateDetailCity').textContent = candidate.cityName;
+
+        const emailEl = document.getElementById('candidateDetailEmail');
+        if (user.email) {
+            emailEl.textContent = user.email;
+            emailEl.href = `mailto:${user.email}`;
+            emailEl.classList.remove('text-muted');
+        } else {
+            emailEl.textContent = 'N/D';
+            emailEl.removeAttribute('href');
+            emailEl.classList.add('text-muted');
+        }
+        document.getElementById('candidateDetailBirthDate').textContent = user.birthDate || 'N/D';
+        document.getElementById('candidateDetailAddress').textContent = user.address || 'N/D';
+
+        // Apro la modale
+        const modal = new bootstrap.Modal(document.getElementById('candidateDetailModal'));
+        modal.show();
+    } catch (err) {
+        console.error('Errore caricamento candidato:', err);
+    }
+}
+
+// =========================
 // CLASSIFICA CANDIDATI 
 // =========================
 async function loadRanking(jobId) {
@@ -387,18 +434,28 @@ async function loadRanking(jobId) {
         // ORDINA IN MANIERA DECRESCENTE
         list.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
 
+        const jobDetailsCandidatesDiv = document.getElementById("jobDetailCandidates");
         const rankingDiv = document.getElementById("jobDetailRanking");
         const podiumDiv = document.getElementById("jobDetailPodium");
+        const allCandidatesHeader = document.getElementById('jobDetailAllCandidatesHeader');
 
         rankingDiv.innerHTML = "";
         podiumDiv.innerHTML = "";
 
         //SE NON CI SONO CANDIDATI
+        const noCandidatesEl = document.getElementById('jobDetailNoCandidates');
         if (list.length === 0) {
-            podiumDiv.innerHTML = `<p class="text-muted">Nessuna candidatura presente</p>`;
+            // Mostra messaggio dedicato e pulisci gli altri contenitori
+            if (noCandidatesEl) noCandidatesEl.classList.remove('d-none');
+            if (podiumDiv) podiumDiv.innerHTML = "";
+            if (rankingDiv) rankingDiv.innerHTML = "";
+            if (allCandidatesHeader) allCandidatesHeader.classList.add('d-none');
             return;
-        }
-
+        } 
+            
+        if (noCandidatesEl) noCandidatesEl.classList.add('d-none');  
+        if (allCandidatesHeader) allCandidatesHeader.classList.remove('d-none');
+     
         const first = list[0];
         const second = list[1];
         const third = list[2];
@@ -411,7 +468,6 @@ async function loadRanking(jobId) {
                         <div class="podium-rank rank-2">🥈</div>
                         <div class="fw-bold">${second.firstName} ${second.lastName}</div>
                         <div class="text-muted small">${second.cityName}</div>
-                        <div class="score">${second.totalScore}</div>
                     ` : ""}
                 </div>
 
@@ -420,7 +476,6 @@ async function loadRanking(jobId) {
                         <div class="podium-rank rank-1">🥇</div>
                         <div class="fw-bold">${first.firstName} ${first.lastName}</div>
                         <div class="text-muted small">${first.cityName}</div>
-                        <div class="score">${first.totalScore}</div>
                     ` : ""}
                 </div>
 
@@ -429,7 +484,6 @@ async function loadRanking(jobId) {
                         <div class="podium-rank rank-3">🥉</div>
                         <div class="fw-bold">${third.firstName} ${third.lastName}</div>
                         <div class="text-muted small">${third.cityName}</div>
-                        <div class="score">${third.totalScore}</div>
                     ` : ""}
                 </div>
 
@@ -438,16 +492,15 @@ async function loadRanking(jobId) {
 
         //DAL QUARTO IN POI
         list.forEach((app, index) => {
-            if (index < 3) return;
 
-            rankingDiv.innerHTML += `
-                <div class="ranking-row d-flex align-items-center gap-3 p-2 border-bottom">
+            rankingDiv.innerHTML += `                     
+                <div class="ranking-row d-flex align-items-center gap-3 p-2 border-bottom" style="cursor: pointer;" onclick="openCandidateModal('${jobId}', ${index + 1})">
                     <div class="rank-number">${index + 1}</div>
                     <div>
                         <strong>${app.firstName} ${app.lastName}</strong>
                         <br><span class="text-muted">${app.cityName}</span>
                     </div>
-                    <div class="ms-auto fw-bold text-primary">${app.totalScore}</div>
+                    <div class="ms-auto fw-bold text-primary"><strong>Punteggio: ${app.totalScore} </strong></div>
                 </div>
             `;
         });
