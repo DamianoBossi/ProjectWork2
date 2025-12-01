@@ -1,9 +1,8 @@
 
-const countriesMap = new Map(); // countryId -> { name }
-const regionsMap = new Map(); // regionId  -> { name, countryId }
-const citiesMap = new Map(); // cityId    -> { name, regionId }
-const skillsMap = new Map(); // skillId   -> name
-const workSchedMap = new Map(); // workSchedId -> name 
+var countriesMap = new Map(); // countryId -> { name }
+var regionsMap = new Map(); // regionId -> { name, countryId }
+var citiesMap = new Map(); // cityId -> { name, regionId }
+var skillsMap = new Map(); // skillId -> name
 
 var myFirstName = "";
 var myLastName = "";
@@ -111,10 +110,11 @@ async function loadRegions() {
         sel.appendChild(optVuota);
 
         data.forEach(r => {
-           if (String(r.countryId) == String(myCountry)) {
+            if (String(r.countryId) == String(myCountry)) {
                 const opt = document.createElement("option");
                 opt.value = r.regionId;
-                opt.textContent = r.name;if (r.regionId == myRegion && myCountry == oldCountry) {
+                opt.textContent = r.name;
+                if (r.regionId == myRegion && myCountry == oldCountry) {
                     opt.selected = true
                 }
                 sel.appendChild(opt);
@@ -168,21 +168,6 @@ async function loadCities() {
             });
         }
 
-        // filtri jobs
-        const filterCity = document.getElementById("filterCity");
-        if (!filterCity) return;
-
-        filterCity.innerHTML = `<option value="">Sede (Tutte)</option>`;
-        data.forEach(c => {
-            const opt = document.createElement("option");
-            opt.value = c.cityId;
-            opt.textContent = c.name;
-            filterCity.appendChild(opt);
-        });
-
-        if (regionId) citySel.disabled = false;
-        debugger
-
     } catch (e) {
         console.error("Errore loadCities:", e);
     }
@@ -196,15 +181,17 @@ async function loadSkills() {
         var skills = json.data || [];
 
         skillsMap.clear();
+
         //popolo la mappa delle skill   
         skills.forEach(function(s) {
             skillsMap.set(s.skillId, { name: s.name });
         });
+
         var profileSkills = document.getElementById("skillsContainer");
         profileSkills.innerHTML = "";
 
         skills.forEach(function(s) {
-
+ 
             var input = document.createElement("input");
             input.type = "checkbox";
             input.className = "btn-check";
@@ -212,12 +199,12 @@ async function loadSkills() {
             input.name = "profileSkills[]";
             input.value = s.skillId;
             input.autocomplete = "off";
-
+ 
             var label = document.createElement("label");
             label.className = "btn btn-primary";
             label.htmlFor = input.id;
             label.textContent = s.name;
-
+ 
             profileSkills.appendChild(input);
             profileSkills.appendChild(label);
         });
@@ -225,7 +212,6 @@ async function loadSkills() {
         console.error("Errore loadSkills:", e); 
     }
 }
-
 // =====================================================
 // LOGOUT
 // =====================================================
@@ -310,9 +296,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     //TODO: inizializza cv
 
-  document.getElementById("registerRegion").addEventListener("change", async function () {
-    await loadCities(this.value);
-  });
 });
 
 //TODO: quando invierò le modifiche ricordarsi di fare controllo che ci siano state effettivamente modifiche
@@ -338,19 +321,36 @@ save.addEventListener("submit", async function (e) {
     }
 
     //controllo se ci sono state effettivamente modifiche
-    var isModified = true;
-    if (profileFirstName.value.trim()==initialFirstName && profileLastName.value.trim()==initialLastName && profileBirthDate.value.trim()==initialBirthDate && 
-            profileCountry.value==initialCountry && profileRegion.value==initialRegion && profileCity.value==initialCity && profileAddress.value.trim()==initialAddress /*TODO cv*/) {
-        
-        if (profileSkills.length == initialSkills.length) {
-            for (var i = 0; i < profileSkills.length; i++) {
+    var isModified = false;
+
+    // Controllo campi singoli
+    if (
+        profileFirstName.value.trim() != initialFirstName ||
+        profileLastName.value.trim() != initialLastName ||
+        profileBirthDate.value.trim() != initialBirthDate ||
+        profileCountry.value != initialCountry ||
+        profileRegion.value != initialRegion ||
+        profileCity.value != initialCity ||
+        profileAddress.value.trim() != initialAddress
+    ) {
+        isModified = true;
+    }
+
+    // Controllo skills (ordine non importa)
+    if (!isModified) {
+        if (profileSkills.length != initialSkills.length) {
+            isModified = true;
+        } else {
+            for (var i = 0; i < initialSkills.length; i++) {
                 if (!profileSkills.includes(initialSkills[i])) {
-                    isModified = false; 
+                    isModified = true;
                     break;
                 }
             }
         }
     }
+
+    // Se tutto è uguale, ricarico
     if (!isModified) {
         location.reload();
         return;
