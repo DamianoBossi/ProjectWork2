@@ -48,7 +48,11 @@ public class jobApplicationMe extends HttpServlet {
 
             HttpSession currentSession = request.getSession(false);
 
-            // TODO: se non esiste una sessione corrente ritornare apposito errore!
+            if (currentSession == null || currentSession.getAttribute("username") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write(gson.toJson(errorResponse("Errore: utente non autenticato.")));
+                return;
+            }
 
             String email = (String) currentSession.getAttribute("username");
 
@@ -56,17 +60,18 @@ public class jobApplicationMe extends HttpServlet {
 
             resultSet = statement.executeQuery(userIdQuery);
 
-            if (!resultSet.next()) {
-                /* TODO: gestire errore */ } // restituite meno di una tupla dalla query
+            resultSet.next();
 
             int sessionUserId = resultSet.getInt("USERID");
 
-            if (resultSet.next()) {
-                /* TODO: gestire errore */ } // restituite più di una tupla dalla query
+            if (resultSet.next()) { // restituite più di una tupla dalla query
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(gson.toJson(errorResponse("Errore: più utenti con la stessa email.")));
+                return;
+            }
 
             String query = "select a.APPLICATIONID, a.USERID, a.TOTALSCORE, a.CREATEDAT, a.LETTER, jo.* from APPLICATIONS a join JOBOPENINGS jo on a.JOBOPENINGID = jo.JOBOPENINGID where USERID = "
                     + sessionUserId;
-            // TODO: controlla se ci sono altre possibili condizioni in cui lanciare errore
 
             resultSet = statement.executeQuery(query);
 

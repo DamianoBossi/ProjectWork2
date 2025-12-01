@@ -96,10 +96,18 @@
           </div>
       </div>
 
-      <!-- CV -->
-      <div class="mb-3">
-        <label for="profileCv" class="form-label">CV (PDF/DOC)</label>
-        <input type="file" class="form-control" id="profileCv" accept=".pdf,.doc,.docx">
+      <!--visualizza vecchio CV -->
+      <div class="mb-3 col-md-6">
+        <label for="profileOldCV" class="form-label">il tuo CV (PDF)</label>
+        <div>
+          <a id="profileOldCV" href="" title="Visualizza il tuo CV attuale" target="_blank">Visualizza il tuo CV attuale</a>
+        </div>
+      </div>
+
+      <!--inserisci nuovo CV -->
+      <div class="mb-3 col-md-6">
+        <label for="profileNewCV" class="form-label">carica un nuovo CV (PDF)</label>
+        <input type="file" class="form-control" id="profileNewCV" accept=".pdf">
       </div>
 
       <!-- SUBMIT -->

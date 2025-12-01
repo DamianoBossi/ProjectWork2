@@ -236,11 +236,9 @@ async function loadSkills() {
         skillsMap.clear();
         skills.forEach(s => skillsMap.set(String(s.skillId), s.name));
 
-
-        // PILLS DELLE SKILLS NELLA REGISTRAZIONE
         var skillsRegistration = document.getElementById("skillsContainer");
         skillsRegistration.innerHTML = "";
- 
+
         skills.forEach(function(s) {
  
             var input = document.createElement("input");
@@ -259,8 +257,6 @@ async function loadSkills() {
             skillsRegistration.appendChild(input);
             skillsRegistration.appendChild(label);
         });
-
-
 
         // filtro skill
         const filterSkill = document.getElementById('filterSkill');
@@ -313,7 +309,6 @@ async function loadJobs() {
         const res = await fetch('servlet/jobopenings');
         const json = await res.json();
         allJobs = json.data || [];
-        allJobs = allJobs.filter(job => job.isOpen == "1");
 
         // conta posizioni initiali
         const count = allJobs.length;
@@ -323,7 +318,6 @@ async function loadJobs() {
         if (card) card.textContent = count;
 
         // render cards
-
         renderJobs(allJobs);
 
     } catch (e) {
@@ -348,7 +342,7 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-     
+    
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
@@ -590,47 +584,6 @@ function updateJobsCount() {
 
 
 
-// =====================================================
-// GESTIONE SKILLS 
-// =====================================================
-function addSkill() {
-    const input = document.getElementById("skillInput");
-    const value = input.value.trim();
-    if (!value) return;
-
-    const search = (document.getElementById('jobSearch')?.value || '').toLowerCase();
-    const fSkill = document.getElementById('filterSkill')?.value || '';
-    const fCity = document.getElementById('filterCity')?.value || '';
-    const fContract = document.getElementById('filterContract')?.value || '';
-
-    const cards = document.querySelectorAll('.job-card');
-
-    cards.forEach(card => {
-
-        const title = card.querySelector('h5').textContent.toLowerCase();
-        const city = card.dataset.city;
-        const contract = card.dataset.contract;
-        const skills = card.dataset.skills.split(',');
-
-        const matchSearch = search ? title.includes(search) : true;
-        const matchCity = fCity ? (city === fCity) : true;
-        const matchContract = fContract ? (contract === fContract) : true;
-
-        // skill: un job può avere più skill → se la skill scelta è nei suoi skill
-        const matchSkill = fSkill ? skills.includes(fSkill) : true;
-
-        if (matchSearch && matchCity && matchContract && matchSkill) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
-    });
-
-    updateJobsCount();
-}
-
-
-
 // =============================================================
 // UPDATE COUNTER
 // =============================================================
@@ -642,31 +595,15 @@ function updateJobsCount() {
 }
 
 
+
+
 // =============================================================
-// SKILL MANAGER (NO TOUCH)
+// MODALE CANDIDATURA APPLICAZIONE
 // =============================================================
-function addSkill(inputId, listId) {
-    const input = document.getElementById(inputId);
-    const val = input.value.trim();
-    if (!val) return;
-
-    const ul = document.getElementById(listId);
-
-    const li = document.createElement("li");
-    li.className = "list-group-item d-flex justify-content-between align-items-center";
-    li.textContent = val;
-
-    const closeIcon = document.createElement("span");
-    closeIcon.innerHTML = "&times;";
-    closeIcon.className = "ms-2 text-danger fw-bold";
-    closeIcon.style.cursor = "pointer";
-
-    closeIcon.onclick = () => li.remove();
-    li.onclick = () => li.remove();
-
-    li.appendChild(closeIcon);
-    ul.appendChild(li);
-    input.value = "";
+function openApplyModal(role) {
+    const modalEl = document.getElementById('registerModal');
+    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    else alert("Candidati per: " + role);
 }
 
 const addSkillBtn = document.getElementById("addSkillBtn");
@@ -759,15 +696,24 @@ async function handleRegisterSubmit(e) {
     const cityId = registerCity.value || "";
     const address = registerAddress.value.trim();
 
- 
+    /*
+    // mappo skillsList (nomi) -> ids basandomi su SKILLS
+    const lowerInserted = skillsList.map(s => s.toLowerCase());
+    const skillIds = [];
+    for (const [id, name] of skillsMap.entries()) {
+        if (lowerInserted.includes(name.toLowerCase())) {
+            skillIds.push(parseInt(id, 10));
+        }
+    }*/
+
     // PRENDI LE SKILL SELEZIONATE
     var checkedSkills = document.querySelectorAll('input[name="skillsRegistration[]"]:checked');
     var skills = [];
- 
+
     for (var i = 0; i < checkedSkills.length; i++) {
         skills.push(parseInt(checkedSkills[i].value));
     }
- 
+
     const payload = {
         firstName,
         lastName,
@@ -782,6 +728,42 @@ async function handleRegisterSubmit(e) {
     };
 
     try {
+        const cvInput = document.getElementById('registerCv');
+        if (cvInput && cvInput.files && cvInput.files.length > 0) {
+            const file = cvInput.files[0];
+            const MAX_BYTES = 10 * 1024 * 1024;
+            if (file.size > MAX_BYTES) {
+                alert("Il file CV è troppo grande (max 10 MB).");
+                return;
+            }
+            if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+                alert("Carica un file PDF valido.");
+                return;
+            }
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = reader.result;
+                    if (typeof result == "string") {
+                        const parts = result.split(",");
+                        resolve(parts.length > 1 ? parts[1] : parts[0]);
+                    } else {
+                        const bytes = new Uint8Array(result);
+                        let binary = "";
+                        const chunkSize = 0x8000;
+                        for (let i = 0; i < bytes.length; i += chunkSize) {
+                            binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunkSize)));
+                        }
+                        resolve(btoa(binary));
+                    }
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(file);
+            });
+            payload.cv = base64;
+        }
+        //TODO: else dare errore?!
+
         const res = await fetch('servlet/registration', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -797,49 +779,45 @@ async function handleRegisterSubmit(e) {
         if (json.redirect) {
             window.location.href = json.redirect;
         }
-
-
-        
-        try {
-            const res = await fetch("servlet/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-    
-            const json = await res.json();
-    
-            if (!json.success) throw new Error(json.message || "Credenziali errate");
-    
-            if (json.redirect) {
-                window.location.href = json.redirect;
-            }
-    
-            localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
-            bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
-    
-            hideButtons();
-    
-    
-        } catch (e) {
-            console.error("Errore login:", e);
-            alert(e.message);
-        }
-
-
-        registerForm.reset();
-        skillsList.length = 0;
-        const ul = document.getElementById("skillsList");
-        if (ul) ul.innerHTML = "";
-
-        const regModal = document.getElementById('registerModal');
-        if (regModal) {
-            bootstrap.Modal.getOrCreateInstance(regModal).hide();
-        }
-
     } catch (err) {
         console.error("Errore registrazione:", err);
         alert("Errore: " + err.message);
+        return;
+    }
+    
+    // AUTO LOGIN DOPO REGISTRAZIONE
+    try {
+        const res = await fetch("servlet/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const json = await res.json();
+
+        if (!json.success) throw new Error(json.message || "Credenziali errate");
+
+        if (json.redirect) {
+            window.location.href = json.redirect;
+        }
+
+        localStorage.setItem("utenteLoggato", JSON.stringify(json.data));
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
+
+        hideButtons();
+
+
+    } catch (e) {
+        console.error("Errore login:", e);
+        alert(e.message);
+        return;
+    }
+
+    registerForm.reset();
+
+    const regModal = document.getElementById('registerModal');
+    if (regModal) {
+        bootstrap.Modal.getOrCreateInstance(regModal).hide();
     }
 }
 

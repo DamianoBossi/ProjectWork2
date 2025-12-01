@@ -15,9 +15,9 @@ var oldRegion = myRegion;
 var myCity = 0;
 var myAddress = "";
 var mySkills = [];
-//TODO: var myCV = "";
+var myCVFilePath = "";
 
-var initialFirstName, initialLastName, initialEmail, initialBirthDate, initialCountry, initialRegion, initialCity, initialAddress/*TODO, initialCV*/;
+var initialFirstName, initialLastName, initialEmail, initialBirthDate, initialCountry, initialRegion, initialCity, initialAddress, initialCVFilePath;
 var initialSkills = [];
 
 async function initializeProfile() {
@@ -47,7 +47,8 @@ async function initializeProfile() {
         initialAddress = myAddress
         mySkills = data.skills;
         initialSkills = mySkills;
-        //TODO: cv
+        myCVFilePath = "localhost:8080" + data.cvFilePath;
+        initialCVFilePath = myCVFilePath;
     } catch (e) {
         console.error("Errore initiaizeProfile:", e);
     }
@@ -212,11 +213,10 @@ async function loadSkills() {
         console.error("Errore loadSkills:", e); 
     }
 }
+
 // =====================================================
 // LOGOUT
 // =====================================================
-
-
 if (document.getElementById("logout-btn")) {
     document.getElementById("logout-btn").onclick = async () => {
         try {
@@ -237,7 +237,23 @@ if (document.getElementById("logout-btn")) {
 
 //Popolamento DOM con i dati dell'utente
 document.addEventListener("DOMContentLoaded", async function () {
-    await initializeProfile();
+    await initializeProfile(); 
+
+    var profileOldCV = document.getElementById("profileOldCV");
+    profileOldCV.href = myCVFilePath;
+
+    //TODO: DA AGGIUSTARE
+    document.getElementById("profileOldCV").addEventListener("click", async function (e) {
+        e.preventDefault();
+        if (myCVFilePath && myCVFilePath.trim() !== "") {
+            setTimeout(() => {
+                const newWindow = window.open(myCVFilePath, "_blank");
+            if (newWindow) newWindow.location.reload();
+        }, 200);
+        } else {
+            return;
+        }
+    });
 
     var profileFirstName = document.getElementById("profileFirstName");
     profileFirstName.value = myFirstName;
@@ -294,11 +310,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         cb.checked = mySkills.includes(cb.value);
     }
 
-    //TODO: inizializza cv
-
 });
 
-//TODO: quando invierò le modifiche ricordarsi di fare controllo che ci siano state effettivamente modifiche
 //submit delle modifiche
 var save = document.getElementById("profileForm")
 save.addEventListener("submit", async function (e) {
@@ -312,7 +325,7 @@ save.addEventListener("submit", async function (e) {
     var profileAddress = document.getElementById("profileAddress");
     var profileSkillsArr = document.getElementsByName("profileSkills[]");
     var profileSkills = [];
-    //TODO: gestire cv
+    var profileNewCV = document.getElementById("profileNewCV");
 
     for (var i = 0; i < profileSkillsArr.length; i++) {
         if (profileSkillsArr[i].checked) {
@@ -331,7 +344,8 @@ save.addEventListener("submit", async function (e) {
         profileCountry.value != initialCountry ||
         profileRegion.value != initialRegion ||
         profileCity.value != initialCity ||
-        profileAddress.value.trim() != initialAddress
+        profileAddress.value.trim() != initialAddress ||
+        profileNewCV.files.length > 0
     ) {
         isModified = true;
     }
@@ -367,8 +381,41 @@ save.addEventListener("submit", async function (e) {
         cityId: profileCity.value,
         address: profileAddress.value.trim(),
         skills: profileSkills
-        //TODO:cv
     };
+
+    if (profileNewCV && profileNewCV.files && profileNewCV.files.length > 0) {
+        const file = profileNewCV.files[0];
+        const MAX_BYTES = 10 * 1024 * 1024;
+        if (file.size > MAX_BYTES) {
+            alert("Il file CV è troppo grande (max 10 MB).");
+            return;
+        }
+        if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+            alert("Carica un file PDF valido.");
+            return;
+        }
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result;
+                if (typeof result == "string") {
+                    const parts = result.split(",");
+                    resolve(parts.length > 1 ? parts[1] : parts[0]);
+                } else {
+                    const bytes = new Uint8Array(result);
+                    let binary = "";
+                    const chunkSize = 0x8000;
+                    for (let i = 0; i < bytes.length; i += chunkSize) {
+                        binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunkSize)));
+                    }
+                    resolve(btoa(binary));
+                }
+            };
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
+        payload.cv = base64;
+    }
 
     try {
         var response = await fetch("servlet/users/me/update", {

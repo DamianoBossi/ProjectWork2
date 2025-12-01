@@ -1,6 +1,8 @@
 package it.zucchetti.packages.servlet.sessionsManagement;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -9,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Base64;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -170,8 +173,7 @@ public class Registration extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write("{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
@@ -184,8 +186,7 @@ public class Registration extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write( "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -219,6 +220,68 @@ public class Registration extends HttpServlet {
                 ? obj.get("countryId").getAsInt()
                 : 0;
 
+        // TODO: meglio double
+        float latitude = 0f;
+        float longitude = 0f;
+
+        //path del file CV da salvare nel DB
+        String cvFilePathDB = null; // TODO
+
+        //Recupero stringa Base64 del CV
+        String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
+
+        //Gestione Salvataggio File CV
+        if (cvBase64 != null && !cvBase64.isEmpty()) {
+            try {
+                // Se la stringa base64 ha l'header lo rimuovo
+                if (cvBase64.contains(",")) {
+                    cvBase64 = cvBase64.split(",")[1];
+                }
+
+                byte[] cvBytes = Base64.getDecoder().decode(cvBase64);
+
+                // Controllo che il file sia davvero un PDF
+                if (cvBytes.length < 4 ||!(cvBytes[0] == '%' && cvBytes[1] == 'P' && cvBytes[2] == 'D' && cvBytes[3] == 'F')) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"success\": false, \"message\": \"Il file caricato non è un PDF valido.\"}");
+                    return;
+                }
+
+                //Cartella di destinazione (NEL TOMCAT, non nella cartella del progetto)
+                String uploadPath = getServletContext().getRealPath("") + File.separator + "curriculum";
+                
+                //creo la cartella se non esiste
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                //Generiamo un nome file unico per evitare sovrascritture (in sto caso è email_timestamp.pdf)
+                //Assumiamo sia un PDF, altrimenti bisognerebbe analizzare i primi byte del file
+                String fileName = email.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ".pdf";
+                String fullPath = uploadPath + File.separator + fileName;
+
+                try (FileOutputStream fos = new FileOutputStream(fullPath)) {
+                    fos.write(cvBytes);
+                }
+
+                // Questo è il path che salviamo nel DB (relativo alla cartella target del Tomcat)
+                cvFilePathDB = "/tech-hub/curriculum/" + fileName;
+
+            } catch (IllegalArgumentException e) {
+                System.err.println("Errore decodifica Base64: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"success\": false, \"message\": \"Errore nel formato del file CV.\"}");
+                return;
+            } catch (IOException e) {
+                System.err.println("Errore salvataggio file: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write("{\"success\": false, \"message\": \"Errore nel salvataggio del file CV.\"}");
+                return;
+            }
+        }
+        
+        //validazione parametri
         /*
          * if (!registrationValidation(email, password, firstName, lastName, birthdate,
          * address, cityId, regionId, countryId)) {
@@ -238,293 +301,6 @@ public class Registration extends HttpServlet {
          * return;
          * }
          */
-
-        /*
-         * //impostazione di latitude e longitude
-         * String city = null;
-         * String region = null;
-         * String country = null;
-         * try {
-         * String cityNameQuery = "SELECT NAME FROM CITIES WHERE CITYID = '" + cityId +
-         * "'";
-         * ResultSet resultSet = statement.executeQuery(cityNameQuery);
-         * 
-         * if (resultSet.next()) {
-         * city = resultSet.getString("NAME");
-         * resultSet.close();
-         * }
-         * else {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare il nome della città.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare il nome della città e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         * } catch (SQLException e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore SQL nella Query per ricavare il nome della città.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore SQL nella Query per ricavare il nome della città e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * } catch (Exception e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare il nome della città.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare il nome della città e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         * 
-         * try {
-         * String regionNameQuery = "SELECT NAME FROM REGIONS WHERE REGIONID = '" +
-         * regionId + "'";
-         * ResultSet resultSet = statement.executeQuery(regionNameQuery);
-         * 
-         * if (resultSet.next()) {
-         * region = resultSet.getString("NAME");
-         * resultSet.close();
-         * }
-         * else {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare il nome della regione.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare il nome della regione e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         * } catch (SQLException e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore SQL nella Query per ricavare il nome della regione.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore SQL nella Query per ricavare il nome della regione e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * } catch (Exception e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare il nome della regione.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare il nome della regione e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         * 
-         * try {
-         * String countryNameQuery = "SELECT NAME FROM COUNTRIES WHERE COUNTRYID = '" +
-         * countryId + "'";
-         * ResultSet resultSet = statement.executeQuery(countryNameQuery);
-         * 
-         * if (resultSet.next()) {
-         * country = resultSet.getString("NAME");
-         * resultSet.close();
-         * }
-         * else {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare il nome del paese.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare il nome del paese e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         * } catch (SQLException e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore SQL nella Query per ricavare il nome del paese.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore SQL nella Query per ricavare il nome del paese e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * } catch (Exception e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare il nome del paese.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare il nome del paese e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         * 
-         * String fullAddress = address + ", " + city + ", " + region + ", " + country;
-         */
-
-        // TODO: meglio double
-        float latitude = 0f;
-        float longitude = 0f;
-
-        /*
-         * try {
-         * String apiKey = "LA_TUA_API_KEY"; // sostituire con la tua API Key
-         * String encodedAddress = java.net.URLEncoder.encode(fullAddress, "UTF-8");
-         * String urlStr = "https://maps.googleapis.com/maps/api/geocode/json?address="
-         * + encodedAddress + "&key=" + apiKey;
-         * 
-         * java.net.URL url = new java.net.URL(urlStr);
-         * java.net.HttpURLConnection conn = (java.net.HttpURLConnection)
-         * url.openConnection();
-         * conn.setRequestMethod("GET");
-         * 
-         * BufferedReader reader = new BufferedReader(new
-         * java.io.InputStreamReader(conn.getInputStream()));
-         * StringBuilder responseSb = new StringBuilder();
-         * String responseLine;
-         * while ((responseLine = reader.readLine()) != null) {
-         * responseSb.append(responseLine);
-         * }
-         * reader.close();
-         * 
-         * String jsonResponse = responseSb.toString();
-         * 
-         * JsonObject responseObj =
-         * JsonParser.parseString(jsonResponse).getAsJsonObject();
-         * JsonArray results = responseObj.getAsJsonArray("results");
-         * 
-         * if (results.size() > 0) {
-         * JsonObject location = results.get(0)
-         * .getAsJsonObject()
-         * .getAsJsonObject("geometry")
-         * .getAsJsonObject("location");
-         * 
-         * latitude = location.get("lat").getAsFloat();
-         * longitude = location.get("lng").getAsFloat();
-         * }
-         * } catch (Exception e) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare le coordinate geografiche.\"}"
-         * );
-         * try {
-         * if (resultSet != null)
-         * resultSet.close();
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.
-         * write("{\"success\": false, \"message\": \"Errore: impossibile recuperare le coordinate geografiche e errore durante la chiusura delle risorse.\"}"
-         * );
-         * }
-         * return;
-         * }
-         */
-
-        // gestione del file curriculum
-        /*
-         * try {
-         * //TODO: gestione file del cv
-         * } catch () {
-         * return;
-         * }
-         */
-        String cvFilePath = ""; // TODO
 
         int[] userSkills = null;
         if (obj.has("skills")) {
@@ -554,7 +330,7 @@ public class Registration extends HttpServlet {
                     + "', '" + firstName + "', '" +
                     lastName + "', '" + birthdate + "', '" + address + "', '" + cityId + "', '" + regionId + "', '"
                     + countryId + "', '" + latitude + "', '" +
-                    longitude + "', '" + cvFilePath + "', '" + updatedAt + "')";
+                    longitude + "', '" + cvFilePathDB + "', '" + updatedAt + "')";
 
             int rowsInserted = statement.executeUpdate(insertion);
 

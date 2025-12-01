@@ -25,16 +25,10 @@ import java.sql.Statement;
 /*TODO: cambiare tipi delle var e degli oggetti che pongo uguali alle cose che mi arrivano dal json di richiesta (x controllo se null o meno, se va bene o meno) (magari metterli 
 tutti a String in modo che posso verificare che siano null e in modo che il frontend possa mandarmeli null)*/
 
-//TODO: aggiungi titolo di studio che viene dato dalla request (su di esso si basa il punteggio dell'utente, ma non lo clacolo io, mi arriva già fatto lo score nella request)
+//TODO: aggiungi titolo di studio che viene dato dalla request? (su di esso si basa il punteggio dell'utente, ma non lo clacolo io, mi arriva già fatto lo score nella request)
 
 @WebServlet("/servlet/jobapplications/create")
 public class JobApplicationCreate extends HttpServlet {
-
-    private static String errorMessage = ""; //TODO: fixa! non è thread safe!
-
-    private static boolean jobApplicationValidation(int userId, String jobOpeningId, String totalScore, String letter) {
-        return true; //TODO
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -42,10 +36,20 @@ public class JobApplicationCreate extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
-        HttpSession currentSession = request.getSession(false); //TODO: se è null ritornare errore
-        //TODO: validazione: (VEDI TODO.txt) + verificare che l'utente sia user (è solo l'user che "crea" candidature)
-
         PrintWriter out = response.getWriter();
+
+        HttpSession currentSession = null;
+        try {
+            currentSession = request.getSession(false); 
+            if (currentSession == null || currentSession.getAttribute("username") == null) {
+                throw new Exception("Utente non autenticato.");
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato.\"}");
+            return;
+        }
+
         Connection connection = null;
         Statement statement = null;        
         
@@ -161,22 +165,7 @@ public class JobApplicationCreate extends HttpServlet {
 
         String jobOpeningId = obj.has("jobOpeningId") ? obj.get("jobOpeningId").getAsString() : null;
         String totalScore = obj.has("totalScore") ? obj.get("totalScore").getAsString() : null;
-        String letter = obj.has("letter") ? obj.get("letter").getAsString() : null;
-
-        if (!jobApplicationValidation(userId, jobOpeningId, totalScore, letter)) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage + "\"}");
-            try {
-                if (statement != null)
-                    statement.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e2) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: " + errorMessage + "errore durante la chiusura delle risorse.\"}");
-            }
-            return;
-        } 
+        String letter = obj.has("letter") ? obj.get("letter").getAsString() : "";
 
         try {
             //inserimento jobApplication nel db

@@ -13,19 +13,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import it.zucchetti.packages.jdbc.JDBCConnection;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 @WebServlet("/servlet/users/me/update")
 public class UserUpdate extends HttpServlet {
@@ -97,25 +99,85 @@ public class UserUpdate extends HttpServlet {
 
             String updatedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
+            //path del file CV da salvare nel DB
+            String cvFilePathDB = null; // TODO
+
+            //Recupero stringa Base64 del CV
+            String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
+
+            //Gestione Salvataggio File CV
+            if (cvBase64 != null && !cvBase64.isEmpty()) {
+                try {
+                    // Se la stringa base64 ha l'header lo rimuovo
+                    if (cvBase64.contains(",")) {
+                        cvBase64 = cvBase64.split(",")[1];
+                    }
+
+                    byte[] cvBytes = Base64.getDecoder().decode(cvBase64);
+
+                    // Controllo che il file sia davvero un PDF
+                    if (cvBytes.length < 4 ||!(cvBytes[0] == '%' && cvBytes[1] == 'P' && cvBytes[2] == 'D' && cvBytes[3] == 'F')) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"success\": false, \"message\": \"Il file caricato non è un PDF valido.\"}");
+                        return;
+                    }
+
+                    //Cartella di destinazione (NEL TOMCAT, non nella cartella del progetto)
+                    String uploadPath = getServletContext().getRealPath("") + File.separator + "curriculum";
+                    
+                    //creo la cartella se non esiste
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+
+                    //Generiamo un nome file unico per evitare sovrascritture (in sto caso è email_timestamp.pdf)
+                    //Assumiamo sia un PDF, altrimenti bisognerebbe analizzare i primi byte del file
+                    String fileName = username.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ".pdf";
+                    String fullPath = uploadPath + File.separator + fileName;
+
+                    try (FileOutputStream fos = new FileOutputStream(fullPath)) {
+                        fos.write(cvBytes);
+                    }
+
+                    // Questo è il path che salviamo nel DB (relativo alla cartella target del Tomcat)
+                    cvFilePathDB = "/tech-hub/curriculum/" + fileName;
+
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Errore decodifica Base64: " + e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"success\": false, \"message\": \"Errore nel formato del file CV.\"}");
+                    return;
+                } catch (IOException e) {
+                    System.err.println("Errore salvataggio file: " + e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.write("{\"success\": false, \"message\": \"Errore nel salvataggio del file CV.\"}");
+                    return;
+                }
+            }
+
             //TODO: validazione dei parametri
 
             //TODO: nelle successive query mettere rollback se anche una sola delle query non va a buon fine!!!
 
             // Eseguo l'aggiornamento dell'utente
             //TODO: aggiustare query (da problemi in molte casistiche valide)
-            statement.executeUpdate("UPDATE USERS SET FIRSTNAME = '"+firstName+"', LASTNAME = '"+lastName+"', BIRTHDATE = '"+birthDate+"', ADDRESS = '"+address+"', "+
-                    "CITYID = "+cityId+", REGIONID = "+regionId+", COUNTRYID = "+countryId+", UPDATEDAT = '"+updatedAt+"' WHERE EMAIL = '"+username+"';");
+            String query = "UPDATE USERS SET FIRSTNAME = '"+firstName+"', LASTNAME = '"+lastName+"', BIRTHDATE = '"+birthDate+"', ADDRESS = '"+address+"', "+
+                    "CITYID = "+cityId+", REGIONID = "+regionId+", COUNTRYID = "+countryId+", UPDATEDAT = '"+updatedAt+"'";
             
-            //TODO: estraggo userId dell'utente
+            if (cvFilePathDB != null) {
+                query += ", CVFILEPATH = '"+cvFilePathDB+"'";
+            }
+
+            query += " WHERE EMAIL = '"+username+"';";
+            statement.executeUpdate(query);
 
             resultSet = statement2.executeQuery("SELECT USERID FROM USERS WHERE EMAIL = '"+username+"';");
             resultSet.next();
             String userId = resultSet.getString("USERID");
 
-            //TODO: delete delle skills da usersskills 
             statement3.executeUpdate("DELETE FROM USERSSKILLS WHERE USERID = "+userId+";");
 
-            //TODO: insert delle skills nuove in usersskills
             for (int i = 0; i < userNewSkills.length; i++) {
                 statement4.executeUpdate("INSERT INTO USERSSKILLS (USERID, SKILLID) VALUES ("+userId+", "+userNewSkills[i]+");");
             }

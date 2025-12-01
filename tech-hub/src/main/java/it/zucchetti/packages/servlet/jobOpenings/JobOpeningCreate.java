@@ -32,22 +32,21 @@ tutti a String in modo che posso verificare che siano null e in modo che il fron
 @WebServlet("/servlet/jobopenings/create")
 public class JobOpeningCreate extends HttpServlet {
 
-    private static String errorMessage = ""; //TODO: fixa! non è thread safe!
-
-    /*private static boolean jobOpeningValidation(String title, String description, Double ralFrom, Double ralTo, int empTypeId, int workSchedId, int cityId, String closingDate) {
-        return true; //TODO
-    }*/
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
-        HttpSession currentSession = request.getSession(false); //TODO: se è null ritornare errore
-        //TODO: validazione: (VEDI TODO.txt) + verificare che l'utente sia admin (è solo l'admin che "crea" le posizioni lavorative)
-
         PrintWriter out = response.getWriter();
+
+        HttpSession currentSession = request.getSession(false); 
+        if (currentSession == null || currentSession.getAttribute("username") == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"success\": false, \"message\": \"Errore: utente non autenticato.\"}");
+            return;
+        }
+
         Connection connection = null;
         Statement statement = null;        
         

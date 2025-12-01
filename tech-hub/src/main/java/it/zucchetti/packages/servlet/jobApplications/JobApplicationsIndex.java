@@ -53,8 +53,6 @@ public class JobApplicationsIndex extends HttpServlet {
                 query += " WHERE JOBOPENINGID = '" + requestedJobOpeningId + "'";
             }
 
-            // TODO: possibili condizioni e errori da lanciare in certi casi (pensaci)
-
             resultSet = statement.executeQuery(query);
 
             JsonObject jsonResponse = new JsonObject();
