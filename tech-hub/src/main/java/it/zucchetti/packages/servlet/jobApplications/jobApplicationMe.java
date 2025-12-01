@@ -48,25 +48,28 @@ public class jobApplicationMe extends HttpServlet {
 
             HttpSession currentSession = request.getSession(false);
 
-            //TODO: se non esiste una sessione corrente ritornare apposito errore!
+            // TODO: se non esiste una sessione corrente ritornare apposito errore!
 
-            String email= (String) currentSession.getAttribute("username");
+            String email = (String) currentSession.getAttribute("username");
 
             String userIdQuery = "SELECT USERID FROM USERS WHERE EMAIL = '" + email + "'";
 
             resultSet = statement.executeQuery(userIdQuery);
 
-            if (!resultSet.next()) { /*TODO: gestire errore*/ } //restituite meno di una tupla dalla query
+            if (!resultSet.next()) {
+                /* TODO: gestire errore */ } // restituite meno di una tupla dalla query
 
             int sessionUserId = resultSet.getInt("USERID");
 
-            if (resultSet.next()) { /*TODO: gestire errore*/ } //restituite più di una tupla dalla query
+            if (resultSet.next()) {
+                /* TODO: gestire errore */ } // restituite più di una tupla dalla query
 
-            String query = "SELECT * FROM APPLICATIONS WHERE USERID = " + sessionUserId;
-            //TODO: controlla se ci sono altre possibili condizioni in cui lanciare errore
+            String query = "select a.APPLICATIONID, a.USERID, a.TOTALSCORE, a.CREATEDAT, a.LETTER, jo.* from APPLICATIONS a join JOBOPENINGS jo on a.JOBOPENINGID = jo.JOBOPENINGID where USERID = "
+                    + sessionUserId;
+            // TODO: controlla se ci sono altre possibili condizioni in cui lanciare errore
 
             resultSet = statement.executeQuery(query);
-            
+
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
             jsonResponse.addProperty("message", "Servlet correttamente eseguita");
@@ -103,6 +106,18 @@ public class jobApplicationMe extends HttpServlet {
                 }
                 applicationObj.addProperty("createdAt", resultSet.getString("CREATEDAT"));
                 applicationObj.addProperty("letter", resultSet.getString("LETTER"));
+                applicationObj.addProperty("jobOpeningId", resultSet.getInt("jobOpeningId"));
+                applicationObj.addProperty("title", resultSet.getString("title"));
+                applicationObj.addProperty("description", resultSet.getString("description"));
+                applicationObj.addProperty("ralFrom", resultSet.getString("ralFrom"));
+                applicationObj.addProperty("ralTo", resultSet.getString("ralTo"));
+                applicationObj.addProperty("isOpen", resultSet.getString("isOpen"));
+                applicationObj.addProperty("empTypeId", resultSet.getInt("empTypeId"));
+                applicationObj.addProperty("workSchedId", resultSet.getString("workSchedId"));
+                applicationObj.addProperty("cityId", resultSet.getString("cityId"));
+                applicationObj.addProperty("latitude", resultSet.getString("latitude"));
+                applicationObj.addProperty("longitude", resultSet.getString("longitude"));
+                applicationObj.addProperty("closingDate", resultSet.getString("closingDate"));
                 dataArray.add(applicationObj);
             }
 

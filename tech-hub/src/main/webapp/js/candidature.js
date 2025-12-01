@@ -100,7 +100,7 @@ async function loadMaps() {
 // =====================================================
 async function loadJobs() {
   try {
-    const res = await fetch('servlet/jobopenings');
+    const res = await fetch('servlet/jobapplications/me');
     const json = await res.json();
     allJobs = json.data || [];
     renderJobs(allJobs);
@@ -116,17 +116,19 @@ function cardJob(job) {
   const city = citiesMap.get(String(job.cityId)) || 'N/D';
   const contract = empTypesMap.get(job.empTypeId) || 'N/D';
   const jobId = String(job.jobOpeningId);
+  const applicationId = job.applicationId;
   const skillIds = jobSkillsMap.get(jobId) || [];
   const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
   debugger
   return `
     <div class="col-md-6 col-lg-4 job-card mb-3"
         data-id="${jobId}"
+        data-applicationId="${job.applicationId || ''}"
         data-city="${job.cityId}"
         data-contract="${job.empTypeId}"
         data-skills="${skillIds.join(',')}">
 
-        <div class="card h-100 p-3 job-clickable" onclick="openJobDetails('${job.jobOpeningId}')">
+        <div class="card h-100 p-3 job-clickable" onclick="openJobDetails('${job.jobOpeningId}', '${job.applicationId}')">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="mb-1">${job.title}</h5>
             <span class="badge rounded-pill bg-light text-primary small">${contract}</span>
@@ -144,6 +146,11 @@ function cardJob(job) {
             <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
                 <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
             </div>
+          </div>
+
+          <div class="btn-container d-flex gap-2 ms-auto" >
+
+          <button class="btn btn-danger fw-semibold" id="applicationDeleteBtn" onclick="event.stopPropagation(); openDeleteModal('${job.applicationId}')">Ritira candidatura</button>
           </div>
         </div>
       </div>
@@ -204,7 +211,7 @@ function updateJobsCount() {
 // =====================================================
 // MODALE DETTAGLI JOBS 
 // =====================================================
-function openJobDetails(jobId) {
+function openJobDetails(jobId, applicationId) {
 
     const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
     if (!job) return;
@@ -244,8 +251,65 @@ function openJobDetails(jobId) {
     }
 
     const modal = new bootstrap.Modal(document.getElementById("jobDetailModal"));
+    const modalEl = document.getElementById('applicationDeleteModal');
+    modalEl.setAttribute('data-applicationId', applicationId);
     modal.show();
+
 }
+
+
+
+
+// =============================================================
+// MODALE CONFERMA CANCELLAZIONE CANDIDATURA
+// =============================================================
+
+document.getElementById('applicationDeleteBtn').addEventListener('click', function () {
+    const modalEl = document.getElementById('applicationDeleteModal');
+    const applicationId = modalEl.getAttribute('data-applicationId');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('jobDetailModal')).hide();
+    openDeleteModal(applicationId);
+});
+
+
+
+function openDeleteModal(applicationId) {
+    const modalEl = document.getElementById('applicationDeleteModal');
+    modalEl.setAttribute('data-applicationId', applicationId);
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
+
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+    const modalEl = document.getElementById('applicationDeleteModal');
+    const applicationId = modalEl.getAttribute('data-applicationId'); 
+    deleteApplication(applicationId);
+});
+
+
+
+// =============================================================
+// CANCELLAZIONE JOB
+// =============================================================
+function deleteApplication(applicationId) {
+debugger
+
+    fetch(`servlet/jobapplications/${applicationId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Candidatura ritirata con successo.');
+            location.reload();
+        } else {
+            alert('Errore durante l\'eliminazione della candidatura: ' + data.message);
+        }
+    });
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('applicationDeleteModal')).hide();
+}
+
 
 
 
