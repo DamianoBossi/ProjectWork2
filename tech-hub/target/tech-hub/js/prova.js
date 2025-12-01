@@ -944,6 +944,10 @@ async function handleLogin(e) {
         bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
         hideButtons();
+        await loadUser();
+        await loadApplications();
+        await loadJobs();
+        renderJobs(allJobs);
 
 
     } catch (e) {
