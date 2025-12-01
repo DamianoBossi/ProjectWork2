@@ -1,4 +1,5 @@
 //TODO: METTERE CONTROLLI FRONTEND PER VERIFICARE CHE LE COSE INSERITE NELLA CREAZIONE DELLA JOB OP SIANO SENSATE
+//TODO: aggiungere errori se le fetch restituiscono un json ben formato ma con success a false
 
 var allJobOpenings = [];
 
