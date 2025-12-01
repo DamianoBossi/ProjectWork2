@@ -26,6 +26,8 @@ const workSchedMap = new Map(); // workSchedId -> name
 let allJobs = [];               // tutti i job
 let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
 
+let myApplications = [];       // le mie candidature-
+
 // array JS con i nomi delle skill inserite nel form
 const skillsList = [];
 
@@ -374,8 +376,8 @@ function cardJob(job) {
                     <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
                 </div>
 
-                <button class="btn btn-sm btn-primary ms-auto" onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
-                    Candidati
+                <button id="applyBtn" class="btn btn-sm ${isApplied(jobId) ? ' btn-success ' : ' btn-primary '}  ms-auto" ${isApplied(jobId) ? ' disabled = true ' : ' d-block '} onclick="event.stopPropagation(); openApplyModal('${jobId}')"> 
+                    ${isApplied(jobId) ? 'Candidatura inviata' : 'Candidati'}
                 </button>
 
             </div>
@@ -393,6 +395,13 @@ function openJobDetails(jobId) {
 
     const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
     if (!job) return;
+
+    if (isApplied(jobId)) {
+        document.getElementById("jobDetailApplyBtn").textContent = "Candidatura Inviata";
+        document.getElementById("jobDetailApplyBtn").disabled = true;
+        document.getElementById("jobDetailApplyBtn").classList.remove("btn-primary");
+        document.getElementById("jobDetailApplyBtn").classList.add("btn-success");
+    }
 
     const city = citiesMap.get(String(job.cityId));
     const contract = empTypesMap.get(job.empTypeId);
@@ -490,8 +499,9 @@ if (document.getElementById("applyForm")) {
         }
 
         const payload = {
+            userId: parseInt(userId, 10),
             jobOpeningId: parseInt(jobId, 10),
-            score: parseInt(score, 10),
+            totalScore: parseInt(score, 10),
             letter: lettera
         };
 
@@ -514,11 +524,37 @@ if (document.getElementById("applyForm")) {
                 document.getElementById("applyModal")
             ).hide();
 
+            await loadJobs();
+            await loadApplications();
+            renderJobs(allJobs);
+
         } catch (err) {
             console.error("Errore candidatura:", err);
             alert("Errore: " + err.message);
         }
     });
+}
+
+
+
+// =====================================================
+// LOAD APPLICATIONS
+// =====================================================
+async function loadApplications() {
+  try {
+    const res = await fetch('servlet/jobapplications/me');
+    const json = await res.json();
+    myApplications = json.data || [];
+  } catch (e) {
+    console.error("Errore loadJobs:", e);
+  }
+}
+
+// =====================================================
+// CONTROLLO CANDIDATURA GIA' INVIATA
+// =====================================================
+function isApplied(jobId){
+    return myApplications.some(app => String(app.jobOpeningId) === String(jobId));
 }
 
 
@@ -886,6 +922,10 @@ async function handleLogin(e) {
         bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
 
         hideButtons();
+        await loadUser();
+        await loadApplications();
+        await loadJobs();
+        renderJobs(allJobs);
 
 
     } catch (e) {
@@ -898,7 +938,22 @@ if (document.getElementById("loginForm")) {
     loginForm.addEventListener("submit", handleLogin);
 }
 
+// =============================================================
+// LOAD USER
+// =============================================================
 
+async function loadUser() {
+    try {
+        const res = await fetch('servlet/users/me');
+        const json = await res.json();
+        const dataRaw = json.data || [];
+        const data = dataRaw[0];
+
+        userId = data.userId;
+    } catch (e) {
+        console.error(e.message);
+    }
+}
 
 // =============================================================
 // HOME / JOBS SWITCH
@@ -923,6 +978,8 @@ window.showHomePage = function () {
 document.addEventListener("DOMContentLoaded", async () => {
 
     if (await checkUserLogged()) {
+        await loadUser();
+        await loadApplications();
         hideButtons();
     }
 
