@@ -125,4 +125,46 @@ public class JobApplicationShow extends HttpServlet {
         errorJson.addProperty("message", message);
         return errorJson;
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String pathInfo = request.getPathInfo();
+        String id = (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
+
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
+        if (id == null) {
+            out.write(gson.toJson(errorResponse("Parametro ID mancante")));
+            return;
+        }
+
+        try (Connection connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING,
+                JDBCConnection.USER, JDBCConnection.PASSWORD);
+                Statement statement = connection.createStatement()) {
+
+            Class.forName(JDBCConnection.JDBC_DRIVER);
+
+            int applicationsDeleted = statement.executeUpdate("DELETE FROM APPLICATIONS WHERE APPLICATIONID = " + id);
+
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.addProperty("success", applicationsDeleted > 0);
+            jsonResponse.addProperty("message", applicationsDeleted > 0
+                    ? "Annuncio eliminato con successo."
+                    : "Nessuna candidatura trovata con questo ID.");
+            jsonResponse.addProperty("applicationsDeleted", applicationsDeleted);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write(gson.toJson(jsonResponse));
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.write(gson.toJson(errorResponse("Errore: " + e.getMessage())));
+        }
+    }
+
 }
