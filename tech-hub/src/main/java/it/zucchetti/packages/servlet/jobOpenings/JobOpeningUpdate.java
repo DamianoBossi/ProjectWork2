@@ -19,6 +19,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @WebServlet("/servlet/jobopenings/update")
 public class JobOpeningUpdate extends HttpServlet {
@@ -44,8 +46,13 @@ public class JobOpeningUpdate extends HttpServlet {
             statement = connection.createStatement();
 
             String requestedJobOpeningId = request.getParameter("jobOpeningId");
+            String updatedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
-            String query = "UPDATE JOBOPENINGS SET ISOPEN = CASE WHEN ISOPEN=1 THEN 0 ELSE 1 END WHERE JOBOPENINGID = ?";
+            String query = "UPDATE JOBOPENINGS " +
+                    "SET ISOPEN = CASE WHEN ISOPEN = 1 THEN 0 ELSE 1 END, " +
+                    "UPDATEDAT = '" + updatedAt + "' " +
+                    "WHERE JOBOPENINGID = ?";
+
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, Integer.parseInt(requestedJobOpeningId)); // se è numerico
             int rowsAffected = ps.executeUpdate();
