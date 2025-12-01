@@ -5,8 +5,18 @@ const citiesMap = new Map(); // cityId    -> { name, regionId }
 const skillsMap = new Map(); // skillId   -> name
 const workSchedMap = new Map(); // workSchedId -> name 
 
-let allJobs = [];               // tutti i job
-let jobSkillsMap = new Map();   // jobOpeningId -> array(skillId)
+var myFirstName = "";
+var myLastName = "";
+var myEmail = "";
+var myBirthDate = "";
+var myCountry = 0;
+var oldCountry = myCountry;
+var myRegion = 0;
+var oldRegion = myRegion;
+var myCity = 0;
+var myAddress = "";
+var mySkills = [];
+//TODO: var myCV = "";
 
 var initialFirstName, initialLastName, initialEmail, initialBirthDate, initialCountry, initialRegion, initialCity, initialAddress/*TODO, initialCV*/;
 var initialSkills = [];
@@ -53,21 +63,19 @@ async function loadCountries() {
 
         countriesMap.clear();
 
-        const sel = document.getElementById("registerCountry");
-        if (!sel) return;
-
-        sel.innerHTML = `<option value="">Seleziona paese</option>`;
+        const sel = document.getElementById("profileCountry");
 
         data.forEach(c => {
             countriesMap.set(String(c.countryId), c.name);
 
             const opt = document.createElement("option");
+            if (c.countryId == myCountry) {
+                opt.selected = true
+            }
             opt.value = c.countryId;
             opt.textContent = c.name;
             sel.appendChild(opt);
         });
-
-debugger
 
     } catch (e) {
         console.error("Errore loadCountries:", e);
@@ -75,28 +83,17 @@ debugger
 }
 
 // -------- REGIONS --------
-async function loadRegions(countryId) {
+async function loadRegions() {
 
-    const sel = document.getElementById("registerRegion");
-    const citySel = document.getElementById("registerCity");
-
-    if (!countryId) {
-        sel.innerHTML = `<option value="">Seleziona regione</option>`;
-        sel.disabled = true;
-        citySel.innerHTML = `<option value="">Seleziona città</option>`;
-        citySel.disabled = true;
-        return;
-    }
+    const sel = document.getElementById("profileRegion");
 
     try {
         const res = await fetch(`servlet/regions`);
         const json = await res.json();
         const data = json.data || [];
 
+        sel.innerHTML = "";
         regionsMap.clear();
-        sel.innerHTML = `<option value="">Seleziona regione</option>`;
-        citySel.innerHTML = `<option value="">Seleziona città</option>`;
-        citySel.disabled = true;
 
         data.forEach(r => {
             regionsMap.set(String(r.regionId), {
@@ -114,10 +111,12 @@ async function loadRegions(countryId) {
         sel.appendChild(optVuota);
 
         data.forEach(r => {
-            if (String(r.countryId) === String(countryId)) {
+           if (String(r.countryId) == String(myCountry)) {
                 const opt = document.createElement("option");
                 opt.value = r.regionId;
-                opt.textContent = r.name;
+                opt.textContent = r.name;if (r.regionId == myRegion && myCountry == oldCountry) {
+                    opt.selected = true
+                }
                 sel.appendChild(opt);
             }
         });
@@ -186,6 +185,44 @@ async function loadCities() {
 
     } catch (e) {
         console.error("Errore loadCities:", e);
+    }
+}
+
+//SKILLS
+async function loadSkills() {
+    try {
+        var res = await fetch(`servlet/skills`);
+        var json = await res.json();
+        var skills = json.data || [];
+
+        skillsMap.clear();
+        //popolo la mappa delle skill   
+        skills.forEach(function(s) {
+            skillsMap.set(s.skillId, { name: s.name });
+        });
+        var profileSkills = document.getElementById("skillsContainer");
+        profileSkills.innerHTML = "";
+
+        skills.forEach(function(s) {
+
+            var input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "btn-check";
+            input.id = "profileSkills" + s.skillId;
+            input.name = "profileSkills[]";
+            input.value = s.skillId;
+            input.autocomplete = "off";
+
+            var label = document.createElement("label");
+            label.className = "btn btn-primary";
+            label.htmlFor = input.id;
+            label.textContent = s.name;
+
+            profileSkills.appendChild(input);
+            profileSkills.appendChild(label);
+        });
+    } catch (e) { 
+        console.error("Errore loadSkills:", e); 
     }
 }
 
@@ -315,7 +352,7 @@ save.addEventListener("submit", async function (e) {
         }
     }
     if (!isModified) {
-        alert("Modifiche salvate correttamente!")
+        location.reload();
         return;
     }
 
