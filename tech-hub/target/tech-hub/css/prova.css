@@ -23,6 +23,13 @@
       --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    span.bg-success,
+    .bg-success,
+    .badge.bg-success {
+      background-color: rgb(19, 201, 117) !important;
+      color: white !important;
+    }
+
     /* --- Global Styles --- */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

@@ -286,14 +286,19 @@ function cardJob(job) {
               ${skillNames.length ? skillNames.join(", ") : "Nessuna specificata"}
             </div>
 
+            <div class="small mb-3">
+                <strong>Stato annuncio:</strong>
+                ${job.isOpen == '1' ? '<span class="badge bg-success align-bottom">Aperto</span>' : '<span class="badge bg-warning align-bottom">Chiuso</span>'}
+            </div>
+
             <div class="d-flex justify-content-between align-items-center mt-auto">
               <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
                 <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
               </div>
 
               <div class="btn-container d-flex gap-2 ms-auto" >
-                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-warning' : 'btn-success'}" onclick="event.stopPropagation(); toggleJobStatus('${jobId}')">
-                ${job.isOpen == '1' ? 'Chiudi posizione' : 'Apri posizione'}
+                <button class="btn btn-sm ${job.isOpen == '1' ? 'btn-success' : 'btn-warning'}" onclick="event.stopPropagation(); toggleJobStatus('${jobId}')">
+                ${job.isOpen == '1' ? '<i class="bi bi-unlock"></i>' : '<i class="bi bi-lock"></i>'}
                 </button>
 
                 <button class="btn btn-sm btn-danger fw-semibold" id="jobDeleteBtn"  onclick="event.stopPropagation(); openDeleteModal('${jobId}')">Elimina
