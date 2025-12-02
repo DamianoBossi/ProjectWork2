@@ -1,4 +1,3 @@
-
 var countriesMap = new Map(); // countryId -> { name }
 var regionsMap = new Map(); // regionId -> { name, countryId }
 var citiesMap = new Map(); // cityId -> { name, regionId }

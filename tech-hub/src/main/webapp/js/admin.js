@@ -371,9 +371,7 @@ function openJobDetails(jobId) {
     modal.show();
 }
 
-
-
-
+var candidateCVPath = "";
 
 // =========================
 // MODALE DETTAGLI CANDIDATO
@@ -414,6 +412,9 @@ async function openCandidateModal(jobId, position) {
         document.getElementById('candidateDetailBirthDate').textContent = user.birthDate || 'N/D';
         document.getElementById('candidateDetailAddress').textContent = user.address || 'N/D';
 
+        if (user.cvFilePath && user.cvFilePath.trim() !== "") 
+            candidateCVPath = "http://localhost:8080" + user.cvFilePath;
+
         // Apro la modale
         const modal = new bootstrap.Modal(document.getElementById('candidateDetailModal'));
         modal.show();
@@ -421,6 +422,12 @@ async function openCandidateModal(jobId, position) {
         console.error('Errore caricamento candidato:', err);
     }
 }
+
+document.getElementById('candidateDetailCV').addEventListener('click', function () {
+    if (candidateCVPath && candidateCVPath.trim() !== "") {
+        window.open(candidateCVPath, '_blank');
+    }
+});
 
 // =========================
 // CLASSIFICA CANDIDATI 

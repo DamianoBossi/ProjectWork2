@@ -642,4 +642,10 @@
   font-weight: bold;
 }
 
+/*button visualizza cv candidato da parte dell'admin*/
+#candidateDetailCV {
+  color: white !important;
+  background: #0d6efd !important;
+}
+
 
