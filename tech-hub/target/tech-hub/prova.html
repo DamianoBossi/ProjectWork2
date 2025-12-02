@@ -520,7 +520,7 @@
             </div>
             </div>
 
-  <!-- CANDIDATURA SPONTANEA (come prima) -->
+  <!-- CANDIDATURA SPONTANEA -->
   <div class="modal fade" id="candidaturaModal" tabindex="-1" aria-labelledby="candidaturaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -574,6 +574,157 @@
               Invia candidatura
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ MODAL -->
+  <div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header text-white" style="background: var(--bs-primary);">
+          <h5 class="modal-title fw-semibold" id="quizModalLabel">Quiz di Candidatura</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body p-4">
+
+          <form id="quizForm">
+
+          <div class="question-box active">
+            <p class="question">1. Tutti i filosofi sono pensatori e alcuni pensatori sono scienziati. Possiamo affermare
+              che alcuni filosofi sono scienziati?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="0" id="q1a"><label
+                for="q1a" class="form-check-label">Sì, sicuramente</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="0" id="q1b"><label
+                for="q1b" class="form-check-label">Forse</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="1" id="q1c"><label
+                for="q1c" class="form-check-label">No, non si può dedurre</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="0" id="q1d"><label
+                for="q1d" class="form-check-label">Tutti i filosofi sono scienziati</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">2. Trova il numero successivo nella sequenza: 2, 3, 5, 9, 17, ?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="0" id="q2a"><label
+                for="q2a" class="form-check-label">25</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="0" id="q2b"><label
+                for="q2b" class="form-check-label">31</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="1" id="q2c"><label
+                for="q2c" class="form-check-label">33</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="0" id="q2d"><label
+                for="q2d" class="form-check-label">34</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">3. Due persone, A e B. A dice: "B è un bugiardo." B dice: "Entrambi siamo onesti." Qual è
+              la situazione coerente?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q3" value="0" id="q3a"><label
+                for="q3a" class="form-check-label">B è onesto, A è bugiardo</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q3" value="1" id="q3b"><label
+                for="q3b" class="form-check-label">A è onesto, B è bugiardo</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q3" value="0" id="q3c"><label
+                for="q3c" class="form-check-label">Entrambi bugiardi</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q3" value="0" id="q3d"><label
+                for="q3d" class="form-check-label">Entrambi onesti</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">4. In un sacchetto ci sono 5 palline rosse, 3 blu e 2 verdi. Se estrai due palline senza
+              reinserirle, qual è la probabilità che entrambe siano rosse?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="0" id="q4a"><label
+                for="q4a" class="form-check-label">1/3</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="1" id="q4b"><label
+                for="q4b" class="form-check-label">2/9</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="0" id="q4c"><label
+                for="q4c" class="form-check-label">3/10</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="0" id="q4d"><label
+                for="q4d" class="form-check-label">1/5</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">5. Quale delle seguenti affermazioni è equivalente al fatto che l'implicazione p → q sia
+              falsa?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="0" id="q5a"><label
+                for="q5a" class="form-check-label">p e q sono entrambi falsi</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="0" id="q5b"><label
+                for="q5b" class="form-check-label">p e q sono entrambi veri</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="1" id="q5c"><label
+                for="q5c" class="form-check-label">p è vero e q è falso</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="0" id="q5d"><label
+                for="q5d" class="form-check-label">p è falso e q è vero</label></div>
+          </div>
+  
+          <!-- HTML/CSS/JS -->
+          <div class="question-box">
+            <p class="question">6. Quale tag HTML è il più appropriato per contenere un articolo o un post indipendente in
+              una pagina?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="0" id="q6a"><label
+                for="q6a" class="form-check-label">&lt;aside&gt;</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="1" id="q6b"><label
+                for="q6b" class="form-check-label">&lt;article&gt;</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="0" id="q6c"><label
+                for="q6c" class="form-check-label">&lt;div&gt;</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="0" id="q6d"><label
+                for="q6d" class="form-check-label">&lt;section&gt;</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">7. Quale proprietà CSS trasforma un elemento in contenitore flex (per usare flexbox)?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="0" id="q7a"><label
+                for="q7a" class="form-check-label">align-items: center;</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="0" id="q7b"><label
+                for="q7b" class="form-check-label">justify-content: space-between;</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="1" id="q7c"><label
+                for="q7c" class="form-check-label">display: flex;</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="0" id="q7d"><label
+                for="q7d" class="form-check-label">flex-direction: row;</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">8. Quale attributo HTML apre un collegamento in una nuova scheda/finestra?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="0" id="q8a"><label
+                for="q8a" class="form-check-label">download</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="1" id="q8b"><label
+                for="q8b" class="form-check-label">target="_blank"</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="0" id="q8c"><label
+                for="q8c" class="form-check-label">href="_new"</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="0" id="q8d"><label
+                for="q8d" class="form-check-label">rel="noopener"</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">9. In JavaScript quale sarà il risultato di <code>typeof NaN</code>?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="0" id="q9a"><label
+                for="q9a" class="form-check-label">"object"</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="1" id="q9b"><label
+                for="q9b" class="form-check-label">"number"</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="0" id="q9c"><label
+                for="q9c" class="form-check-label">"NaN"</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="0" id="q9d"><label
+                for="q9d" class="form-check-label">"undefined"</label></div>
+          </div>
+  
+          <div class="question-box">
+            <p class="question">10. Quale selettore CSS ha maggiore specificità?</p>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="0" id="q10a"><label
+                for="q10a" class="form-check-label">ul li a</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="1" id="q10b"><label
+                for="q10b" class="form-check-label">#menu .item</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="0" id="q10c"><label
+                for="q10c" class="form-check-label">.container p</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="0" id="q10d"><label
+                for="q10d" class="form-check-label">.item:hover</label></div>
+          </div>
+  
+          <div class="navigation-buttons mt-4 d-flex justify-content-between">
+            <button type="button" id="prevBtn" class="btn btn-secondary" disabled>Indietro</button>
+            <button type="button" id="nextBtn" class="btn btn-primary">Avanti</button>
+            <button type="submit" id="submitBtn" class="btn btn-success" style="display:none;">Invia Quiz</button>
+          </div>
+          <div id="errorMsg" class="text-danger mt-2"></div>
+          </form>
+
         </div>
       </div>
     </div>
