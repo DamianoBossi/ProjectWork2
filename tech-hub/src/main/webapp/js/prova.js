@@ -482,21 +482,70 @@ async function openApplyModal(jobId) {
     bootstrap.Modal.getOrCreateInstance(
         document.getElementById('jobDetailModal')).hide();
 
-
-    //SE LOGGATO GLI APRO IL MODALE DA LOGGATO
-    const job = allJobs.find(j => String(j.jobOpeningId) === String(jobId));
-    document.getElementById("applyJobId").value = jobId;
-    document.getElementById("applyJobTitle").textContent = job.title;
-
-    bootstrap.Modal.getOrCreateInstance(
-        document.getElementById('applyModal')
-    ).show();
+    // APRI IL QUIZ
+    const quizModal = new bootstrap.Modal(document.getElementById('quizModal'));
+    current = 0;
+    showQuestion(current);
+        currentJobIdForQuiz = jobId; // Store jobId for quiz
+    quizModal.show();
 }
 
 
 
 // =====================================================
 // SUBMIT APPLY FORM 
+// =====================================================
+// SUBMIT QUIZ AND CREATE APPLICATION
+// =====================================================
+async function submitQuizAndApplication() {
+    if (!currentJobIdForQuiz || !userId) {
+        alert("Errore: dati mancanti. Ricarica la pagina.");
+        return;
+    }
+
+    const payload = {
+        userId: parseInt(userId, 10),
+        jobOpeningId: parseInt(currentJobIdForQuiz, 10),
+        totalScore: quizScore,
+        letter: "Quiz candidatura - Score: " + quizScore
+    };
+
+    try {
+        const res = await fetch("servlet/jobapplications/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+
+        if (!json.success) {
+            throw new Error(json.message || "Errore nell'invio candidatura");
+        }
+
+        alert(`Candidatura inviata con successo! Punteggio: ${quizScore}/${questions.length}`);
+
+        // Chiudi il quiz modal
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById("quizModal")
+        ).hide();
+
+        // Ricarica i dati e aggiorna la vista
+        await loadApplications();
+        renderJobs(allJobs);
+
+        // Reset quiz state
+        current = 0;
+        quizScore = 0;
+        currentJobIdForQuiz = null;
+        if (quizResult) quizResult.style.display = "none";
+
+    } catch (err) {
+        console.error("Errore candidatura:", err);
+        alert("Errore: " + err.message);
+    }
+}
+
 // =====================================================
 if (document.getElementById("applyForm")) {
 
@@ -1023,6 +1072,8 @@ async function loadUser() {
     }
 }
 
+
+
 // =============================================================
 // HOME / JOBS SWITCH
 // =============================================================
@@ -1038,6 +1089,72 @@ window.showHomePage = function () {
     window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
+
+
+// =============================================================
+// QUIZ LOGIC
+// =============================================================
+const questions = document.querySelectorAll(".question-box");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
+const quizForm = document.getElementById("quizForm");
+const quizResult = document.getElementById("quizResult");
+const errorMsg = document.getElementById("errorMsg");
+let current = 0;
+let quizScore = 0;
+let currentJobIdForQuiz = null;
+
+function showQuestion(index) {
+    if (!questions.length) return;
+    questions.forEach((q, i) => q.style.display = i === index ? "block" : "none");
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.style.display = index === questions.length - 1 ? "none" : "inline-block";
+    if (submitBtn) submitBtn.style.display = index === questions.length - 1 ? "inline-block" : "none";
+    if (errorMsg) errorMsg.textContent = "";
+}
+
+if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+        const radios = questions[current].querySelectorAll("input[type=radio]");
+        if (![...radios].some(r => r.checked)) {
+            if (errorMsg) errorMsg.textContent = "Seleziona una risposta!";
+            return;
+        }
+        current++;
+        showQuestion(current);
+    });
+}
+
+if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+        current--;
+        showQuestion(current);
+    });
+}
+
+if (quizForm) {
+    quizForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        quizScore = 0;
+        questions.forEach(q => {
+            const selected = q.querySelector("input[type=radio]:checked");
+            if (selected && selected.value === "1") quizScore++;
+        });
+        if (quizResult) {
+            quizResult.textContent = `Hai totalizzato ${quizScore} su ${questions.length}`;
+            quizResult.style.display = "block";
+        }
+
+        // Invia candidatura con quiz score
+        submitQuizAndApplication();
+    });
+}
+
+// Initialize first question on page load
+if (questions.length > 0) {
+    showQuestion(0);
+}
 
 
 // =============================================================
