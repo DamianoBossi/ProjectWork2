@@ -1188,6 +1188,56 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadJobs();
 
 
+    // === EmailJS configuration ===
+    // Replace the placeholders below with your actual EmailJS Service ID, Template ID and Public Key
+    const EMAILJS_SERVICE_ID = 'service_8b0l85h';
+    const EMAILJS_TEMPLATE_ID = 'template_nfg47xa';
+    const EMAILJS_PUBLIC_KEY = '5QMP3eiIASpGIS_E0';
+
+    // Initialize EmailJS if SDK loaded
+    if (window.emailjs && typeof emailjs.init === 'function') {
+        try {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+        } catch (err) {
+            console.warn('EmailJS init failed:', err);
+        }
+    }
+
+    // Candidatura spontanea: invio email tramite EmailJS
+    const candidaturaForm = document.getElementById('candidaturaForm');
+    if (candidaturaForm) {
+        candidaturaForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nome')?.value.trim();
+            const cognome = document.getElementById('cognome')?.value.trim();
+            const emailAddr = document.getElementById('email')?.value.trim();
+            const telefono = document.getElementById('telefono')?.value.trim();
+            const titoloStudio = document.getElementById('titoloStudio')?.value.trim();
+            const lettera = document.getElementById('lettera')?.value.trim();
+
+            if (!nome || !cognome || !emailAddr || !lettera) {
+                alert('Compila i campi obbligatori: nome, cognome, email e lettera di presentazione.');
+                return;
+            }
+
+            // Send email using EmailJS - uses form field names to populate template variables
+            try {
+                if (!window.emailjs || typeof emailjs.sendForm !== 'function') {
+                    throw new Error('EmailJS SDK non caricato correttamente. Verificare l\'inclusione del CDN.');
+                }
+
+                await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, candidaturaForm);
+
+                alert('Candidatura inviata. Ho inviato una mail di conferma.');
+                candidaturaForm.reset();
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('candidaturaModal')).hide();
+            } catch (err) {
+                console.error('Errore invio EmailJS:', err);
+                alert('Errore nell\'invio dell\'email. Controlla console e i tuoi ID EmailJS.');
+            }
+        });
+    }
 
     updateJobsCount();
 });
