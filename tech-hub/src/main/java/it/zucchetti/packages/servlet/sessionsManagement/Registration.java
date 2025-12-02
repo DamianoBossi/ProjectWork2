@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import it.zucchetti.packages.jdbc.JDBCConnection;
+import it.zucchetti.packages.security.PasswordUtils;
 
 /* 
 -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,7 +174,8 @@ public class Registration extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
@@ -186,7 +188,8 @@ public class Registration extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write( "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -224,13 +227,13 @@ public class Registration extends HttpServlet {
         float latitude = 0f;
         float longitude = 0f;
 
-        //path del file CV da salvare nel DB
+        // path del file CV da salvare nel DB
         String cvFilePathDB = null; // TODO
 
-        //Recupero stringa Base64 del CV
+        // Recupero stringa Base64 del CV
         String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
 
-        //Gestione Salvataggio File CV
+        // Gestione Salvataggio File CV
         if (cvBase64 != null && !cvBase64.isEmpty()) {
             try {
                 // Se la stringa base64 ha l'header lo rimuovo
@@ -241,23 +244,26 @@ public class Registration extends HttpServlet {
                 byte[] cvBytes = Base64.getDecoder().decode(cvBase64);
 
                 // Controllo che il file sia davvero un PDF
-                if (cvBytes.length < 4 ||!(cvBytes[0] == '%' && cvBytes[1] == 'P' && cvBytes[2] == 'D' && cvBytes[3] == 'F')) {
+                if (cvBytes.length < 4
+                        || !(cvBytes[0] == '%' && cvBytes[1] == 'P' && cvBytes[2] == 'D' && cvBytes[3] == 'F')) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     out.write("{\"success\": false, \"message\": \"Il file caricato non è un PDF valido.\"}");
                     return;
                 }
 
-                //Cartella di destinazione (NEL TOMCAT, non nella cartella del progetto)
+                // Cartella di destinazione (NEL TOMCAT, non nella cartella del progetto)
                 String uploadPath = getServletContext().getRealPath("") + File.separator + "curriculum";
-                
-                //creo la cartella se non esiste
+
+                // creo la cartella se non esiste
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                 }
 
-                //Generiamo un nome file unico per evitare sovrascritture (in sto caso è email_timestamp.pdf)
-                //Assumiamo sia un PDF, altrimenti bisognerebbe analizzare i primi byte del file
+                // Generiamo un nome file unico per evitare sovrascritture (in sto caso è
+                // email_timestamp.pdf)
+                // Assumiamo sia un PDF, altrimenti bisognerebbe analizzare i primi byte del
+                // file
                 String fileName = email.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ".pdf";
                 String fullPath = uploadPath + File.separator + fileName;
 
@@ -265,7 +271,8 @@ public class Registration extends HttpServlet {
                     fos.write(cvBytes);
                 }
 
-                // Questo è il path che salviamo nel DB (relativo alla cartella target del Tomcat)
+                // Questo è il path che salviamo nel DB (relativo alla cartella target del
+                // Tomcat)
                 cvFilePathDB = "/tech-hub/curriculum/" + fileName;
 
             } catch (IllegalArgumentException e) {
@@ -280,8 +287,8 @@ public class Registration extends HttpServlet {
                 return;
             }
         }
-        
-        //validazione parametri
+
+        // validazione parametri
         /*
          * if (!registrationValidation(email, password, firstName, lastName, birthdate,
          * address, cityId, regionId, countryId)) {
@@ -324,9 +331,12 @@ public class Registration extends HttpServlet {
         }
 
         try {
+            // Hash della password prima di salvarla
+            String hashedPassword = PasswordUtils.hashPassword(password);
+
             // inserimento utente nel db
             String insertion = "INSERT INTO USERS (ROLEID, EMAIL, PASSWORD, FIRSTNAME, LASTNAME, BIRTHDATE, ADDRESS, CITYID, REGIONID, COUNTRYID, LATITUDE,"
-                    + " LONGITUDE, CVFILEPATH, UPDATEDAT) VALUES ('" + roleId + "', '" + email + "', '" + password
+                    + " LONGITUDE, CVFILEPATH, UPDATEDAT) VALUES ('" + roleId + "', '" + email + "', '" + hashedPassword
                     + "', '" + firstName + "', '" +
                     lastName + "', '" + birthdate + "', '" + address + "', '" + cityId + "', '" + regionId + "', '"
                     + countryId + "', '" + latitude + "', '" +

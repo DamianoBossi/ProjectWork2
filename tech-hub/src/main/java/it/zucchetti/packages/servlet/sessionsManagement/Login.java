@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import it.zucchetti.packages.jdbc.JDBCConnection;
+import it.zucchetti.packages.security.PasswordUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,12 +39,12 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         PrintWriter out = response.getWriter();
-        
+
         String email;
         String password;
-        
+
         JsonObject json = JsonParser.parseReader(request.getReader()).getAsJsonObject();
         email = json.get("email").getAsString();
         password = json.get("password").getAsString();
@@ -65,39 +66,57 @@ public class Login extends HttpServlet {
 
             statement = connection.createStatement();
 
-            String query = "SELECT * FROM USERS WHERE EMAIL = '" + email + "' AND PASSWORD = '" + password + "'"; 
-            //TODO: sostituire con PreparedStatement per evitare SQL Injection
-            //TODO: hash della password, non usare mai password esplicitamente
+            String query = "SELECT * FROM USERS WHERE EMAIL = '" + email + "'";
+            // TODO: sostituire con PreparedStatement per evitare SQL Injection
             resultSet = statement.executeQuery(query);
 
             if (resultSet.next()) {
-                HttpSession session = request.getSession(true);
+                // Recupera l'hash della password dal database
+                String storedHashedPassword = resultSet.getString("PASSWORD");
 
-                session.setAttribute("username", email);
-                int roleid = resultSet.getInt("ROLEID");
-                String role = roleid == 1 ? "user" : "admin"; 
-                session.setAttribute("role", role);
-                session.setMaxInactiveInterval(30*60); //30 minuti //Da evitare?
+                // Verifica se la password fornita corrisponde all'hash
+                if (PasswordUtils.verifyPassword(password, storedHashedPassword)) {
+                    HttpSession session = request.getSession(true);
 
-                /*String csrfToken = UUID.randomUUID().toString(); //da usare nelle form POST come campo nascosto o nell'header X-CSRF-Token 
-                session.setAttribute("csrfToken", csrfToken);*/
+                    session.setAttribute("username", email);
+                    int roleid = resultSet.getInt("ROLEID");
+                    String role = roleid == 1 ? "user" : "admin";
+                    session.setAttribute("role", role);
+                    session.setMaxInactiveInterval(30 * 60); // 30 minuti //Da evitare?
 
-                /*String sameSite = "SameSite=Lax"; //o "SameSite=Strict"
-                String secureFlag = request.isSecure() ? "; Secure" : "";*/
-                String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub; HttpOnly;" /*+ secureFlag + "; " + sameSite*/;
-                
-                response.setHeader("Set-Cookie", jsessionidCookie);
-          
-                if (role.equals("admin")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"success\": true, \"message\": \"Login effettuato.\", \"redirect\": \"admin.html\"}");
+                    /*
+                     * String csrfToken = UUID.randomUUID().toString(); //da usare nelle form POST
+                     * come campo nascosto o nell'header X-CSRF-Token
+                     * session.setAttribute("csrfToken", csrfToken);
+                     */
+
+                    /*
+                     * String sameSite = "SameSite=Lax"; //o "SameSite=Strict"
+                     * String secureFlag = request.isSecure() ? "; Secure" : "";
+                     */
+                    String jsessionidCookie = "JSESSIONID=" + session.getId() + "; Path=/tech-hub; HttpOnly;" /*
+                                                                                                               * +
+                                                                                                               * secureFlag
+                                                                                                               * + "; "
+                                                                                                               * +
+                                                                                                               * sameSite
+                                                                                                               */;
+
+                    response.setHeader("Set-Cookie", jsessionidCookie);
+
+                    if (role.equals("admin")) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write(
+                                "{\"success\": true, \"message\": \"Login effettuato.\", \"redirect\": \"admin.html\"}");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"success\": true, \"message\": \"Login effettuato.\"}");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"success\": false, \"message\": \"Errore: Credenziali non valide.\"}");
                 }
-                else {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"success\": true, \"message\": \"Login effettuato.\"}");
-                }
-            }
-            else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"success\": false, \"message\": \"Errore: Credenziali non valide.\"}");
             }
@@ -125,5 +144,5 @@ public class Login extends HttpServlet {
         }
     }
 
-    //bloccare la doGet implementandola in modo che restituisca un JSON d'errore?
+    // bloccare la doGet implementandola in modo che restituisca un JSON d'errore?
 }
