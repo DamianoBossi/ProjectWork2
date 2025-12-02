@@ -237,23 +237,24 @@ if (document.getElementById("logout-btn")) {
 
 //Popolamento DOM con i dati dell'utente
 document.addEventListener("DOMContentLoaded", async function () {
-    await initializeProfile(); 
+    await initializeProfile();
 
-    var profileOldCV = document.getElementById("profileOldCV");
-    profileOldCV.href = myCVFilePath;
-
-    //TODO: DA AGGIUSTARE
-    document.getElementById("profileOldCV").addEventListener("click", async function (e) {
-        e.preventDefault();
-        if (myCVFilePath && myCVFilePath.trim() !== "") {
-            setTimeout(() => {
-                const newWindow = window.open(myCVFilePath, "_blank");
-            if (newWindow) newWindow.location.reload();
-        }, 200);
-        } else {
-            return;
-        }
-    });
+    const profileOldCV = document.getElementById("profileOldCV");
+    let raw = myCVFilePath.trim() || "";
+    if (raw.length > 0){
+        raw = "http://" + raw;
+    }
+    else {
+        return;
+    }
+    let finalUrl;
+    try {
+        finalUrl = new URL(raw, window.location.href).href;
+    } catch (err) {
+        console.error("Impossibile parsare myCVFilePath:", raw, err);
+        return;
+    }
+    profileOldCV.href = finalUrl;
 
     var profileFirstName = document.getElementById("profileFirstName");
     profileFirstName.value = myFirstName;
@@ -299,6 +300,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         var newCitySelect = document.getElementById("profileCity");
         myCity = newCitySelect.value;
     });
+
+    //TODO: devo fare in modo all'inserimento di un nuovo cv di eliminare il precedente?
 
     var profileAddress = document.getElementById("profileAddress");
     profileAddress.value = myAddress;
