@@ -39,7 +39,9 @@ public class UserUpdate extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         Connection connection = null;
-        Statement statement = null;
+        Statement statement0 = null;
+        ResultSet resultSet0 = null;
+        Statement statement1 = null;
         Statement statement2 = null;
         ResultSet resultSet = null;
         Statement statement3 = null;
@@ -54,7 +56,8 @@ public class UserUpdate extends HttpServlet {
             connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING, JDBCConnection.USER,
                     JDBCConnection.PASSWORD);
 
-            statement = connection.createStatement();
+            statement0 = connection.createStatement();
+            statement1 = connection.createStatement();
             statement2 = connection.createStatement();
             statement3 = connection.createStatement();
             statement4 = connection.createStatement();
@@ -105,7 +108,9 @@ public class UserUpdate extends HttpServlet {
             //Recupero stringa Base64 del CV
             String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
 
-            //Gestione Salvataggio File CV
+            //TODO: validazione dei parametri
+
+            //Gestione Salvataggio File CV e poi delete del cv precedente
             if (cvBase64 != null && !cvBase64.isEmpty()) {
                 try {
                     // Se la stringa base64 ha l'header lo rimuovo
@@ -143,20 +148,38 @@ public class UserUpdate extends HttpServlet {
                     // Questo è il path che salviamo nel DB (relativo alla cartella target del Tomcat)
                     cvFilePathDB = "/tech-hub/curriculum/" + fileName;
 
+                    //Recupero il path del vecchio file dal DB
+                    resultSet0 = statement0.executeQuery("SELECT CVFILEPATH FROM USERS WHERE EMAIL = '" + username + "';");
+                    if (resultSet0.next()) {
+                        String oldCvPath = resultSet0.getString("CVFILEPATH");
+                        if (oldCvPath != null && !oldCvPath.isEmpty()) {
+                            String fullOldCvPath = getServletContext().getRealPath("") + (oldCvPath.replace("/tech-hub/", "")).replace("/", File.separator);
+                            //out.println(fullOldCvPath);
+                            File oldCvFile = new File(fullOldCvPath);
+                            if (oldCvFile.exists()) {
+                                oldCvFile.delete();
+                            }
+                        }
+                    }
+
                 } catch (IllegalArgumentException e) {
                     System.err.println("Errore decodifica Base64: " + e.getMessage());
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.write("{\"success\": false, \"message\": \"Errore nel formato del file CV.\"}");
-                    return;
+                    out.write("{\"success\": false, \"message\": \"Errore nella decodifica del file CV.\"}");
+                    return; 
                 } catch (IOException e) {
-                    System.err.println("Errore salvataggio file: " + e.getMessage());
+                    System.err.println("Errore scrittura file CV: " + e.getMessage());
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore nel salvataggio del file CV.\"}");
+                    out.write("{\"success\": false, \"message\": \"Errore durante la scrittura del file CV.\"}");
+                    return;
+                } catch (Exception e) {
+                    System.err.println("Errore generico gestione file: " + e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.write("{\"success\": false, \"message\": \"Errore durante la gestione del file CV.\"}");
                     return;
                 }
-            }
 
-            //TODO: validazione dei parametri
+            }
 
             //TODO: nelle successive query mettere rollback se anche una sola delle query non va a buon fine!!!
 
@@ -170,7 +193,7 @@ public class UserUpdate extends HttpServlet {
             }
 
             query += " WHERE EMAIL = '"+username+"';";
-            statement.executeUpdate(query);
+            statement1.executeUpdate(query);
 
             resultSet = statement2.executeQuery("SELECT USERID FROM USERS WHERE EMAIL = '"+username+"';");
             resultSet.next();
@@ -201,8 +224,12 @@ public class UserUpdate extends HttpServlet {
             out.write(gson.toJson(errorResponse("Errore: errore inaspettato: " + e.getMessage())));
         } finally {
             try {
-                if (statement != null)
-                    statement.close();
+                if (statement0 != null)
+                    statement0.close();
+                if (resultSet0 != null)
+                    resultSet0.close();
+                if (statement1 != null)
+                    statement1.close();
                 if (statement2 != null)
                     statement2.close();
                 if (statement3 != null)
