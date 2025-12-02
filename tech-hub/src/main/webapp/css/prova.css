@@ -249,7 +249,7 @@
       -webkit-line-clamp: 3;
       /* Numero di righe visibili */
       -webkit-box-orient: vertical;
-      white-space: normal;
+      white-space: pre-wrap;
     }
 
     #jobSection .card {

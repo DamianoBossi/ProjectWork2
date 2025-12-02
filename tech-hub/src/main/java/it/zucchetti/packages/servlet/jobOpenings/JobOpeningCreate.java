@@ -20,6 +20,7 @@ import it.zucchetti.packages.jdbc.JDBCConnection;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -37,10 +38,10 @@ public class JobOpeningCreate extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         PrintWriter out = response.getWriter();
 
-        HttpSession currentSession = request.getSession(false); 
+        HttpSession currentSession = request.getSession(false);
         if (currentSession == null || currentSession.getAttribute("username") == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"success\": false, \"message\": \"Errore: utente non autenticato.\"}");
@@ -48,9 +49,9 @@ public class JobOpeningCreate extends HttpServlet {
         }
 
         Connection connection = null;
-        Statement statement = null;        
-        
-        //connessione al db
+        Statement statement = null;
+
+        // connessione al db
         try {
             Class.forName(JDBCConnection.JDBC_DRIVER);
             connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING, JDBCConnection.USER,
@@ -68,7 +69,8 @@ public class JobOpeningCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
@@ -81,12 +83,13 @@ public class JobOpeningCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
 
-        //recupero parametri dal JSON della richiesta
+        // recupero parametri dal JSON della richiesta
         BufferedReader bodyReader = request.getReader();
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -97,24 +100,42 @@ public class JobOpeningCreate extends HttpServlet {
 
         JsonObject obj = JsonParser.parseString(jsonString).getAsJsonObject();
 
-        String title = obj.has("title") && !obj.get("title").isJsonNull()? obj.get("title").getAsString() : null;
-        String description = obj.has("description") && !obj.get("description").isJsonNull()? obj.get("description").getAsString() : "";
-        //uso di Double (wrapper di double)
-        Double ralFrom = obj.has("ralFrom") && !obj.get("ralFrom").isJsonNull() ? obj.get("ralFrom").getAsDouble() : null;
+        String title = obj.has("title") && !obj.get("title").isJsonNull() ? obj.get("title").getAsString() : null;
+        String description = obj.has("description") && !obj.get("description").isJsonNull()
+                ? obj.get("description").getAsString()
+                : "";
+        // uso di Double (wrapper di double)
+        Double ralFrom = obj.has("ralFrom") && !obj.get("ralFrom").isJsonNull() ? obj.get("ralFrom").getAsDouble()
+                : null;
         Double ralTo = obj.has("ralTo") && !obj.get("ralTo").isJsonNull() ? obj.get("ralTo").getAsDouble() : null;
-        //uso di Boolean (wrapper di boolean)
-        Boolean isOpen = obj.has("isOpen") && !obj.get("isOpen").isJsonNull()? obj.get("isOpen").getAsBoolean() : null; //mi aspetto che la richiesta qui mi invi un booleano true/false
-        Integer empTypeId = obj.has("empTypeId") && !obj.get("empTypeId").isJsonNull()? obj.get("empTypeId").getAsInt() : null;
-        Integer workSchedId = obj.has("workSchedId") && !obj.get("workSchedId").isJsonNull()? obj.get("workSchedId").getAsInt() : null;
-        Integer cityId = obj.has("cityId") && !obj.get("cityId").isJsonNull()? obj.get("cityId").getAsInt() : null;
+        // uso di Boolean (wrapper di boolean)
+        Boolean isOpen = obj.has("isOpen") && !obj.get("isOpen").isJsonNull() ? obj.get("isOpen").getAsBoolean() : null; // mi
+                                                                                                                         // aspetto
+                                                                                                                         // che
+                                                                                                                         // la
+                                                                                                                         // richiesta
+                                                                                                                         // qui
+                                                                                                                         // mi
+                                                                                                                         // invi
+                                                                                                                         // un
+                                                                                                                         // booleano
+                                                                                                                         // true/false
+        Integer empTypeId = obj.has("empTypeId") && !obj.get("empTypeId").isJsonNull() ? obj.get("empTypeId").getAsInt()
+                : null;
+        Integer workSchedId = obj.has("workSchedId") && !obj.get("workSchedId").isJsonNull()
+                ? obj.get("workSchedId").getAsInt()
+                : null;
+        Integer cityId = obj.has("cityId") && !obj.get("cityId").isJsonNull() ? obj.get("cityId").getAsInt() : null;
 
-        //TODO: calcolo latitude e longitude
+        // TODO: calcolo latitude e longitude
         Double latitude = (double) 0;
         Double longitude = (double) 0;
 
         String updatedAt = (new Date(System.currentTimeMillis())).toString();
 
-        String closingDate = obj.has("closingDate") && !obj.get("closingDate").isJsonNull()? obj.get("closingDate").getAsString() : null;
+        String closingDate = obj.has("closingDate") && !obj.get("closingDate").isJsonNull()
+                ? obj.get("closingDate").getAsString()
+                : null;
 
         int[] jobOpeningSkills = null;
         if (obj.has("skills")) {
@@ -129,43 +150,51 @@ public class JobOpeningCreate extends HttpServlet {
             jobOpeningSkills = new int[0];
         }
 
-        /*if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId, workSchedId, cityId, closingDate)) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage + "\"}");
-            try {
-                if (statement != null)
-                    statement.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e2) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: " + errorMessage + "errore durante la chiusura delle risorse.\"}");
-            }
-            return;
-        } */
+        /*
+         * if (!jobOpeningValidation(title, description, ralFrom, ralTo, empTypeId,
+         * workSchedId, cityId, closingDate)) {
+         * response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+         * out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage +
+         * "\"}");
+         * try {
+         * if (statement != null)
+         * statement.close();
+         * if (connection != null)
+         * connection.close();
+         * } catch (SQLException e2) {
+         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+         * out.write("{\"success\": false, \"message\": \"Errore: " + errorMessage +
+         * "errore durante la chiusura delle risorse.\"}");
+         * }
+         * return;
+         * }
+         */
 
         try {
-            //inserimento jobOpening nel db
-            String insertion =
-                "INSERT INTO JOBOPENINGS (TITLE, DESCRIPTION, RALFROM, RALTO, ISOPEN, EMPTYPEID, WORKSCHEDID, CITYID, LATITUDE, LONGITUDE, UPDATEDAT, CLOSINGDATE) VALUES ("
-                + "'" + title.replace("'", "''") + "', "
-                + "'" + description.replace("'", "''") + "', "
-                + (ralFrom != null ? ralFrom : "NULL") + ", "
-                + (ralTo != null ? ralTo : "NULL") + ", "
-                + (isOpen ? 1 : 0) + ", "
-                + empTypeId + ", "
-                + workSchedId + ", "
-                + cityId + ", "
-                + latitude + ", "
-                + longitude + ", "
-                + "CONVERT(DATETIME2, '" + updatedAt + "'), "
-                + "CONVERT(DATE, '" + closingDate + "')" + ")"; 
+            // inserimento jobOpening nel db con PreparedStatement
+            String insertion = "INSERT INTO JOBOPENINGS (TITLE, DESCRIPTION, RALFROM, RALTO, ISOPEN, EMPTYPEID, WORKSCHEDID, CITYID, LATITUDE, LONGITUDE, UPDATEDAT, CLOSINGDATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CONVERT(DATETIME2, ?), CONVERT(DATE, ?))";
 
-            int rowsInserted = statement.executeUpdate(insertion);
+            PreparedStatement pstmt = connection.prepareStatement(insertion);
+            pstmt.setString(1, title);
+            pstmt.setString(2, description);
+            pstmt.setObject(3, ralFrom);
+            pstmt.setObject(4, ralTo);
+            pstmt.setInt(5, isOpen ? 1 : 0);
+            pstmt.setInt(6, empTypeId);
+            pstmt.setInt(7, workSchedId);
+            pstmt.setInt(8, cityId);
+            pstmt.setDouble(9, latitude);
+            pstmt.setDouble(10, longitude);
+            pstmt.setString(11, updatedAt);
+            pstmt.setString(12, closingDate);
+
+            int rowsInserted = pstmt.executeUpdate();
+            pstmt.close();
 
             if (rowsInserted == 0) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito.\"}");
                 try {
                     if (statement != null)
                         statement.close();
@@ -173,13 +202,14 @@ public class JobOpeningCreate extends HttpServlet {
                         connection.close();
                 } catch (SQLException e2) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito e errore durante la chiusura delle risorse.\"}");
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
-            } 
-            else if (rowsInserted > 1) {
+            } else if (rowsInserted > 1) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito per motivi sconosciuti.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito per motivi sconosciuti.\"}");
                 try {
                     if (statement != null)
                         statement.close();
@@ -187,13 +217,17 @@ public class JobOpeningCreate extends HttpServlet {
                         connection.close();
                 } catch (SQLException e2) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito per motivi sconosciuti e errore durante la chiusura delle risorse.\"}");
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: Inserimento della posizione lavorativa nel db non riuscito per motivi sconosciuti e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
-            } 
+            }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della posizione lavorativa nel db.\"}");
+            String errorDetail = e.getMessage() != null ? e.getMessage() : "Errore sconosciuto";
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore SQL: " + errorDetail + "\"}");
+            e.printStackTrace();
             try {
                 if (statement != null)
                     statement.close();
@@ -201,12 +235,14 @@ public class JobOpeningCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della posizione lavorativa nel db e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della posizione lavorativa nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della posizione lavorativa nel db.\"}");
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della posizione lavorativa nel db.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -214,7 +250,8 @@ public class JobOpeningCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della posizione lavorativa nel db e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della posizione lavorativa nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -255,7 +292,8 @@ public class JobOpeningCreate extends HttpServlet {
             }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID della posizione lavorativa.\"}");
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID della posizione lavorativa.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -269,7 +307,8 @@ public class JobOpeningCreate extends HttpServlet {
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID della posizione lavorativa.\"}");
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID della posizione lavorativa.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -287,7 +326,8 @@ public class JobOpeningCreate extends HttpServlet {
             // inserimento skill della posizione lavorativa nel db
             String skillInsertion = "";
             for (int skillId : jobOpeningSkills) {
-                skillInsertion = "INSERT INTO JOBOPENINGSSKILLS (JOBOPENINGID, SKILLID) VALUES (" + jobOpeningId + ", " + skillId + ")";
+                skillInsertion = "INSERT INTO JOBOPENINGSSKILLS (JOBOPENINGID, SKILLID) VALUES (" + jobOpeningId + ", "
+                        + skillId + ")";
                 statement.executeUpdate(skillInsertion);
             }
         } catch (SQLException e) {

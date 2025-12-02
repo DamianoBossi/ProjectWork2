@@ -332,6 +332,7 @@ function openJobDetails(jobId) {
 
     document.getElementById("jobDetailTitle").textContent = job.title;
     document.getElementById("jobDetailDescription").textContent = job.description;
+    document.getElementById("jobDetailDescription").style.whiteSpace = "pre-wrap";
     document.getElementById("jobDetailCity").textContent = city ? city.name : "N/D";
     document.getElementById("jobDetailContract").textContent = contract || "N/D";
     document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
@@ -651,7 +652,7 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     e.preventDefault();
 
     var title = document.getElementById('titlejobOpCreate').value.trim() || null;
-    var description = document.getElementById('descriptionjobOpCreate').value.trim() || null;
+    var description = document.getElementById('descriptionjobOpCreate').value || null;
     var ralFrom = document.getElementById('ralFromjobOpCreate').value.trim() || null;
     var ralTo = document.getElementById('ralTojobOpCreate').value.trim() || null;
     var isOpen = document.getElementById('isOpenjobOpCreate').value === "true";

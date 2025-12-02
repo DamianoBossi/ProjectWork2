@@ -227,6 +227,7 @@ function openJobDetails(jobId, applicationId) {
 
     document.getElementById("jobDetailTitle").textContent = job.title;
     document.getElementById("jobDetailDescription").textContent = job.description;
+    document.getElementById("jobDetailDescription").style.whiteSpace = "pre-wrap";
     document.getElementById("jobDetailCity").textContent = city ? city.name : "N/D";
     document.getElementById("jobDetailContract").textContent = contract || "N/D";
     document.getElementById("jobDetailRal").textContent = job.ralFrom + " - " + job.ralTo;
