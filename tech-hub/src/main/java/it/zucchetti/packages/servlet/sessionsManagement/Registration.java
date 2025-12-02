@@ -195,6 +195,7 @@ public class Registration extends HttpServlet {
         }
 
         // recupero parametri dal JSON della richiesta
+        request.setCharacterEncoding("UTF-8");
         BufferedReader bodyReader = request.getReader();
         StringBuilder sb = new StringBuilder();
         String line = null;

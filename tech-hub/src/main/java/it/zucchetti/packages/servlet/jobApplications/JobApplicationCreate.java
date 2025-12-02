@@ -35,12 +35,12 @@ public class JobApplicationCreate extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         PrintWriter out = response.getWriter();
 
         HttpSession currentSession = null;
         try {
-            currentSession = request.getSession(false); 
+            currentSession = request.getSession(false);
             if (currentSession == null || currentSession.getAttribute("username") == null) {
                 throw new Exception("Utente non autenticato.");
             }
@@ -51,9 +51,9 @@ public class JobApplicationCreate extends HttpServlet {
         }
 
         Connection connection = null;
-        Statement statement = null;        
-        
-        //connessione al db
+        Statement statement = null;
+
+        // connessione al db
         try {
             Class.forName(JDBCConnection.JDBC_DRIVER);
             connection = DriverManager.getConnection(JDBCConnection.CONNECTION_STRING, JDBCConnection.USER,
@@ -71,7 +71,8 @@ public class JobApplicationCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
@@ -84,12 +85,14 @@ public class JobApplicationCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
 
-        //recupero parametri dal JSON della richiesta
+        // recupero parametri dal JSON della richiesta
+        request.setCharacterEncoding("UTF-8");
         BufferedReader bodyReader = request.getReader();
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -102,10 +105,9 @@ public class JobApplicationCreate extends HttpServlet {
 
         String email = (String) currentSession.getAttribute("username");
 
-        
         int userId = 0;
         try {
-            //prelevo l'id dell'utente loggato
+            // prelevo l'id dell'utente loggato
             String userIdQuery = "SELECT USERID FROM USERS WHERE EMAIL = '" + email + "'";
             ResultSet resultSet = statement.executeQuery(userIdQuery);
             if (resultSet.next()) {
@@ -115,13 +117,14 @@ public class JobApplicationCreate extends HttpServlet {
                         resultSet.close();
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse dopo aver recuperato correttamente l'ID utente.\"}");
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse dopo aver recuperato correttamente l'ID utente.\"}");
                     return;
                 }
-            }
-            else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID utente dopo la registrazione.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID utente dopo la registrazione.\"}");
                 try {
                     if (resultSet != null)
                         resultSet.close();
@@ -131,7 +134,8 @@ public class JobApplicationCreate extends HttpServlet {
                         connection.close();
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID utente dopo la registrazione e errore durante la chiusura delle risorse.\"}");
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID utente dopo la registrazione e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
             }
@@ -145,7 +149,8 @@ public class JobApplicationCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
@@ -158,7 +163,8 @@ public class JobApplicationCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -168,14 +174,16 @@ public class JobApplicationCreate extends HttpServlet {
         String letter = obj.has("letter") ? obj.get("letter").getAsString() : "";
 
         try {
-            //inserimento jobApplication nel db
-            String insertion = "INSERT INTO APPLICATIONS (USERID, JOBOPENINGID, TOTALSCORE, LETTER) VALUES ('" + userId + "', '" + jobOpeningId + "', '" + totalScore + "', '" + letter + "')"; 
-            
+            // inserimento jobApplication nel db
+            String insertion = "INSERT INTO APPLICATIONS (USERID, JOBOPENINGID, TOTALSCORE, LETTER) VALUES ('" + userId
+                    + "', '" + jobOpeningId + "', '" + totalScore + "', '" + letter + "')";
+
             int rowsInserted = statement.executeUpdate(insertion);
 
             if (rowsInserted == 0) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito.\"}");
                 try {
                     if (statement != null)
                         statement.close();
@@ -183,13 +191,14 @@ public class JobApplicationCreate extends HttpServlet {
                         connection.close();
                 } catch (SQLException e2) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito e errore durante la chiusura delle risorse.\"}");
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
-            } 
-            else if (rowsInserted > 1) {
+            } else if (rowsInserted > 1) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito per motivi sconosciuti.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito per motivi sconosciuti.\"}");
                 try {
                     if (statement != null)
                         statement.close();
@@ -197,13 +206,15 @@ public class JobApplicationCreate extends HttpServlet {
                         connection.close();
                 } catch (SQLException e2) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.write("{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito per motivi sconosciuti e errore durante la chiusura delle risorse.\"}");
+                    out.write(
+                            "{\"success\": false, \"message\": \"Errore: Inserimento della candidatura nel db non riuscito per motivi sconosciuti e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
-            } 
+            }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della candidatura nel db.\"}");
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della candidatura nel db.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -211,12 +222,14 @@ public class JobApplicationCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della candidatura nel db e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento della candidatura nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della candidatura nel db.\"}");
+            out.write(
+                    "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della candidatura nel db.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -224,7 +237,8 @@ public class JobApplicationCreate extends HttpServlet {
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della candidatura nel db e errore durante la chiusura delle risorse.\"}");
+                out.write(
+                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento della candidatura nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
