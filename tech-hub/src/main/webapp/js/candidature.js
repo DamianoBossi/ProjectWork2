@@ -144,7 +144,7 @@ function cardJob(job) {
           
           <div class="d-flex justify-content-between align-items-center mt-auto">
             <div class="small text-muted ${job.ralFrom && job.ralTo ? '' : 'd-none'}">
-                <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo}
+                <i class="bi bi-wallet2"></i> ${job.ralFrom} - ${job.ralTo} €
             </div>
           </div>
 
