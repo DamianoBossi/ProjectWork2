@@ -42,7 +42,7 @@ public class RegionsIndex extends HttpServlet {
                     JDBCConnection.PASSWORD);
 
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM REGIONS");
+            resultSet = statement.executeQuery("SELECT * FROM REGIONS ORDER BY NAME ASC");
 
             // Costruisco il JSON con Gson
             JsonObject jsonResponse = new JsonObject();

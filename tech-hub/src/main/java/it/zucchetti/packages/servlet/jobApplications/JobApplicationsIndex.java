@@ -47,6 +47,12 @@ public class JobApplicationsIndex extends HttpServlet {
 
             String requestedJobOpeningId = request.getParameter("jobOpeningId");
 
+            if (requestedJobOpeningId != null && !requestedJobOpeningId.matches("\\d+")) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write(gson.toJson(errorResponse("Parametro jobOpeningId non valido")));
+                return;
+            }
+
             String query = "SELECT a.*, u.USERID, u.FIRSTNAME, u.LASTNAME, c.NAME as CITYNAME FROM APPLICATIONS a join USERS u on a.USERID = u.USERID join CITIES c on u.CITYID = c.CITYID";
 
             if (requestedJobOpeningId != null) {

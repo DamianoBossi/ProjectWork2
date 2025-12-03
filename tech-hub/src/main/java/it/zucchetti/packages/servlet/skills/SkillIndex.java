@@ -43,7 +43,7 @@ public class SkillIndex extends HttpServlet {
                     JDBCConnection.PASSWORD);
 
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM Skills");
+            resultSet = statement.executeQuery("SELECT * FROM Skills ORDER BY NAME ASC");
 
             // Costruisco il JSON con Gson
             JsonObject jsonResponse = new JsonObject();
