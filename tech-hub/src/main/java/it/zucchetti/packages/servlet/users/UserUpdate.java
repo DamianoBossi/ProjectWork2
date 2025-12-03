@@ -64,11 +64,12 @@ public class UserUpdate extends HttpServlet {
 
             HttpSession currentSession = request.getSession(false);
 
-            //TODO: se non esiste una sessione corrente ritornare apposito errore!
+            // TODO: se non esiste una sessione corrente ritornare apposito errore!
 
             String username = (String) currentSession.getAttribute("username");
 
             // recupero parametri dal JSON della richiesta
+            request.setCharacterEncoding("UTF-8");
             BufferedReader bodyReader = request.getReader();
             StringBuilder sb = new StringBuilder();
             String line = null;
@@ -86,7 +87,7 @@ public class UserUpdate extends HttpServlet {
             String regionId = obj.has("regionId") ? obj.get("regionId").getAsString() : null;
             String cityId = obj.has("cityId") ? obj.get("cityId").getAsString() : null;
             String address = obj.has("address") ? obj.get("address").getAsString() : null;
-            
+
             String[] userNewSkills = null;
             if (obj.has("skills")) {
                 JsonArray skillsArray = obj.getAsJsonArray("skills");
@@ -102,15 +103,15 @@ public class UserUpdate extends HttpServlet {
 
             String updatedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
-            //path del file CV da salvare nel DB
+            // path del file CV da salvare nel DB
             String cvFilePathDB = null; // TODO
 
-            //Recupero stringa Base64 del CV
+            // Recupero stringa Base64 del CV
             String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
 
-            //TODO: validazione dei parametri
+            // TODO: validazione dei parametri
 
-            //Gestione Salvataggio File CV e poi delete del cv precedente
+            // Gestione Salvataggio File CV e poi delete del cv precedente
             if (cvBase64 != null && !cvBase64.isEmpty()) {
                 try {
                     // Se la stringa base64 ha l'header lo rimuovo
@@ -121,40 +122,47 @@ public class UserUpdate extends HttpServlet {
                     byte[] cvBytes = Base64.getDecoder().decode(cvBase64);
 
                     // Controllo che il file sia davvero un PDF
-                    if (cvBytes.length < 4 ||!(cvBytes[0] == '%' && cvBytes[1] == 'P' && cvBytes[2] == 'D' && cvBytes[3] == 'F')) {
+                    if (cvBytes.length < 4
+                            || !(cvBytes[0] == '%' && cvBytes[1] == 'P' && cvBytes[2] == 'D' && cvBytes[3] == 'F')) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         out.write("{\"success\": false, \"message\": \"Il file caricato non è un PDF valido.\"}");
                         return;
                     }
 
-                    //Cartella di destinazione (NEL TOMCAT, non nella cartella del progetto)
+                    // Cartella di destinazione (NEL TOMCAT, non nella cartella del progetto)
                     String uploadPath = getServletContext().getRealPath("") + File.separator + "curriculum";
-                    
-                    //creo la cartella se non esiste
+
+                    // creo la cartella se non esiste
                     File uploadDir = new File(uploadPath);
                     if (!uploadDir.exists()) {
                         uploadDir.mkdirs();
                     }
 
-                    //Generiamo un nome file unico per evitare sovrascritture (in sto caso è email_timestamp.pdf)
-                    //Assumiamo sia un PDF, altrimenti bisognerebbe analizzare i primi byte del file
-                    String fileName = username.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ".pdf";
+                    // Generiamo un nome file unico per evitare sovrascritture (in sto caso è
+                    // email_timestamp.pdf)
+                    // Assumiamo sia un PDF, altrimenti bisognerebbe analizzare i primi byte del
+                    // file
+                    String fileName = username.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis()
+                            + ".pdf";
                     String fullPath = uploadPath + File.separator + fileName;
 
                     try (FileOutputStream fos = new FileOutputStream(fullPath)) {
                         fos.write(cvBytes);
                     }
 
-                    // Questo è il path che salviamo nel DB (relativo alla cartella target del Tomcat)
+                    // Questo è il path che salviamo nel DB (relativo alla cartella target del
+                    // Tomcat)
                     cvFilePathDB = "/tech-hub/curriculum/" + fileName;
 
-                    //Recupero il path del vecchio file dal DB
-                    resultSet0 = statement0.executeQuery("SELECT CVFILEPATH FROM USERS WHERE EMAIL = '" + username + "';");
+                    // Recupero il path del vecchio file dal DB
+                    resultSet0 = statement0
+                            .executeQuery("SELECT CVFILEPATH FROM USERS WHERE EMAIL = '" + username + "';");
                     if (resultSet0.next()) {
                         String oldCvPath = resultSet0.getString("CVFILEPATH");
                         if (oldCvPath != null && !oldCvPath.isEmpty()) {
-                            String fullOldCvPath = getServletContext().getRealPath("") + (oldCvPath.replace("/tech-hub/", "")).replace("/", File.separator);
-                            //out.println(fullOldCvPath);
+                            String fullOldCvPath = getServletContext().getRealPath("")
+                                    + (oldCvPath.replace("/tech-hub/", "")).replace("/", File.separator);
+                            // out.println(fullOldCvPath);
                             File oldCvFile = new File(fullOldCvPath);
                             if (oldCvFile.exists()) {
                                 oldCvFile.delete();
@@ -166,7 +174,7 @@ public class UserUpdate extends HttpServlet {
                     System.err.println("Errore decodifica Base64: " + e.getMessage());
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     out.write("{\"success\": false, \"message\": \"Errore nella decodifica del file CV.\"}");
-                    return; 
+                    return;
                 } catch (IOException e) {
                     System.err.println("Errore scrittura file CV: " + e.getMessage());
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -181,28 +189,32 @@ public class UserUpdate extends HttpServlet {
 
             }
 
-            //TODO: nelle successive query mettere rollback se anche una sola delle query non va a buon fine!!!
+            // TODO: nelle successive query mettere rollback se anche una sola delle query
+            // non va a buon fine!!!
 
             // Eseguo l'aggiornamento dell'utente
-            //TODO: aggiustare query (da problemi in molte casistiche valide)
-            String query = "UPDATE USERS SET FIRSTNAME = '"+firstName+"', LASTNAME = '"+lastName+"', BIRTHDATE = '"+birthDate+"', ADDRESS = '"+address+"', "+
-                    "CITYID = "+cityId+", REGIONID = "+regionId+", COUNTRYID = "+countryId+", UPDATEDAT = '"+updatedAt+"'";
-            
+            // TODO: aggiustare query (da problemi in molte casistiche valide)
+            String query = "UPDATE USERS SET FIRSTNAME = '" + firstName + "', LASTNAME = '" + lastName
+                    + "', BIRTHDATE = '" + birthDate + "', ADDRESS = '" + address + "', " +
+                    "CITYID = " + cityId + ", REGIONID = " + regionId + ", COUNTRYID = " + countryId + ", UPDATEDAT = '"
+                    + updatedAt + "'";
+
             if (cvFilePathDB != null) {
-                query += ", CVFILEPATH = '"+cvFilePathDB+"'";
+                query += ", CVFILEPATH = '" + cvFilePathDB + "'";
             }
 
-            query += " WHERE EMAIL = '"+username+"';";
+            query += " WHERE EMAIL = '" + username + "';";
             statement1.executeUpdate(query);
 
-            resultSet = statement2.executeQuery("SELECT USERID FROM USERS WHERE EMAIL = '"+username+"';");
+            resultSet = statement2.executeQuery("SELECT USERID FROM USERS WHERE EMAIL = '" + username + "';");
             resultSet.next();
             String userId = resultSet.getString("USERID");
 
-            statement3.executeUpdate("DELETE FROM USERSSKILLS WHERE USERID = "+userId+";");
+            statement3.executeUpdate("DELETE FROM USERSSKILLS WHERE USERID = " + userId + ";");
 
             for (int i = 0; i < userNewSkills.length; i++) {
-                statement4.executeUpdate("INSERT INTO USERSSKILLS (USERID, SKILLID) VALUES ("+userId+", "+userNewSkills[i]+");");
+                statement4.executeUpdate(
+                        "INSERT INTO USERSSKILLS (USERID, SKILLID) VALUES (" + userId + ", " + userNewSkills[i] + ");");
             }
 
             // Costruisco il JSON con Gson

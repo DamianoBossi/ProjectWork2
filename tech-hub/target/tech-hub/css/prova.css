@@ -48,6 +48,11 @@
     /* 2. COMPONENTI MODIFICATI: Miglioramenti a Pulsanti e Card */
     /* ------------------------------------------------------------------- */
 
+    footer{
+      background: linear-gradient(90deg, var(--color-primary-end), var(--color-primary-start));
+      color: white;
+    }
+
     /* Hero / Buttons */
     .btn-primary {
       /* Usa le variabili per il gradiente e aggiungi una transizione */
@@ -446,7 +451,6 @@
       margin-top: 3rem;
       padding: 1.5rem 0;
       text-align: center;
-      color: #6c757d;
     }
 
     /*stile buttons delle skill nella checkbox delle skill della creazione nuova pos lavorativa*/
