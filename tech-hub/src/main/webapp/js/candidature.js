@@ -163,10 +163,20 @@ function cardJob(job) {
 function renderJobs(list) {
   const grid = document.getElementById('jobsGrid');
   if (!grid) return;
-  list = list.filter(job => job.isOpen == "1"); // solo aperti
+
+  const today = new Date(); // data corrente
+
+  list = list.filter(job => {
+    const isOpen = job.isOpen == "1"; // solo aperti
+    const closingDate = new Date(job.closingDate); // converte la stringa in Date
+    return isOpen && closingDate >= today; // aperti e non scaduti
+  });
+
   grid.innerHTML = list.map(j => cardJob(j)).join("");
   updateJobsCount();
 }
+
+
 
 // =====================================================
 // FILTRI JOBS

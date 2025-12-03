@@ -954,6 +954,8 @@ async function handleRegisterSubmit(e) {
             await loadUser();
             await loadApplications();
     
+    
+    
         } catch (e) {
             console.error("Errore login:", e);
             alert(e.message);
