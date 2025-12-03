@@ -951,6 +951,9 @@ async function handleRegisterSubmit(e) {
             bootstrap.Modal.getOrCreateInstance(document.getElementById("loginModal")).hide();
     
             hideButtons();
+            await loadUser();
+            await loadApplications();
+    
     
     
         } catch (e) {
