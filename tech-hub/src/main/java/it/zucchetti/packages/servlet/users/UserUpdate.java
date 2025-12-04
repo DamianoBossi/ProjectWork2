@@ -22,15 +22,62 @@ import it.zucchetti.packages.jdbc.JDBCConnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 @WebServlet("/servlet/users/me/update")
 public class UserUpdate extends HttpServlet {
+
+    private static String errorMessage = "";
+    
+    private static boolean registrationValidation(String firstName, String lastName,
+            String birthdate, String address) {
+        errorMessage = "";
+        boolean isValid = true;
+
+        
+        String[] dateParts = birthdate.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+        int day = Integer.parseInt(dateParts[2]);
+
+        if (month < 1 || month > 12 || day < 1 || day > 31) {
+            errorMessage += "Il campo della data di nascita non rappresenta una data valida.  ";
+            isValid = false;
+        } else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            errorMessage += "Il campo della data di nascita non rappresenta una data valida.  ";
+            isValid = false;
+        } else if (month == 2) {
+            boolean isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+            if ((isLeapYear && day > 29) || (!isLeapYear && day > 28)) {
+                errorMessage += "Il campo della data di nascita non rappresenta una data valida.  ";
+                isValid = false;
+            }
+        } 
+        if (!errorMessage.contains("non rappresenta una data valida")) {
+            DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
+            LocalDate birthD = LocalDate.parse(birthdate, fmt);
+            LocalDate today = LocalDate.now();
+            LocalDate eighteenYearsAgo = today.minusYears(18);
+
+            if (birthD.isAfter(today)) {
+                errorMessage += "Il campo della data di nascita non deve essere una data futura. ";
+                isValid = false;
+            }
+            else if (birthD.isAfter(eighteenYearsAgo)) {
+                errorMessage += "Devi essere maggiorenne. ";
+                isValid = false;
+            }
+        }
+
+        return isValid;
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -64,7 +111,11 @@ public class UserUpdate extends HttpServlet {
 
             HttpSession currentSession = request.getSession(false);
 
-            // TODO: se non esiste una sessione corrente ritornare apposito errore!
+            if (currentSession == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write(gson.toJson(errorResponse("utente non autenticato.")));
+                return;
+            }
 
             String username = (String) currentSession.getAttribute("username");
 
@@ -104,12 +155,10 @@ public class UserUpdate extends HttpServlet {
             String updatedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
             // path del file CV da salvare nel DB
-            String cvFilePathDB = null; // TODO
+            String cvFilePathDB = null; 
 
             // Recupero stringa Base64 del CV
             String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
-
-            // TODO: validazione dei parametri
 
             // Gestione Salvataggio File CV e poi delete del cv precedente
             if (cvBase64 != null && !cvBase64.isEmpty()) {
@@ -189,22 +238,61 @@ public class UserUpdate extends HttpServlet {
 
             }
 
-            // TODO: nelle successive query mettere rollback se anche una sola delle query
-            // non va a buon fine!!!
-
-            // Eseguo l'aggiornamento dell'utente
-            // TODO: aggiustare query (da problemi in molte casistiche valide)
-            String query = "UPDATE USERS SET FIRSTNAME = '" + firstName + "', LASTNAME = '" + lastName
-                    + "', BIRTHDATE = '" + birthDate + "', ADDRESS = '" + address + "', " +
-                    "CITYID = " + cityId + ", REGIONID = " + regionId + ", COUNTRYID = " + countryId + ", UPDATEDAT = '"
-                    + updatedAt + "'";
-
-            if (cvFilePathDB != null) {
-                query += ", CVFILEPATH = '" + cvFilePathDB + "'";
+            errorMessage = "";
+            if (!registrationValidation(firstName, lastName, birthDate, address)) {
+                try {
+                    if (statement0 != null)
+                        statement0.close();
+                    if (resultSet0 != null)
+                        resultSet0.close();
+                    if (statement1 != null)
+                        statement1.close();
+                    if (statement2 != null)
+                        statement2.close();
+                    if (statement3 != null)
+                        statement3.close();
+                    if (statement4 != null)
+                        statement4.close();
+                    if (connection != null)
+                        connection.close();
+                } catch (SQLException e2) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.write("{\"success\": false, \"message\": \"" + errorMessage +
+                    "errore durante la chiusura delle risorse.\"}");
+                    return;
+                }
+                
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write(gson.toJson(errorResponse(errorMessage)));
+                return;
             }
 
-            query += " WHERE EMAIL = '" + username + "';";
-            statement1.executeUpdate(query);
+
+            // Eseguo l'aggiornamento dell'utente
+            String query = "UPDATE USERS SET FIRSTNAME = ?, LASTNAME = ?, BIRTHDATE = ?, ADDRESS = ?, " +
+               "CITYID = ?, REGIONID = ?, COUNTRYID = ?, UPDATEDAT = ? " +
+               (cvFilePathDB != null ? ", CVFILEPATH = ? " : "") +
+               "WHERE EMAIL = ?";
+
+            PreparedStatement ps = connection.prepareStatement(query);
+
+            int index = 1;
+            ps.setString(index++, firstName);
+            ps.setString(index++, lastName);
+            ps.setString(index++, birthDate);
+            ps.setString(index++, address);
+            ps.setString(index++, cityId);
+            ps.setString(index++, regionId);
+            ps.setString(index++, countryId);
+            ps.setString(index++, updatedAt);
+
+            if (cvFilePathDB != null) {
+                ps.setString(index++, cvFilePathDB);
+            }
+
+            ps.setString(index++, username);
+
+            ps.executeUpdate();
 
             resultSet = statement2.executeQuery("SELECT USERID FROM USERS WHERE EMAIL = '" + username + "';");
             resultSet.next();
@@ -227,13 +315,13 @@ public class UserUpdate extends HttpServlet {
 
         } catch (ClassNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write(gson.toJson(errorResponse("Errore: driver JDBC non trovato:" + e.getMessage())));
+            out.write(gson.toJson(errorResponse("driver JDBC non trovato:" + e.getMessage())));
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write(gson.toJson(errorResponse("Errore: errore SQL: " + e.getMessage())));
+            out.write(gson.toJson(errorResponse("errore SQL: " + e.getMessage())));
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write(gson.toJson(errorResponse("Errore: errore inaspettato: " + e.getMessage())));
+            out.write(gson.toJson(errorResponse("errore inaspettato: " + e.getMessage())));
         } finally {
             try {
                 if (statement0 != null)
@@ -254,7 +342,7 @@ public class UserUpdate extends HttpServlet {
                     connection.close();
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.write(gson.toJson(errorResponse("Errore: errore durante la chiusura delle risorse.")));
+                out.write(gson.toJson(errorResponse("errore durante la chiusura delle risorse.")));
             }
         }
     }

@@ -8,9 +8,12 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 import javax.servlet.ServletException;
@@ -38,112 +41,54 @@ https://chatgpt.com/share/691b4d12-477c-8012-9e11-933c8b257239 <- discussione ri
 @WebServlet("/servlet/registration")
 public class Registration extends HttpServlet {
 
-    private static String errorMessage = ""; // TODO: fixa! non è thread safe!
-
-    private static boolean emailFormatValidation(String email) {
-        if (email == null /* || !email.matches("^[\\w.-]+@[\\w.-]+(\\.[A-Za-z]{2,})+$") */) {
-            errorMessage += "Email non valida. ";
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean passwordFormatValidation(String password) {
-        if (password == null /* || !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$") */) {
-            errorMessage += "Password non valida. ";
-            return false;
-        }
-        return true;
-    }
-
-    // TODO: riguarda ciò: validazione nome/cognome accettano caratteri non latini?
-    // Il regex include À-ÿ che può andar bene, ma attenzione a caratteri combinati;
-    // potresti preferire \p{L}
-
-    private static boolean firstNameFormatValidation(String firstName) {
-        if (firstName == null /* || !firstName.matches("^[A-Za-zÀ-ÿ -]{2,}$") */) {
-            errorMessage += "Nome non valido. ";
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean lastNameFormatValidation(String lastName) {
-        if (lastName == null /* || !lastName.matches("^[A-Za-zÀ-ÿ' -]{2,}$") */) {
-            errorMessage += "Cognome non valido. ";
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean birthdateFormatValidation(String birthdate) {
-        if (birthdate == null /* || !birthdate.matches("^\\d{4}-\\d{2}-\\d{2}$") */) {
-            // TODO: manca la verifica che sia una data valida, sensata
-            errorMessage += "Data di nascita non valida. ";
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean addressFormatValidation(String address) {
-        /*
-         * if (address == null || !address.
-         * matches("(?i)^(Via|Viale|Vicolo|P\\.za|Piazza|Corso|Largo|L\\.go|Strada|S\\.da)\\s+[\\p{L}0-9 .-']+(?:,)?\\s*\\d+\\p{L}?$"
-         * )) {
-         * errorMessage += "Indirizzo non valido. ";
-         * return false;
-         * }
-         */
-        return true;
-    }
-
-    private static boolean cityIdValidation(int id) {
-        /*
-         * if (id <= 0) {
-         * errorMessage += "Città non valida. ";
-         * return false;
-         * }
-         */
-        return true;
-    }
-
-    private static boolean regionIdValidation(int id) {
-        /*
-         * if (id <= 0) {
-         * errorMessage += "Regione non valida. ";
-         * return false;
-         * }
-         */
-        return true;
-    }
-
-    private static boolean countryIdValidation(int id) {
-        /*
-         * if (id <= 0) {
-         * errorMessage += "Paese non valido. ";
-         * return false;
-         * }
-         */
-        return true;
-    }
-
+    private static String errorMessage = "";
+    
     private static boolean registrationValidation(String email, String password, String firstName, String lastName,
             String birthdate, String address,
             int cityid, int regionid, int countryid) {
         errorMessage = "";
+        boolean isValid = true;
 
-        boolean validEmail = emailFormatValidation(email);
-        boolean validPassword = passwordFormatValidation(password);
-        boolean validFirstName = firstNameFormatValidation(firstName);
-        boolean validLastName = lastNameFormatValidation(lastName);
-        boolean validBirthdate = birthdateFormatValidation(birthdate);
-        boolean validAddress = addressFormatValidation(address);
-        boolean validCityId = cityIdValidation(cityid);
-        boolean validRegionId = regionIdValidation(regionid);
-        boolean validCountryId = countryIdValidation(countryid);
+        if (!email.matches("^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            errorMessage += "Email non valida. ";
+            isValid = false;
+        }
 
-        return validEmail && validPassword && validFirstName && validLastName && validBirthdate && validAddress
-                && validCityId && validRegionId && validCountryId;
+        
+        String[] dateParts = birthdate.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+        int day = Integer.parseInt(dateParts[2]);
+
+        if (month < 1 || month > 12 || day < 1 || day > 31) {
+            errorMessage += "Il campo della data di nascita non rappresenta una data valida.  ";
+            isValid = false;
+        } else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            errorMessage += "Il campo della data di nascita non rappresenta una data valida.  ";
+            isValid = false;
+        } else if (month == 2) {
+            boolean isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+            if ((isLeapYear && day > 29) || (!isLeapYear && day > 28)) {
+                errorMessage += "Il campo della data di nascita non rappresenta una data valida.  ";
+                isValid = false;
+            }
+        } 
+        if (!errorMessage.contains("non rappresenta una data valida")) {
+            DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
+            LocalDate birthD = LocalDate.parse(birthdate, fmt);
+            LocalDate today = LocalDate.now();
+            LocalDate eighteenYearsAgo = today.minusYears(18);
+
+            if (birthD.isAfter(today)) {
+                errorMessage += "Il campo della data di nascita non deve essere una data futura. ";
+                isValid = false;
+            }else if (birthD.isAfter(eighteenYearsAgo)) {
+                errorMessage += "Devi essere maggiorenne per registrarti. ";
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
     @Override
@@ -164,23 +109,23 @@ public class Registration extends HttpServlet {
             statement = connection.createStatement();
         } catch (ClassNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: driver JDBC non trovato.\"}");
+            out.write("{\"success\": false, \"message\": \"driver JDBC non trovato.\"}");
             return;
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB.\"}");
+            out.write("{\"success\": false, \"message\": \"errore SQL nella connessione al DB.\"}");
             try {
                 if (connection != null)
                     connection.close();
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore SQL nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB.\"}");
+            out.write("{\"success\": false, \"message\": \"errore inaspettato nella connessione al DB.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -189,7 +134,7 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore inaspettato nella connessione al DB e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -224,12 +169,11 @@ public class Registration extends HttpServlet {
                 ? obj.get("countryId").getAsInt()
                 : 0;
 
-        // TODO: meglio double
         float latitude = 0f;
         float longitude = 0f;
 
         // path del file CV da salvare nel DB
-        String cvFilePathDB = null; // TODO
+        String cvFilePathDB = null;
 
         // Recupero stringa Base64 del CV
         String cvBase64 = (obj.has("cv") && !obj.get("cv").isJsonNull()) ? obj.get("cv").getAsString() : null;
@@ -289,26 +233,27 @@ public class Registration extends HttpServlet {
             }
         }
 
+        errorMessage = "";
+
         // validazione parametri
-        /*
-         * if (!registrationValidation(email, password, firstName, lastName, birthdate,
-         * address, cityId, regionId, countryId)) {
-         * response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-         * out.write("{\"success\": false, \"message\": \" Errore: " + errorMessage +
-         * "\"}");
-         * try {
-         * if (statement != null)
-         * statement.close();
-         * if (connection != null)
-         * connection.close();
-         * } catch (SQLException e2) {
-         * response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-         * out.write("{\"success\": false, \"message\": \"Errore: " + errorMessage +
-         * "errore durante la chiusura delle risorse.\"}");
-         * }
-         * return;
-         * }
-         */
+        
+        if (!registrationValidation(email, password, firstName, lastName, birthdate,
+                address, cityId, regionId, countryId)) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write("{\"success\": false, \"message\": \"" + errorMessage +
+            "\"}");
+            try {
+                if (statement != null)
+                    statement.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e2) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write("{\"success\": false, \"message\": \"" + errorMessage +
+                "errore durante la chiusura delle risorse.\"}");
+            }
+            return;
+        }
 
         int[] userSkills = null;
         if (obj.has("skills")) {
@@ -336,19 +281,33 @@ public class Registration extends HttpServlet {
             String hashedPassword = PasswordUtils.hashPassword(password);
 
             // inserimento utente nel db
-            String insertion = "INSERT INTO USERS (ROLEID, EMAIL, PASSWORD, FIRSTNAME, LASTNAME, BIRTHDATE, ADDRESS, CITYID, REGIONID, COUNTRYID, LATITUDE,"
-                    + " LONGITUDE, CVFILEPATH, UPDATEDAT) VALUES ('" + roleId + "', '" + email + "', '" + hashedPassword
-                    + "', '" + firstName + "', '" +
-                    lastName + "', '" + birthdate + "', '" + address + "', '" + cityId + "', '" + regionId + "', '"
-                    + countryId + "', '" + latitude + "', '" +
-                    longitude + "', '" + cvFilePathDB + "', '" + updatedAt + "')";
+            String insertion = "INSERT INTO USERS (ROLEID, EMAIL, PASSWORD, FIRSTNAME, LASTNAME, BIRTHDATE, ADDRESS, " +
+                   "CITYID, REGIONID, COUNTRYID, LATITUDE, LONGITUDE, CVFILEPATH, UPDATEDAT) " +
+                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            int rowsInserted = statement.executeUpdate(insertion);
+            PreparedStatement ps = connection.prepareStatement(insertion);
+
+            ps.setInt(1, roleId);
+            ps.setString(2, email);
+            ps.setString(3, hashedPassword);
+            ps.setString(4, firstName);
+            ps.setString(5, lastName);
+            ps.setString(6, birthdate);
+            ps.setString(7, address);
+            ps.setInt(8, cityId);
+            ps.setInt(9, regionId);
+            ps.setInt(10, countryId);
+            ps.setFloat(11, latitude);
+            ps.setFloat(12, longitude);
+            ps.setString(13, cvFilePathDB);
+            ps.setString(14, updatedAt);
+
+            int rowsInserted = ps.executeUpdate();
 
             if (rowsInserted == 0) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: Inserimento dell'utente nel db non riuscito.\"}");
+                        "{\"success\": false, \"message\": \"Inserimento dell'utente nel db non riuscito.\"}");
                 try {
                     if (statement != null)
                         statement.close();
@@ -357,13 +316,13 @@ public class Registration extends HttpServlet {
                 } catch (SQLException e2) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.write(
-                            "{\"success\": false, \"message\": \"Errore: Inserimento dell'utente nel db non riuscito e errore durante la chiusura delle risorse.\"}");
+                            "{\"success\": false, \"message\": \"Inserimento dell'utente nel db non riuscito e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
             } else if (rowsInserted > 1) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: Inserimento dell'utente nel db non riuscito per motivi sconosciuti.\"}");
+                        "{\"success\": false, \"message\": \"Inserimento dell'utente nel db non riuscito per motivi sconosciuti.\"}");
                 try {
                     if (statement != null)
                         statement.close();
@@ -372,13 +331,13 @@ public class Registration extends HttpServlet {
                 } catch (SQLException e2) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.write(
-                            "{\"success\": false, \"message\": \"Errore: Inserimento dell'utente nel db non riuscito per motivi sconosciuti e errore durante la chiusura delle risorse.\"}");
+                            "{\"success\": false, \"message\": \"Inserimento dell'utente nel db non riuscito per motivi sconosciuti e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
             }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento dell'utente nel db.\"}");
+            out.write("{\"success\": false, \"message\": \"Esiste gia un utente con questa email!\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -387,13 +346,13 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento dell'utente nel db e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore SQL nell'inserimento dell'utente nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write(
-                    "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento dell'utente nel db.\"}");
+                    "{\"success\": false, \"message\": \"errore inaspettato nell'inserimento dell'utente nel db.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -402,7 +361,7 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento dell'utente nel db e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore inaspettato nell'inserimento dell'utente nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -420,13 +379,13 @@ public class Registration extends HttpServlet {
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.write(
-                            "{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse dopo aver recuperato correttamente l'ID utente.\"}");
+                            "{\"success\": false, \"message\": \"errore durante la chiusura delle risorse dopo aver recuperato correttamente l'ID utente.\"}");
                     return;
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID utente dopo la registrazione.\"}");
+                        "{\"success\": false, \"message\": \"impossibile recuperare l'ID utente dopo la registrazione.\"}");
                 try {
                     if (resultSet != null)
                         resultSet.close();
@@ -437,13 +396,13 @@ public class Registration extends HttpServlet {
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.write(
-                            "{\"success\": false, \"message\": \"Errore: impossibile recuperare l'ID utente dopo la registrazione e errore durante la chiusura delle risorse.\"}");
+                            "{\"success\": false, \"message\": \"impossibile recuperare l'ID utente dopo la registrazione e errore durante la chiusura delle risorse.\"}");
                 }
                 return;
             }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID utente.\"}");
+            out.write("{\"success\": false, \"message\": \"errore SQL nel recuperare l'ID utente.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -452,12 +411,12 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore SQL nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore SQL nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID utente.\"}");
+            out.write("{\"success\": false, \"message\": \"errore inaspettato nel recuperare l'ID utente.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -466,7 +425,7 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore inaspettato nel recuperare l'ID utente e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -482,7 +441,7 @@ public class Registration extends HttpServlet {
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write(
-                    "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento delle skill dell'utente nel db.\"}");
+                    "{\"success\": false, \"message\": \"errore SQL nell'inserimento delle skill dell'utente nel db.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -491,13 +450,13 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore SQL nell'inserimento delle skill dell'utente nel db e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore SQL nell'inserimento delle skill dell'utente nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write(
-                    "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento delle skill dell'utente nel db.\"}");
+                    "{\"success\": false, \"message\": \"errore inaspettato nell'inserimento delle skill dell'utente nel db.\"}");
             try {
                 if (statement != null)
                     statement.close();
@@ -506,7 +465,7 @@ public class Registration extends HttpServlet {
             } catch (SQLException e2) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.write(
-                        "{\"success\": false, \"message\": \"Errore: errore inaspettato nell'inserimento delle skill dell'utente nel db e errore durante la chiusura delle risorse.\"}");
+                        "{\"success\": false, \"message\": \"errore inaspettato nell'inserimento delle skill dell'utente nel db e errore durante la chiusura delle risorse.\"}");
             }
             return;
         }
@@ -535,7 +494,7 @@ public class Registration extends HttpServlet {
                 connection.close();
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"success\": false, \"message\": \"Errore: errore durante la chiusura delle risorse.\"}");
+            out.write("{\"success\": false, \"message\": \"errore durante la chiusura delle risorse.\"}");
         }
 
         return;

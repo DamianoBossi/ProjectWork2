@@ -452,7 +452,7 @@ async function openCandidateModal(jobId, position) {
     
 
         if (user.cvFilePath && user.cvFilePath.trim() !== "") 
-            candidateCVPath = "http://localhost:8081" + user.cvFilePath;
+            candidateCVPath = "http://localhost:8080" + user.cvFilePath;
 
         // Apro la modale
         const modal = new bootstrap.Modal(document.getElementById('candidateDetailModal'));
@@ -789,7 +789,7 @@ if (document.getElementById("logout-btn")) {
                 method: "POST"
             });
             if (res.ok) {
-                window.location.href = "prova.html";
+                window.location.href = "user.html";
             }
         } catch (e) {
             console.error("Errore logout:", e);
@@ -803,7 +803,7 @@ if (document.getElementById("logout-btn")) {
 document.addEventListener("DOMContentLoaded", async () => {
 
     if (!(await checkAdminLogged())) {
-        window.location.href = "prova.html";
+        window.location.href = "user.html";
         return;
     }
 

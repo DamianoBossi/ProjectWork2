@@ -9,7 +9,7 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="css/prova.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
         <i class="bi bi-person-circle me-2" aria-hidden="true"></i>Il Tuo Profilo
       </h2>
       <div class="btn-container d-flex gap-2">
-        <a href="prova.html" class="btn btn-primary btn-sm btn-icon">
+        <a href="user.html" class="btn btn-primary btn-sm btn-icon">
           <i class="bi bi-house-door me-2"></i>Home
         </a>
         <button id="logout-btn" class="btn btn-danger btn-sm btn-icon d-block">
@@ -37,11 +37,11 @@
       <!-- NOME / COGNOME -->
       <div class="row g-3 mb-3">
         <div class="col-md-6">
-          <label for="profileFirstName" class="form-label">Nome</label>
+          <label for="profileFirstName" class="form-label">Nome*</label>
           <input type="text" class="form-control" id="profileFirstName" required>
         </div>
         <div class="col-md-6">
-          <label for="profileLastName" class="form-label">Cognome</label>
+          <label for="profileLastName" class="form-label">Cognome*</label>
           <input type="text" class="form-control" id="profileLastName" required>
         </div>
       </div>
@@ -53,27 +53,27 @@
           <input type="email" class="form-control" id="profileEmail" required>
         </div>
         <div class="col-md-6">
-          <label for="profileBirthDate" class="form-label">Data di nascita</label>
-          <input type="date" class="form-control" id="profileBirthDate" required>
+          <label for="profileBirthDate" class="form-label">Data di nascita*</label>
+          <input type="date" class="form-control" id="profileBirthDate" min="1900-01-01" required>
         </div>
       </div>
 
       <!-- PAESE / REGIONE / CITTÀ -->
       <div class="row g-3 mb-3">
         <div class="col-md-4">
-          <label for="profileCountry" class="form-label">Paese</label>
+          <label for="profileCountry" class="form-label">Paese*</label>
           <select id="profileCountry" class="form-select" required>
           </select>
         </div>
 
         <div class="col-md-4">
-          <label for="profileRegion" class="form-label">Regione</label>
+          <label for="profileRegion" class="form-label">Regione*</label>
           <select id="profileRegion" class="form-select" required>
           </select>
         </div>
 
         <div class="col-md-4">
-          <label for="profileCity" class="form-label">Città</label>
+          <label for="profileCity" class="form-label">Città*</label>
           <select id="profileCity" class="form-select" required>
           </select>
         </div>
@@ -81,13 +81,13 @@
 
       <!-- INDIRIZZO -->
       <div class="mb-3">
-        <label for="profileAddress" class="form-label">Indirizzo</label>
+        <label for="profileAddress" class="form-label">Indirizzo*</label>
         <input type="text" class="form-control" id="profileAddress" required>
       </div>
 
       <!-- SKILLS -->
       <div class="col-md-12 mb-3">
-          <label for="profileSkills" class="form-label">Le tue skills</label> <!--TODO: deve essere vietato non inserire alcuna skill?-->
+          <label for="profileSkills" class="form-label">Le tue skills</label>
           <div id="skillsContainer" class="skills-box" role="group" aria-labelledby="profileSkills">   
                 <!--<input type="checkbox" class="btn-check" id="profileSkills1" autocomplete="off" name="profileSkills[]" value="1"> 
                 <label class="btn btn-primary" for="profileSkills1">HTML</label>

@@ -36,6 +36,7 @@ public class JobOpeningCreate extends HttpServlet {
             Integer empTypeId, Integer workSchedId, Integer cityId, String closingDate) {
         
         boolean isValid = true;
+        errorMessage = "";
         
         if (title == null || title.isEmpty()) {
             errorMessage += "Il campo del titolo non deve essere vuoto. ";
@@ -98,27 +99,27 @@ public class JobOpeningCreate extends HttpServlet {
             if (month < 1 || month > 12 || day < 1 || day > 31) {
                 errorMessage += "Il campo della data di chiusura non rappresenta una data valida.  ";
                 isValid = false;
-            }
-
-            if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+            } else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
                 errorMessage += "Il campo della data di chiusura non rappresenta una data valida.  ";
                 isValid = false;
-            }
-            if (month == 2) {
+            }else if (month == 2) {
                 boolean isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
                 if ((isLeapYear && day > 29) || (!isLeapYear && day > 28)) {
                     errorMessage += "Il campo della data di chiusura non rappresenta una data valida.  ";
                     isValid = false;
                 }
             }
-            DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
-            LocalDate close = LocalDate.parse(closingDate, fmt);
-            LocalDate today = LocalDate.now();
+            if (!errorMessage.contains("non rappresenta una data valida")) {
+                DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
+                LocalDate close = LocalDate.parse(closingDate, fmt);
+                LocalDate today = LocalDate.now();
 
-            if (close.isBefore(today) || close.isEqual(today)) {
-                errorMessage += "Il campo della data di chiusura non deve essere una data passata o la data odierna.";
-                isValid = false;
+                if (close.isBefore(today) || close.isEqual(today)) {
+                    errorMessage += "Il campo della data di chiusura non deve essere una data passata o la data odierna.";
+                    isValid = false;
+                }
             }
+            
         }
 
 

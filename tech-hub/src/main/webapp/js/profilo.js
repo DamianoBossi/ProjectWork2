@@ -223,7 +223,7 @@ if (document.getElementById("logout-btn")) {
                 method: "POST"
             });
             if (res.ok) {
-                window.location.href = "prova.html";
+                window.location.href = "user.html";
             }
         } catch (e) {
             console.error("Errore logout:", e);
@@ -300,8 +300,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         myCity = newCitySelect.value;
     });
 
-    //TODO: devo fare in modo all'inserimento di un nuovo cv di eliminare il precedente?
-
     var profileAddress = document.getElementById("profileAddress");
     profileAddress.value = myAddress;
 
@@ -372,8 +370,6 @@ save.addEventListener("submit", async function (e) {
         return;
     }
 
-    //TODO: controllo validità delle robe inserite
-
     var payload = {
         firstName: profileFirstName.value.trim(),
         lastName: profileLastName.value.trim(),
@@ -428,7 +424,10 @@ save.addEventListener("submit", async function (e) {
 
         var json = await response.json();
         
-        if (!json.success) throw new Error(json.message || "Salvataggio dati fallito");
+        if (!json.success) {
+            alert(json.message || "Salvataggio dati fallito");
+            throw new Error(json.message || "Salvataggio dati fallito");
+        } 
 
         console.log("success", json.message);
         location.reload();

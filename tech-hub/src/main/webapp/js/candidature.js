@@ -334,7 +334,7 @@ debugger
 document.getElementById('logoutBtn')?.addEventListener('click', async () => {
   try {
     const res = await fetch('servlet/logout', { method: 'POST' });
-    if (res.ok) window.location.href = 'prova.html';
+    if (res.ok) window.location.href = 'user.html';
   } catch (e) {
     console.error("Errore logout:", e);
   }
@@ -362,10 +362,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-/* nomi cambianti perché prova.js--> gestisce le posizioni aperte (job openings). Tutte le variabili, mappe e funzioni sono legate ai job
+/* nomi cambianti perché user.js--> gestisce le posizioni aperte (job openings). Tutte le variabili, mappe e funzioni sono legate ai job
 Nel JS di candidature--> invece gestisci le candidature (le persone che hanno fatto domanda). Quindi devi avere mappe, array e funzioni dedicate:
 
-prova.js
+user.js
 
 allJobs
 jobSkillsMap

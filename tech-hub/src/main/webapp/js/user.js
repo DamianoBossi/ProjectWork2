@@ -826,7 +826,7 @@ if (document.getElementById("logout-btn")) {
                 method: "POST"
             });
             if (res.ok) {
-                window.location.href = "prova.html";
+                window.location.href = "user.html";
             }
         } catch (e) {
             console.error("Errore logout:", e);
@@ -848,9 +848,9 @@ async function handleRegisterSubmit(e) {
     const email = registerEmail.value.trim();
     const password = registerPassword.value.trim();
 
-    const countryId = registerCountry.value || "";
-    const regionId = registerRegion.value || "";
-    const cityId = registerCity.value || "";
+    const countryId = registerCountry.value;
+    const regionId = registerRegion.value;
+    const cityId = registerCity.value;
     const address = registerAddress.value.trim();
 
  
@@ -868,16 +868,14 @@ async function handleRegisterSubmit(e) {
         birthDate: dob,
         email,
         password,
-        countryId: countryId ? parseInt(countryId, 10) : null,
-        regionId: regionId ? parseInt(regionId, 10) : null,
-        cityId: cityId ? parseInt(cityId, 10) : null,
+        countryId: parseInt(countryId, 10),
+        regionId: parseInt(regionId, 10),
+        cityId: parseInt(cityId, 10),
         address,
-        skills: skills
+        skills
     };
 
     try {
-
-
         const cvInput = document.getElementById('registerCv');
         if (cvInput && cvInput.files && cvInput.files.length > 0) {
             const file = cvInput.files[0];
@@ -912,7 +910,10 @@ async function handleRegisterSubmit(e) {
             });
             payload.cv = base64;
         }
-        //TODO: else dare errore?!
+        else {
+            alert("Per procedere devi caricare il tuo CV in formato PDF.");
+            return;
+        }
 
         const res = await fetch('servlet/registration', {
             method: "POST",
@@ -959,6 +960,7 @@ async function handleRegisterSubmit(e) {
         } catch (e) {
             console.error("Errore login:", e);
             alert(e.message);
+            return;
         }
 
 
