@@ -28,16 +28,27 @@ public class JobApplicationShow extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+    
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
         String pathInfo = request.getPathInfo(); // es. "/1"
         String id = (pathInfo != null && pathInfo.length() > 1) ? pathInfo.substring(1) : null;
 
+        if (id == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write(gson.toJson(errorResponse("Parametro ID mancante")));
+            return;
+        }
+        else if (!id.matches("\\d+")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.write(gson.toJson(errorResponse("Parametro ID non valido")));
+            return;
+        }
+
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
-
-        PrintWriter out = response.getWriter();
-        Gson gson = new Gson();
 
         try {
             Class.forName(JDBCConnection.JDBC_DRIVER);

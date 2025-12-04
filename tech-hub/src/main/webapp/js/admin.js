@@ -17,6 +17,9 @@ async function loadSkills() {
     try {
         var res = await fetch(`servlet/skills`);
         var json = await res.json();
+
+        if (!json.success) throw new Error("Errore nel caricamento delle skills");
+
         var skills = json.data || [];
 
         skillsMap.clear();
@@ -63,6 +66,9 @@ async function loadCities() {
     try {
         var res = await fetch(`servlet/cities`);
         var json = await res.json();
+
+        if (!json.success) throw new Error("Errore nel caricamento delle città");
+
         var data = json.data || [];
 
         citiesMap.clear();
@@ -104,6 +110,9 @@ async function loadEmpTypes() {
     try {
         var res = await fetch(`servlet/emptypes`);
         var json = await res.json();
+
+        if (!json.success) throw new Error("Errore nel caricamento dei tipi di contratto");
+
         var data = json.data || [];
 
         empTypesMap.clear();
@@ -141,6 +150,9 @@ async function loadWorkSched() {
     try {
         var res = await fetch(`servlet/workscheds`);
         var json = await res.json();
+
+        if (!json.success) throw new Error("Errore nel caricamento degli orari di lavoro");
+
         var data = json.data || [];
 
         workSchedMap.clear();
@@ -186,6 +198,9 @@ async function loadJobSkills() {
     try {
         const res = await fetch('servlet/jobopeningsskills');
         const json = await res.json();
+
+        if (!json.success) throw new Error("Errore nel caricamento delle skills delle posizioni lavorative");
+
         const list = json.data || [];
 
         jobSkillsMap.clear();
@@ -210,6 +225,9 @@ async function loadJobs() {
     try {
         const res = await fetch('servlet/jobopenings');
         const json = await res.json();
+
+        if (!json.success) throw new Error("Errore nel caricamento delle posizioni lavorative");
+
         allJobs = json.data || [];
 
         // conta posizioni initiali
@@ -258,7 +276,6 @@ function cardJob(job) {
     const skillNames = skillIds
         .map(id => skillsMap.get(id))
         .filter(Boolean);
-    debugger
     return `
         <div class="col-md-6 col-lg-4 job-card"
             data-id="${jobId}"
@@ -383,6 +400,7 @@ async function openCandidateModal(jobId, position) {
     try {
         const res = await fetch(`servlet/jobapplications?jobOpeningId=${jobId}`);
         const json = await res.json();
+        if (!json.success) throw new Error("Errore nel caricamento dei dettagli del candidato");
         let list = json.data || [];
         
         list.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
@@ -457,6 +475,7 @@ async function loadRanking(jobId) {
     try {
         const res = await fetch(`servlet/jobapplications?jobOpeningId=${jobId}`);
         const json = await res.json();
+        if (!json.success) throw new Error("Errore nel caricamento della classifica dei candidati");
 
         const list = json.data || [];
 
@@ -573,7 +592,7 @@ document.getElementById('jobDeleteDetailBtn').addEventListener('click', function
 
 
 function openDeleteModal(jobId) {
-    debugger
+    
     const modalEl = document.getElementById('jobDeleteModal');
     modalEl.setAttribute('data-job-id', jobId);
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
@@ -592,7 +611,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function (
 // CANCELLAZIONE JOB
 // =============================================================
 function deleteJob(jobId) {
-debugger
+
 
     fetch(`servlet/jobopenings/${jobId}`, {
         method: 'DELETE'
@@ -684,18 +703,18 @@ document.getElementById('create-btn').addEventListener('click', function () {
 document.getElementById('createJobOpeningForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    var title = document.getElementById('titlejobOpCreate').value.trim() || null;
-    var description = document.getElementById('descriptionjobOpCreate').value || null;
-    var ralFrom = document.getElementById('ralFromjobOpCreate').value.trim() || null;
-    var ralTo = document.getElementById('ralTojobOpCreate').value.trim() || null;
-    var isOpen = document.getElementById('isOpenjobOpCreate').value === "true";
-    var empTypeId = parseInt(document.getElementById('empTypeIdjobOpCreate').value) || null;
-    var workSchedId = parseInt(document.getElementById('workSchedIdjobOpCreate').value) || null;
-    var cityId = parseInt(document.getElementById('cityIdjobOpCreate').value) || null;
-    var closingDate = String(document.getElementById('closingDatejobOpCreate').value) || null;
+    var title = document.getElementById('titlejobOpCreate').value? document.getElementById('titlejobOpCreate').value.trim() : null;
+    var description = document.getElementById('descriptionjobOpCreate').value? document.getElementById('descriptionjobOpCreate').value.trim() : null;
+    var ralFrom = document.getElementById('ralFromjobOpCreate').value? document.getElementById('ralFromjobOpCreate').value.trim() : null;
+    var ralTo = document.getElementById('ralTojobOpCreate').value? document.getElementById('ralTojobOpCreate').value.trim() : null;
+    var isOpen = document.getElementById('isOpenjobOpCreate').value? document.getElementById('isOpenjobOpCreate').value.trim()=="true" : null;
+    var empTypeId = document.getElementById('empTypeIdjobOpCreate').value? parseInt(document.getElementById('empTypeIdjobOpCreate').value.trim()) : null;
+    var workSchedId = document.getElementById('workSchedIdjobOpCreate').value? parseInt(document.getElementById('workSchedIdjobOpCreate').value.trim()) : null;
+    var cityId = document.getElementById('cityIdjobOpCreate').value? parseInt(document.getElementById('cityIdjobOpCreate').value.trim()) : null;
+    var closingDate = document.getElementById('closingDatejobOpCreate').value? String(document.getElementById('closingDatejobOpCreate').value.trim()) : null;
     
     // PRENDI LE SKILL SELEZIONATE
-    var checkedSkills = document.querySelectorAll('input[name="skillsJobOpCreate[]"]:checked');
+    var checkedSkills = document.querySelectorAll('input[name="skillsJobOpCreate[]"]:checked')? document.querySelectorAll('input[name="skillsJobOpCreate[]"]:checked') : [];
     var skills = [];
 
     for (var i = 0; i < checkedSkills.length; i++) {
@@ -718,7 +737,7 @@ document.getElementById('createJobOpeningForm').addEventListener('submit', async
     try {
         var res = await fetch('servlet/jobopenings/create', {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json; charset=UTF-8" },
             body: JSON.stringify(payload)
         });
 
