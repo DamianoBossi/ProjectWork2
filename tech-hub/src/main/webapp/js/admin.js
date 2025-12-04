@@ -430,8 +430,29 @@ async function openCandidateModal(jobId, position) {
         document.getElementById('candidateDetailBirthDate').textContent = user.birthDate || 'N/D';
         document.getElementById('candidateDetailAddress').textContent = user.address || 'N/D';
 
+        const skillNames = user.skills.map(id => skillsMap.get(id)).filter(Boolean);
+
+        const skillsWrapper = document.getElementById("userSkillsWrapper");
+        const container = document.getElementById("userDetailSkills");
+    
+        container.innerHTML = "";
+    
+        skillNames.forEach(s => {
+            const pill = document.createElement("span");
+            pill.className = "badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2";
+            pill.textContent = s;
+            container.appendChild(pill);
+        });
+    
+        if (skillNames.length === 0) {
+            skillsWrapper.style.display = "none";
+        } else {
+            skillsWrapper.style.display = "block";
+        }
+    
+
         if (user.cvFilePath && user.cvFilePath.trim() !== "") 
-            candidateCVPath = "http://localhost:8080" + user.cvFilePath;
+            candidateCVPath = "http://localhost:8081" + user.cvFilePath;
 
         // Apro la modale
         const modal = new bootstrap.Modal(document.getElementById('candidateDetailModal'));
@@ -618,7 +639,12 @@ function renderJobs(list) {
     const grid = document.getElementById('jobsGrid');
     if (!grid) return;
 
-    grid.innerHTML = list.map(job => cardJob(job)).join("");
+    if (list.length === 0) {
+        grid.innerHTML = '';
+        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0;"><p class="text-muted fs-5">Nessun risultato</p></div>';
+    } else {
+        grid.innerHTML = list.map(job => cardJob(job)).join("");
+    }
     updateJobsCount();
 }
 
