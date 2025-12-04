@@ -119,7 +119,7 @@ function cardJob(job) {
   const applicationId = job.applicationId;
   const skillIds = jobSkillsMap.get(jobId) || [];
   const skillNames = skillIds.map(id => skillsMap.get(id)).filter(Boolean);
-  debugger
+  
   return `
     <div class="col-md-6 col-lg-4 job-card mb-3"
         data-id="${jobId}"
@@ -303,7 +303,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function (
 // CANCELLAZIONE JOB
 // =============================================================
 function deleteApplication(applicationId) {
-debugger
+
 
     fetch(`servlet/jobapplications/${applicationId}`, {
         method: 'DELETE'

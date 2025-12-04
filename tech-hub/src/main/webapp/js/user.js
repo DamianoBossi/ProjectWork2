@@ -629,8 +629,13 @@ function renderJobs(list) {
     const grid = document.getElementById('jobsGrid');
     if (!grid) return;
 
+    const today = new Date();
     // TOLGO ANNUNCI CHIUSI
-    list = list.filter(job => job.isOpen == "1");
+    list = list.filter(job => {
+        const isOpen = job.isOpen == "1"; 
+        const closingDate = new Date(job.closingDate); 
+        return isOpen && closingDate >= today; 
+    });
 
     grid.innerHTML = list.map(job => cardJob(job)).join("");
     updateJobsCount();
@@ -1107,6 +1112,56 @@ const submitBtn = document.getElementById("submitBtn");
 const quizForm = document.getElementById("quizForm");
 const quizResult = document.getElementById("quizResult");
 const errorMsg = document.getElementById("errorMsg");
+const q1a = document.getElementById("q1a");
+const q1b = document.getElementById("q1b");
+const q1c = document.getElementById("q1c");
+const q1d = document.getElementById("q1d");
+const q1 = document.getElementsByTagName("q1");
+const q2a = document.getElementById("q2a");
+const q2b = document.getElementById("q2b");
+const q2c = document.getElementById("q2c");
+const q2d = document.getElementById("q2d");
+const q2 = document.getElementsByTagName("q2");
+const q3a = document.getElementById("q3a");
+const q3b = document.getElementById("q3b");
+const q3c = document.getElementById("q3c");
+const q3d = document.getElementById("q3d");
+const q3 = document.getElementsByTagName("q3");
+const q4a = document.getElementById("q4a");
+const q4b = document.getElementById("q4b");
+const q4c = document.getElementById("q4c");
+const q4d = document.getElementById("q4d");
+const q4 = document.getElementsByTagName("q4");
+const q5a = document.getElementById("q5a");
+const q5b = document.getElementById("q5b");
+const q5c = document.getElementById("q5c");
+const q5d = document.getElementById("q5d");
+const q5 = document.getElementsByTagName("q5");
+const q6a = document.getElementById("q6a");
+const q6b = document.getElementById("q6b");
+const q6c = document.getElementById("q6c");
+const q6d = document.getElementById("q6d");
+const q6 = document.getElementsByTagName("q6");
+const q7a = document.getElementById("q7a");
+const q7b = document.getElementById("q7b");
+const q7c = document.getElementById("q7c");
+const q7d = document.getElementById("q7d");
+const q7 = document.getElementsByTagName("q7");
+const q8a = document.getElementById("q8a");
+const q8b = document.getElementById("q8b");
+const q8c = document.getElementById("q8c");
+const q8d = document.getElementById("q8d");
+const q8 = document.getElementsByTagName("q8");
+const q9a = document.getElementById("q9a");
+const q9b = document.getElementById("q9b");
+const q9c = document.getElementById("q9c");
+const q9d = document.getElementById("q9d");
+const q9 = document.getElementsByTagName("q9");
+const q10a = document.getElementById("q10a");
+const q10b = document.getElementById("q10b");
+const q10c = document.getElementById("q10c");
+const q10d = document.getElementById("q10d");
+const q10 = document.getElementsByTagName("q10");
 let current = 0;
 let quizScore = 0;
 let currentJobIdForQuiz = null;
@@ -1117,6 +1172,8 @@ function showQuestion(index) {
     if (prevBtn) prevBtn.disabled = index === 0;
     if (nextBtn) nextBtn.style.display = index === questions.length - 1 ? "none" : "inline-block";
     if (submitBtn) submitBtn.style.display = index === questions.length - 1 ? "inline-block" : "none";
+    if (submitBtn.style.display === "inline-block") submitBtn.disabled = false;
+    else submitBtn.disabled = true;
     if (errorMsg) errorMsg.textContent = "";
 }
 
@@ -1139,23 +1196,72 @@ if (prevBtn) {
     });
 }
 
-if (quizForm) {
-    quizForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        quizScore = 0;
-        questions.forEach(q => {
-            const selected = q.querySelector("input[type=radio]:checked");
-            if (selected && selected.value === "1") quizScore++;
-        });
-        if (quizResult) {
-            quizResult.textContent = `Hai totalizzato ${quizScore} su ${questions.length}`;
-            quizResult.style.display = "block";
-        }
 
-        // Invia candidatura con quiz score
-        submitQuizAndApplication();
+submitBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    
+    if (q10a.checked == false && q10b.checked == false && q10c.checked == false && q10d.checked == false) {
+        if (errorMsg) errorMsg.textContent = "Seleziona una risposta!";
+        return;
+    }
+
+    quizScore = 0;
+    questions.forEach(q => {
+        const selected = q.querySelector("input[type=radio]:checked");
+        if (selected && selected.value === "1") quizScore++;
     });
-}
+    if (quizResult) {
+        quizResult.textContent = `Hai totalizzato ${quizScore} su ${questions.length}`;
+        quizResult.style.display = "block";
+    }
+    submitBtn.disabled = true;
+
+    // Invia candidatura con quiz score
+    submitQuizAndApplication();
+
+    q1a.checked = false;
+    q1b.checked = false;
+    q1c.checked = false;
+    q1d.checked = false;
+    q2a.checked = false;
+    q2b.checked = false;
+    q2c.checked = false;
+    q2d.checked = false;
+    q3a.checked = false;
+    q3b.checked = false;
+    q3c.checked = false;
+    q3d.checked = false;
+    q4a.checked = false;
+    q4b.checked = false;
+    q4c.checked = false;
+    q4d.checked = false;
+    q5a.checked = false;
+    q5b.checked = false;
+    q5c.checked = false;
+    q5d.checked = false;
+    q6a.checked = false;
+    q6b.checked = false;
+    q6c.checked = false;
+    q6d.checked = false;
+    q7a.checked = false;
+    q7b.checked = false;
+    q7c.checked = false;
+    q7d.checked = false;
+    q8a.checked = false;
+    q8b.checked = false;
+    q8c.checked = false;
+    q8d.checked = false;
+    q9a.checked = false;
+    q9b.checked = false;
+    q9c.checked = false;
+    q9d.checked = false;
+    q10a.checked = false;
+    q10b.checked = false;
+    q10c.checked = false;
+    q10d.checked = false;
+    if (errorMsg) errorMsg.textContent = "";
+});
+
 
 // Initialize first question on page load
 if (questions.length > 0) {
