@@ -241,6 +241,9 @@
     /* 4. SEZIONE POSIZIONI APERTE (jobSection) */
     /* ------------------------------------------------------------------- */
 
+    #jobSection {
+      min-height: 70vh;
+    }
 
     .job-description {
       height: 80px;
