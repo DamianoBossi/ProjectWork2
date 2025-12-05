@@ -1302,7 +1302,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // === EmailJS configuration ===
     // Replace the placeholders below with your actual EmailJS Service ID, Template ID and Public Key
     const EMAILJS_SERVICE_ID = 'service_8b0l85h';
-    const EMAILJS_TEMPLATE_ID = 'template_nfg47xa';
+    const EMAILJS_TEMPLATE_ID = 'template_tjgwqdr';
     const EMAILJS_PUBLIC_KEY = '5QMP3eiIASpGIS_E0';
 
     // Initialize EmailJS if SDK loaded
