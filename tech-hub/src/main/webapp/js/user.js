@@ -1332,6 +1332,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
+            if (emailAddr) {
+                const regex = /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+                if (!regex.test(emailAddr)) {
+                    alert('Inserisci un indirizzo email valido.');
+                    return;
+                }
+            }
+
             // Send email using EmailJS - uses form field names to populate template variables
             try {
                 if (!window.emailjs || typeof emailjs.sendForm !== 'function') {
