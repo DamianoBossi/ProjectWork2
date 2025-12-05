@@ -241,6 +241,9 @@
     /* 4. SEZIONE POSIZIONI APERTE (jobSection) */
     /* ------------------------------------------------------------------- */
 
+    #jobSection {
+      min-height: 70vh;
+    }
 
     .job-description {
       height: 80px;
@@ -653,3 +656,59 @@
 }
 
 
+/* parte quiz*/
+.form-check-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Contenitore della risposta (blocco grande) */
+.form-check {
+  display: flex;
+  align-items: center;
+  padding: 18px 16px;
+  margin: 10px 0;
+  border-radius: 14px;
+  border: 2px solid #e0e0e0;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+/* Testo della risposta */
+.form-check-label {
+  font-size: 1.05rem;
+  width: 100%;
+  user-select: none;
+}
+
+/* Hover (quando passi sopra) */
+.form-check:hover {
+  background: #f0f4ff;
+  border-color: #a7b7ff;
+  transform: translateY(-2px);
+}
+
+/* Quando il radio è selezionato → evidenzia il blocco */
+.form-check-input:checked + .form-check-label {
+  font-weight: 700;
+}
+
+/* Evidenzia TUTTO il blocco se il radio è checked */
+.form-check-input:checked + .form-check-label:hover,
+.form-check-input:checked + .form-check-label {
+  color: #0b3bff;
+}
+
+.form-check-input:checked ~ .form-check {
+  border-color: #4c6fff;
+}
+
+/* Evidenzia blocco selezionato tramite parent */
+.form-check:has(.form-check-input:checked) {
+  background: #e6ecff;
+  border-color: #4c6fff;
+  box-shadow: 0 4px 10px rgba(0, 50, 255, 0.18);
+  transform: translateY(-2px);
+}
