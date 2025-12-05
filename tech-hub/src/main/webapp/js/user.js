@@ -1352,3 +1352,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     updateJobsCount();
 });
+
+/*parte quiz*/
+document.querySelectorAll('.form-check').forEach(box => {
+  box.addEventListener('click', () => {
+    box.querySelector('input').checked = true;
+  });
+});
